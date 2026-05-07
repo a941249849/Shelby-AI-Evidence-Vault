@@ -13,7 +13,7 @@
   "blobs": [
     {
       "id": "blob-001",
-      "shelbyRef": "shelby://testnet/blob/a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+      "shelbyRef": "shelby://demo/blob/a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
       "hash": "sha256:3b4c9e2f1a8d7c6b5e4f3a2b1c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1",
       "source": "https://commoncrawl.s3.amazonaws.com/crawl-data/CC-MAIN-2024-04/warc.paths.gz",
       "tags": ["common-crawl", "warc", "raw"],
@@ -24,7 +24,7 @@
     },
     {
       "id": "blob-002",
-      "shelbyRef": "shelby://testnet/blob/b2c3d4e5f6a7b2c3d4e5f6a7b2c3d4e5",
+      "shelbyRef": "shelby://demo/blob/b2c3d4e5f6a7b2c3d4e5f6a7b2c3d4e5",
       "hash": "sha256:b4e5f0a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9",
       "source": "https://commoncrawl.s3.amazonaws.com/crawl-data/CC-MAIN-2024-04/wet.paths.gz",
       "tags": ["common-crawl", "wet", "text"],

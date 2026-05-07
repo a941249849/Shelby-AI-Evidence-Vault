@@ -21,8 +21,10 @@
  *   These are not consumed in M1 — defined here for M2+ reference.
  *   Aptos signing/transactions are NOT part of M1.
  *
- * Shelby coordination contract on shelbynet:
- *   0xc63d6a5efb0080a6029403131715bd4971e1149f7cc099aac69bb0069b3ddbf5
+ * Shelby coordination contract/account:
+ *   Must be verified against current official Shelby docs and explorer
+ *   at M2 implementation time. Do not hardcode earlier audit values in M1B.
+ *   Explorer: https://explorer.shelby.xyz/shelbynet (verify at M2)
  */
 
 /** Default Shelby network. Shelbynet is the official Shelby testnet network. */

@@ -1,6 +1,8 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the M1 app to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **M1B local demo** to stakeholders or the community.
+
+> **M1B scope:** This is a local mock upload demo. No real Shelby blobs are stored. Real Shelby upload is blocked until M2. Built-in demo data uses illustrative `shelby://demo/blob/` references — these are not real Shelby blob identities.
 
 ## Prerequisites
 
@@ -21,7 +23,7 @@ Open `http://localhost:3000`.
 
 **Point out:**
 - The hero section: "AI agents need verifiable data memory."
-- The **M1 Demo** badge (top of hero): "M1 Demo — Shelby Testnet"
+- The **M1B Demo** badge (top of hero): "M1B Demo — Local mock upload · Real Shelby blocked until M2"
 - The three CTA buttons: Launch Demo, View GitHub, Read Docs
 - Scroll down to the **Problem** section — explain why data provenance matters for AI
 - Scroll to **Solution** — evidence packs, Shelby blob references, read receipts
@@ -52,7 +54,7 @@ Navigate to `/blob/blob-001`.
 
 **Point out:**
 - The full blob metadata table
-- **Shelby Reference** row: `shelby://testnet/blob/a1b2c3d4...` — the content-addressable reference
+- **Demo Reference** row: `shelby://demo/blob/a1b2c3d4...` — an illustrative demo reference, not a real Shelby blob identity. Real Shelby identity uses account namespace + blob name and requires M2 integration.
 - **SHA-256 Hash** row: the content fingerprint
 - **Source** row: the original URL from Common Crawl S3
 - **MIME Type**: `application/warc`
@@ -79,13 +81,13 @@ Explain: "Every time an agent runs, we can produce this receipt. It's a full aud
 
 ---
 
-## Step 5 — Upload page (`/upload`) — **NEW in M1**
+## Step 5 — Upload page (`/upload`) — **NEW in M1B (local demo)**
 
 Navigate to `/upload`.
 
 **Point out:**
-- The **mode indicator** at the top — shows "Mock mode" or "Shelby testnet mode"
-- In mock mode: "Shelby refs are generated deterministically from your file hash"
+- The **mode indicator** at the top — shows "Local demo upload" (mock) or "Real Shelby upload blocked until M2" (testnet)
+- In local demo mode: "Files are hashed in-browser and saved locally. No Shelby network call is made."
 - The working form: title, category, source type, tags, description
 - The **file drop area**: drag & drop or click to browse
 - File size limit: 5 MB per file
@@ -94,14 +96,14 @@ Navigate to `/upload`.
 1. Enter a title: "My Test Evidence Pack"
 2. Select a small local file (e.g. a text file or image)
 3. Watch the **SHA-256** hash appear under the file name as it computes
-4. Click **"Upload to Shelby"**
+4. Click **"Save locally (mock Shelby reference)"**
 5. See the **success screen** with:
    - Pack name
-   - Number of blobs uploaded
-   - Mode (mock)
+   - Number of blobs saved
+   - Mode (local demo)
    - Links to blob detail pages
 
-**Click a blob link** — it opens `/blob/local-blob-...` and shows the full detail with a **"Local (mock)"** badge.
+**Click a blob link** — it opens `/blob/local-blob-...` and shows the full detail with a **"Local demo upload"** badge and a **Mock Reference** row that says `shelby://mock/blob/{id}` — a local demo identifier, not a real Shelby blob.
 
 ---
 
@@ -123,13 +125,13 @@ Navigate back to `/dashboard`.
 
 Open the repo in your editor.
 
-1. **`src/lib/demo-data/`** — TypeScript types and static demo arrays
+1. **`src/lib/demo-data/`** — TypeScript types and static demo arrays (illustrative `shelby://demo/blob/` refs)
 2. **`src/lib/evidence/service.ts`** — service functions (clean, no framework)
 3. **`src/lib/shelby/`** — the dual-mode adapter structure:
-   - `adapter.ts` — interface
-   - `mock-adapter.ts` — deterministic mock
-   - `testnet-adapter.ts` — placeholder with M2 implementation notes
-   - `config.ts` — reads `SHELBY_MODE` env var
+   - `adapter.ts` — interface and types
+   - `mock-adapter.ts` — deterministic local mock (produces `shelby://mock/blob/` refs)
+   - `testnet-adapter.ts` — blocked until M2 (throws canonical error on any upload attempt)
+   - `config.ts` — reads `SHELBY_MODE` env var; two-plane architecture docs
    - `index.ts` — `getAdapter()` factory
 4. **`src/app/actions/upload.ts`** — Server Action (API key stays server-side)
 5. **`src/lib/validation.ts`** — `buildEvidencePack()`, `buildBlobRecord()`, `parseTags()`
@@ -143,9 +145,9 @@ Key message: "When M2 comes with real Shelby SDK access, only `testnet-adapter.t
 ## Talking points
 
 - **Why evidence packs?** Grouping related blobs into packs gives you a unit of provenance — one pack = one dataset or one agent run.
-- **Why Shelby refs?** `shelby://testnet/blob/{id}` is a stable, content-addressable testnet blob reference tied to the SHA-256 hash.
+- **Why Shelby refs?** In M1B, `shelby://mock/blob/{id}` is a local demo identifier derived from the SHA-256 hash. In M2+, real Shelby identity uses account namespace + blob name registered on shelbynet.
 - **Why read receipts?** AI outputs are only as trustworthy as their inputs. Read receipts make the input-output chain inspectable.
-- **Why localStorage?** For M1 demo purposes, localStorage is sufficient — uploads survive refresh, no server needed. M2 can add a real backend.
+- **Why localStorage?** For M1B demo purposes, localStorage is sufficient — uploads survive refresh, no server needed. M2 can add a real backend.
 - **Why mock mode by default?** Zero setup. Any developer can clone, run, and upload in under a minute with no accounts or API keys.
 
 ---
@@ -160,5 +162,4 @@ cp .env.example .env.local
 npm run dev
 ```
 
-> **M1 note:** The real testnet adapter is a placeholder. The upload will show a clear error until the SDK is wired in (M2+). Mock mode continues to work.
-
+> **M1B note:** The real testnet adapter is blocked until M2. Any upload attempt with `SHELBY_MODE=testnet` will show the canonical error: "Real Shelby upload is blocked until M2. Official integration requires commitment generation, on-chain registration, RPC upload, network selection, signer/wallet design, API key handling, and funding." Mock mode continues to work.

@@ -123,8 +123,14 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
         <Row label="Blob ID">
           <code className="font-mono text-sm text-slate-800">{blob.id}</code>
         </Row>
-        <Row label={blob.dataSource === 'local' ? 'Mock Reference' : 'Shelby Reference'}>
+        <Row label={blob.dataSource === 'local' ? 'Mock Reference' : 'Demo Reference'}>
           <code className="font-mono text-sm text-indigo-700 break-all">{blob.shelbyRef}</code>
+          {blob.dataSource !== 'local' && (
+            <p className="text-xs text-slate-400 mt-1">
+              Illustrative demo reference only — not a real Shelby blob identity. Real Shelby
+              identity uses account namespace + blob name and requires M2 integration.
+            </p>
+          )}
           {blob.dataSource === 'local' && (
             <p className="text-xs text-slate-400 mt-1">
               Local demo reference only — not a real Shelby blob identity. Real Shelby identity
