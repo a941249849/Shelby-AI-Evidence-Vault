@@ -24,7 +24,7 @@ export default function RootLayout({
         <footer className="bg-slate-900 border-t border-slate-800 py-6 mt-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-slate-400 text-xs">
-              Shelby AI Evidence Vault — M0 Demo. Not for production use.
+              Shelby AI Evidence Vault — M1 Demo. Not for production use.
             </p>
             <p className="text-slate-500 text-xs">MIT License</p>
           </div>

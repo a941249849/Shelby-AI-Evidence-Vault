@@ -8,6 +8,21 @@ export interface ShelbyUploadPayload {
   hash: string;
   /** File size in bytes */
   size: number;
+  /**
+   * Base64-encoded file content.
+   *
+   * Optional in M1: the mock adapter derives a deterministic ref from `hash`
+   * alone and ignores this field. A real testnet adapter (M2+) must use
+   * `content` to actually upload the file bytes to the Shelby network.
+   *
+   * When present on the client, read the file as ArrayBuffer and convert:
+   *   const b64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+   */
+  content?: string;
+  /** Original file name, used by the testnet adapter as a metadata hint. */
+  fileName?: string;
+  /** MIME type of the uploaded file. */
+  mimeType?: string;
 }
 
 export interface ShelbyUploadResult {

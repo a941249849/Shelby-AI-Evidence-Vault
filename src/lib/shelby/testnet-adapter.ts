@@ -15,8 +15,18 @@
  *      npm install @shelby/sdk   (replace with actual package name)
  * 2. Import the SDK client and initialise it with config.apiKey and
  *    config.testnetRpcUrl.
- * 3. Replace the `upload` body below with the real SDK call:
- *      const result = await client.blobs.upload({ data, metadata });
+ * 3. Replace the `upload` body below with the real SDK call.
+ *    The `data` payload already carries all required fields:
+ *      data.hash     — "sha256:<hex>" content fingerprint
+ *      data.size     — file size in bytes
+ *      data.content  — base64-encoded file bytes (use atob() to decode)
+ *      data.fileName — original file name
+ *      data.mimeType — MIME type
+ *    Example SDK call:
+ *      const fileBytes = Buffer.from(data.content ?? '', 'base64');
+ *      const result = await client.blobs.upload(fileBytes, {
+ *        hash: data.hash, mimeType: data.mimeType, ...metadata
+ *      });
  *      return { shelbyRef: result.ref, hash: result.hash, timestamp: result.createdAt };
  * 4. Update isConnected() to perform a live health-check.
  * 5. Remove this comment block once the real implementation is in place.

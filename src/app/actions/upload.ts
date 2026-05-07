@@ -28,13 +28,27 @@ export type UploadActionResponse = UploadActionResult | UploadActionError;
 export async function shelbyUploadAction(
   hash: string,
   size: number,
-  metadata: Record<string, string>
+  metadata: Record<string, string>,
+  /**
+   * Optional base64-encoded file content.
+   * Ignored by the mock adapter; required by a real testnet adapter (M2+).
+   * Pass `undefined` in mock-only deployments to avoid serialising large payloads.
+   */
+  content?: string
 ): Promise<UploadActionResponse> {
   const config = getShelbyConfig();
   const adapter = getAdapter();
 
+  const payload = {
+    hash,
+    size,
+    content,
+    fileName: metadata.fileName,
+    mimeType: metadata.mimeType,
+  };
+
   try {
-    const result = await adapter.upload({ hash, size }, metadata);
+    const result = await adapter.upload(payload, metadata);
     return { success: true, result, mode: config.mode };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown upload error';

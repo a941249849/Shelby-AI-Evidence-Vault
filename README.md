@@ -26,7 +26,7 @@ Shelby AI Evidence Vault is a public demo showing how AI pipelines can store dat
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript 5 |
 | Styling | Tailwind CSS v4 |
-| Fonts | Geist / Geist Mono (next/font) |
+| Fonts | System fonts (no `next/font` dependency) |
 | Demo data | Static mock data |
 | Upload adapter | Mock (deterministic) / Testnet placeholder |
 | Persistence | Browser localStorage (M1) |
@@ -104,6 +104,21 @@ src/
     │   └── local-store.ts   # Browser localStorage persistence
     └── validation.ts        # parseTags, isValidSHA256, buildEvidencePack, buildBlobRecord
 ```
+
+---
+
+## Validation utilities (`src/lib/validation.ts`)
+
+No test framework is installed. Validation logic lives in `src/lib/validation.ts` and can be imported anywhere, including in Node.js test runners if added later.
+
+| Utility | What it validates / builds |
+|---|---|
+| `parseTags(raw)` | Splits comma-separated tags, trims, lowercases, removes duplicates and empty entries |
+| `isValidSHA256(hash)` | Returns `true` if the string matches `sha256:[0-9a-f]{64}` exactly |
+| `buildEvidencePack(input)` | Constructs a new `EvidencePack` with `crypto.randomUUID()`-based ID; throws if title is empty |
+| `buildBlobRecord(input)` | Constructs a new `BlobRecord`; throws if `hash` fails `isValidSHA256` check |
+
+All four are pure functions with no side-effects. `buildEvidencePack` and `buildBlobRecord` call `crypto.randomUUID()`, which requires Node.js ≥ 19 or any modern browser (Chrome 92+, Firefox 95+, Safari 15.4+). Next.js 16 satisfies this requirement for both server-side and client-side usage.
 
 ---
 

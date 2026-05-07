@@ -46,10 +46,12 @@ function ModeIndicator({ mode }: { mode: 'mock' | 'testnet' | null }) {
   if (mode === null) return null;
   if (mode === 'testnet') {
     return (
-      <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-lg px-4 py-3 mb-8">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+      <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3 mb-8">
+        <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
         <span>
-          <strong>Shelby testnet mode</strong> — uploads will be registered on the testnet.
+          <strong>Shelby testnet mode</strong> — testnet SDK integration is a placeholder in M1.
+          Uploads will fail with a clear error until the SDK is wired in (M2). File content is
+          passed through the adapter interface so M2 can use it without redesigning the pipeline.
         </span>
       </div>
     );
@@ -193,11 +195,34 @@ export default function UploadPage() {
         const hash = entry.hash!;
         const mimeType = entry.file.type || 'application/octet-stream';
 
-        const actionResult = await shelbyUploadAction(hash, entry.file.size, {
-          packId: pack.id,
-          fileName: entry.file.name,
-          mimeType,
-        });
+        // Read file content as base64 so the adapter interface can carry it.
+        // The mock adapter ignores content; a real testnet adapter (M2+) uses it.
+        let content: string | undefined;
+        try {
+          const buffer = await entry.file.arrayBuffer();
+          const bytes = new Uint8Array(buffer);
+          // Chunk the conversion to avoid stack overflows on large files.
+          const chunkSize = 0x8000; // 32 KB
+          let binary = '';
+          for (let i = 0; i < bytes.length; i += chunkSize) {
+            binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+          }
+          content = btoa(binary);
+        } catch {
+          // If reading fails, proceed without content (mock mode is unaffected)
+          content = undefined;
+        }
+
+        const actionResult = await shelbyUploadAction(
+          hash,
+          entry.file.size,
+          {
+            packId: pack.id,
+            fileName: entry.file.name,
+            mimeType,
+          },
+          content
+        );
 
         if (!actionResult.success) {
           throw new Error(actionResult.error);
