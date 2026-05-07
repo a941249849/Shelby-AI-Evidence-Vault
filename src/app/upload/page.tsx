@@ -19,12 +19,14 @@ interface FormState {
   description: string;
 }
 
-interface FileEntry {
+/** Represents a file in the upload queue along with its SHA-256 computation state. */
+interface UploadFileEntry {
   file: File;
   hash: string | null;
   hashStatus: 'pending' | 'computing' | 'done' | 'error';
 }
 
+/** Represents the result state shown after a successful upload. */
 interface UploadedResult {
   packId: string;
   packTitle: string;
@@ -73,7 +75,7 @@ export default function UploadPage() {
     tags: '',
     description: '',
   });
-  const [files, setFiles] = useState<FileEntry[]>([]);
+  const [files, setFiles] = useState<UploadFileEntry[]>([]);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadedResult | null>(null);
@@ -100,7 +102,7 @@ export default function UploadPage() {
         `${oversized.length} file(s) skipped: files must be ≤ ${formatBytes(MAX_FILE_SIZE)}.`
       );
     }
-    const entries: FileEntry[] = valid.map((f) => ({
+    const entries: UploadFileEntry[] = valid.map((f) => ({
       file: f,
       hash: null,
       hashStatus: 'pending',

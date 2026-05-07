@@ -66,7 +66,7 @@ export function buildEvidencePack(input: BuildPackInput): EvidencePack {
   if (!title) throw new Error('Pack title is required.');
 
   return {
-    id: `local-pack-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: `local-pack-${crypto.randomUUID()}`,
     title,
     category: input.category,
     sourceType: input.sourceType,
@@ -100,7 +100,7 @@ export function buildBlobRecord(input: BuildBlobInput): BlobRecord {
   }
 
   return {
-    id: `local-blob-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: `local-blob-${crypto.randomUUID()}`,
     shelbyRef: input.shelbyRef,
     hash: input.hash,
     source: `local://upload/${input.fileName}`,

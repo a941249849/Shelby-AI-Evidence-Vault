@@ -20,8 +20,8 @@ export function getShelbyConfig(): ShelbyConfig {
 
   return {
     mode,
-    testnetRpcUrl: process.env.SHELBY_TESTNET_RPC_URL || undefined,
-    apiKey: process.env.SHELBY_API_KEY || undefined,
-    accountAddress: process.env.SHELBY_ACCOUNT_ADDRESS || undefined,
+    testnetRpcUrl: process.env.SHELBY_TESTNET_RPC_URL,
+    apiKey: process.env.SHELBY_API_KEY,
+    accountAddress: process.env.SHELBY_ACCOUNT_ADDRESS,
   };
 }
