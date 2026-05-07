@@ -105,6 +105,6 @@ Key message: "When M1 comes, only the adapter changes. The service, UI, and type
 ## Talking points
 
 - **Why evidence packs?** Grouping related blobs into packs gives you a unit of provenance — one pack = one dataset or one agent run.
-- **Why Shelby refs?** `shelby://testnet/blob/{id}` is a stable, content-addressable pointer. Even if the file moves, the reference is permanent on testnet.
+- **Why Shelby refs?** `shelby://testnet/blob/{id}` is a stable, content-addressable testnet blob reference. The reference is tied to content hash, making it independently verifiable for the lifetime of the testnet environment.
 - **Why read receipts?** AI outputs are only as trustworthy as their inputs. Read receipts make the input-output chain inspectable.
 - **Why M0 mock data?** The demo is reproducible with zero setup. Any developer can clone and run it in under a minute.
