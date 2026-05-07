@@ -47,7 +47,7 @@ function Field({
 }) {
   return (
     <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-6 border-b border-slate-800/60 last:border-0">
-      <dt className="text-[10px] font-mono font-semibold text-slate-600 uppercase tracking-widest w-36 flex-shrink-0 pt-1">
+      <dt className="text-xs font-mono font-semibold text-slate-600 uppercase tracking-widest w-36 flex-shrink-0 pt-1">
         {label}
       </dt>
       <dd className={`flex-1 ${mono ? 'font-mono' : ''} ${accent ?? 'text-slate-300'} text-sm break-all`}>
@@ -145,7 +145,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
       <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
         {/* Panel header */}
         <div className="flex items-center gap-3 px-5 py-3 border-b border-slate-800 bg-slate-950/60">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">
+          <span className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest">
             Blob record · {isDemo ? 'demo' : 'local upload'}
           </span>
         </div>

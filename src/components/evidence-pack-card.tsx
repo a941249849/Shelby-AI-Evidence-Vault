@@ -50,9 +50,9 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
         )}
 
         <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs border-t border-slate-800 pt-4">
-          <dt className="text-slate-600 font-mono uppercase tracking-wider text-[10px]">Blobs</dt>
+          <dt className="text-slate-600 font-mono uppercase tracking-wider text-xs">Blobs</dt>
           <dd className="text-slate-300 font-medium tabular-nums">{pack.blobCount}</dd>
-          <dt className="text-slate-600 font-mono uppercase tracking-wider text-[10px]">Created</dt>
+          <dt className="text-slate-600 font-mono uppercase tracking-wider text-xs">Created</dt>
           <dd className="text-slate-400">{formatDate(pack.createdAt)}</dd>
         </dl>
       </div>

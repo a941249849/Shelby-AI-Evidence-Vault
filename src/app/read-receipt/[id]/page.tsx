@@ -60,7 +60,7 @@ export default async function ReadReceiptPage({ params }: ReadReceiptPageProps) 
 
       {/* Query */}
       <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 mb-4">
-        <p className="text-[10px] font-mono font-semibold text-slate-500 uppercase tracking-widest mb-3">
+        <p className="text-xs font-mono font-semibold text-slate-500 uppercase tracking-widest mb-3">
           Query
         </p>
         <p className="text-sm text-slate-200 leading-relaxed">{receipt.query}</p>
@@ -68,7 +68,7 @@ export default async function ReadReceiptPage({ params }: ReadReceiptPageProps) 
 
       {/* Answer summary */}
       <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 mb-6">
-        <p className="text-[10px] font-mono font-semibold text-slate-500 uppercase tracking-widest mb-3">
+        <p className="text-xs font-mono font-semibold text-slate-500 uppercase tracking-widest mb-3">
           Answer Summary
         </p>
         <p className="text-sm text-slate-300 leading-relaxed">{receipt.answerSummary}</p>
@@ -77,7 +77,7 @@ export default async function ReadReceiptPage({ params }: ReadReceiptPageProps) 
       {/* Metadata */}
       <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden mb-6">
         <div className="flex items-center gap-3 px-5 py-3 border-b border-slate-800 bg-slate-950/60">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">
+          <span className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest">
             Run metadata
           </span>
         </div>
@@ -136,7 +136,7 @@ export default async function ReadReceiptPage({ params }: ReadReceiptPageProps) 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-6 border-b border-slate-800/60 last:border-0">
-      <dt className="text-[10px] font-mono font-semibold text-slate-600 uppercase tracking-widest w-36 flex-shrink-0 pt-1">
+      <dt className="text-xs font-mono font-semibold text-slate-600 uppercase tracking-widest w-36 flex-shrink-0 pt-1">
         {label}
       </dt>
       <dd className="flex-1">{children}</dd>

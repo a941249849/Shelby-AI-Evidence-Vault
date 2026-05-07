@@ -49,8 +49,8 @@ function ModeIndicator({ mode }: { mode: 'mock' | 'testnet' | null }) {
       <div className="flex items-start gap-3 bg-amber-950/40 border border-amber-800/60 text-amber-300 text-sm rounded-lg px-4 py-3 mb-8">
         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0 mt-1" />
         <span className="text-xs leading-relaxed">
-          <strong className="text-amber-300 font-semibold">Real Shelby upload blocked until M2</strong>
-          {' '}— Official integration requires commitment generation, on-chain registration, RPC
+          <strong className="text-amber-300 font-semibold">Real Shelby upload blocked until M2</strong>{' '}
+          — Official integration requires commitment generation, on-chain registration, RPC
           upload, network selection, signer/wallet design, API key handling, and funding. Uploads
           will fail with a clear error. Set{' '}
           <code className="font-mono text-xs bg-amber-900/40 px-1 rounded">SHELBY_MODE=mock</code>{' '}
@@ -63,8 +63,8 @@ function ModeIndicator({ mode }: { mode: 'mock' | 'testnet' | null }) {
     <div className="flex items-start gap-3 bg-slate-800/60 border border-slate-700 text-slate-300 text-sm rounded-lg px-4 py-3 mb-8">
       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-1" />
       <span className="text-xs leading-relaxed">
-        <strong className="text-slate-200 font-semibold">Local demo upload</strong>
-        {' '}— Files are hashed in-browser and saved to localStorage with a deterministic{' '}
+        <strong className="text-slate-200 font-semibold">Local demo upload</strong>{' '}
+        — Files are hashed in-browser and saved to localStorage with a deterministic{' '}
         <code className="font-mono text-xs text-cyan-400">shelby://mock/blob/{'{id}'}</code>{' '}
         reference. No wallet signing, no network calls, no real Shelby integration in M1B.
       </span>
@@ -311,7 +311,7 @@ export default function UploadPage() {
             </Link>
             <button
               onClick={() => setUploadResult(null)}
-              className="border border-slate-700 text-slate-300 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+              className="border border-slate-700 text-slate-200 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
             >
               Upload Another Pack
             </button>

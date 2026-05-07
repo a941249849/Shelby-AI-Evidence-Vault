@@ -67,7 +67,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             <p className={`text-2xl font-bold font-mono tabular-nums ${stat.accent}`}>
               {stat.value}
             </p>
-            <p className="text-xs text-slate-500 font-mono uppercase tracking-wider mt-1">
+            <p className="text-xs text-slate-400 font-mono uppercase tracking-wider mt-1">
               {stat.label}
             </p>
           </div>
