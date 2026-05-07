@@ -46,31 +46,36 @@ function ModeIndicator({ mode }: { mode: 'mock' | 'testnet' | null }) {
   if (mode === null) return null;
   if (mode === 'testnet') {
     return (
-      <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3 mb-8">
-        <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
-        <span>
-          <strong>Real Shelby upload blocked until M2</strong> — Official integration requires
-          commitment generation, on-chain registration, RPC upload, network selection,
-          signer/wallet design, API key handling, and funding. Uploads will fail with a clear
-          error. Set <code className="font-mono text-xs bg-amber-100 px-1 rounded">SHELBY_MODE=mock</code>{' '}
+      <div className="flex items-start gap-3 bg-amber-950/40 border border-amber-800/60 text-amber-300 text-sm rounded-lg px-4 py-3 mb-8">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0 mt-1" />
+        <span className="text-xs leading-relaxed">
+          <strong className="text-amber-300 font-semibold">Real Shelby upload blocked until M2</strong>
+          {' '}— Official integration requires commitment generation, on-chain registration, RPC
+          upload, network selection, signer/wallet design, API key handling, and funding. Uploads
+          will fail with a clear error. Set{' '}
+          <code className="font-mono text-xs bg-amber-900/40 px-1 rounded">SHELBY_MODE=mock</code>{' '}
           for local demo mode.
         </span>
       </div>
     );
   }
   return (
-    <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-800 text-sm rounded-lg px-4 py-3 mb-8">
-      <span className="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0" />
-      <span>
-        <strong>Local demo upload</strong> — Files are saved to browser localStorage with a
-        deterministic mock Shelby reference. No wallet signing, no network calls, no real Shelby
-        integration in M1B.{' '}
-        <code className="font-mono text-xs bg-indigo-100 px-1 rounded">SHELBY_MODE=testnet</code>{' '}
-        is blocked until M2.
+    <div className="flex items-start gap-3 bg-slate-800/60 border border-slate-700 text-slate-300 text-sm rounded-lg px-4 py-3 mb-8">
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-1" />
+      <span className="text-xs leading-relaxed">
+        <strong className="text-slate-200 font-semibold">Local demo upload</strong>
+        {' '}— Files are hashed in-browser and saved to localStorage with a deterministic{' '}
+        <code className="font-mono text-xs text-cyan-400">shelby://mock/blob/{'{id}'}</code>{' '}
+        reference. No wallet signing, no network calls, no real Shelby integration in M1B.
       </span>
     </div>
   );
 }
+
+// Shared input class
+const inputCls =
+  'w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500';
+const labelCls = 'block text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-1.5';
 
 export default function UploadPage() {
   const [form, setForm] = useState<FormState>({
@@ -268,40 +273,45 @@ export default function UploadPage() {
   if (uploadResult) {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
-        <PageHeader title="Local Demo Upload Complete" subtitle="Evidence pack saved to browser localStorage with a mock Shelby reference." />
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mb-6">
-          <p className="text-emerald-800 font-semibold mb-1">✓ {uploadResult.packTitle}</p>
-          <p className="text-emerald-700 text-sm">
+        <PageHeader
+          title="Upload Complete"
+          subtitle="Evidence pack saved to browser localStorage with a mock Shelby reference."
+        />
+        <div className="bg-emerald-950/40 border border-emerald-800/60 rounded-lg p-5 mb-6">
+          <p className="text-emerald-400 font-mono font-semibold text-sm mb-1">
+            ✓ {uploadResult.packTitle}
+          </p>
+          <p className="text-emerald-300/70 text-xs leading-relaxed">
             {uploadResult.blobIds.length} blob{uploadResult.blobIds.length !== 1 ? 's' : ''}{' '}
             saved locally with a <strong>mock Shelby reference</strong>. No wallet signing or
             network upload in M1B.
           </p>
         </div>
-        <div className="space-y-3">
-          <div>
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
-              Blob detail pages
+        <div className="space-y-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+            <p className="text-[10px] font-mono font-semibold text-slate-500 uppercase tracking-widest mb-3">
+              Blob receipts
             </p>
             {uploadResult.blobIds.map((blobId) => (
               <Link
                 key={blobId}
                 href={`/blob/${blobId}`}
-                className="block text-sm text-indigo-600 hover:text-indigo-800 font-mono mb-1"
+                className="flex items-center gap-2 text-xs text-violet-400 hover:text-violet-300 font-mono mb-1.5 transition-colors"
               >
-                /blob/{blobId}
+                <span className="text-slate-600">/blob/</span>{blobId}
               </Link>
             ))}
           </div>
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             <Link
               href="/dashboard"
-              className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              className="bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
             >
-              View Dashboard
+              Open Evidence Vault
             </Link>
             <button
               onClick={() => setUploadResult(null)}
-              className="border border-slate-300 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+              className="border border-slate-700 text-slate-300 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
             >
               Upload Another Pack
             </button>
@@ -321,16 +331,16 @@ export default function UploadPage() {
       <ModeIndicator mode={mode} />
 
       {uploadError && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm rounded-lg px-4 py-3 mb-6">
+        <div className="bg-red-950/40 border border-red-800/60 text-red-300 text-xs rounded-lg px-4 py-3 mb-6 font-mono">
           {uploadError}
         </div>
       )}
 
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <form className="space-y-5" onSubmit={handleSubmit}>
         {/* Pack title */}
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-1">
-            Pack title <span className="text-red-400">*</span>
+          <label htmlFor="title" className={labelCls}>
+            Pack title <span className="text-red-400 normal-case">*</span>
           </label>
           <input
             id="title"
@@ -339,53 +349,54 @@ export default function UploadPage() {
             value={form.title}
             onChange={handleFormChange}
             placeholder="e.g. Common Crawl Sample — Web Text 2024-Q1"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className={inputCls}
           />
         </div>
 
-        {/* Category */}
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-1">
-            Category
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={form.category}
-            onChange={handleFormChange}
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          >
-            <option value="dataset">Dataset</option>
-            <option value="agent-run">Agent Run</option>
-            <option value="document">Document</option>
-            <option value="manifest">Manifest</option>
-          </select>
-        </div>
+        {/* Category + Source row */}
+        <div className="grid sm:grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="category" className={labelCls}>
+              Category
+            </label>
+            <select
+              id="category"
+              name="category"
+              value={form.category}
+              onChange={handleFormChange}
+              className={inputCls}
+            >
+              <option value="dataset">Dataset</option>
+              <option value="agent-run">Agent Run</option>
+              <option value="document">Document</option>
+              <option value="manifest">Manifest</option>
+            </select>
+          </div>
 
-        {/* Source type */}
-        <div>
-          <label htmlFor="sourceType" className="block text-sm font-medium text-slate-700 mb-1">
-            Source type
-          </label>
-          <select
-            id="sourceType"
-            name="sourceType"
-            value={form.sourceType}
-            onChange={handleFormChange}
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          >
-            <option value="web-scrape">Web Scrape</option>
-            <option value="api-export">API Export</option>
-            <option value="agent-output">Agent Output</option>
-            <option value="manual-upload">Manual Upload</option>
-          </select>
+          <div>
+            <label htmlFor="sourceType" className={labelCls}>
+              Source type
+            </label>
+            <select
+              id="sourceType"
+              name="sourceType"
+              value={form.sourceType}
+              onChange={handleFormChange}
+              className={inputCls}
+            >
+              <option value="web-scrape">Web Scrape</option>
+              <option value="api-export">API Export</option>
+              <option value="agent-output">Agent Output</option>
+              <option value="manual-upload">Manual Upload</option>
+            </select>
+          </div>
         </div>
 
         {/* Tags */}
         <div>
-          <label htmlFor="tags" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="tags" className={labelCls}>
             Tags{' '}
-            <span className="text-slate-400 font-normal text-xs">(comma-separated)</span>
+            <span className="text-slate-600 normal-case font-normal tracking-normal">comma-separated</span>
           </label>
           <input
             id="tags"
@@ -393,14 +404,14 @@ export default function UploadPage() {
             type="text"
             value={form.tags}
             onChange={handleFormChange}
-            placeholder="e.g. nlp, training-data, 2024"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="nlp, training-data, 2024"
+            className={inputCls}
           />
         </div>
 
         {/* Description */}
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="description" className={labelCls}>
             Description
           </label>
           <textarea
@@ -410,23 +421,23 @@ export default function UploadPage() {
             value={form.description}
             onChange={handleFormChange}
             placeholder="Describe the contents, source, and intended use of this evidence pack."
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+            className={`${inputCls} resize-none`}
           />
         </div>
 
         {/* File selector */}
         <div>
-          <p className="block text-sm font-medium text-slate-700 mb-1">
+          <p className={labelCls}>
             Files{' '}
-            <span className="text-slate-400 font-normal text-xs">
-              (max {formatBytes(MAX_FILE_SIZE)} per file)
+            <span className="text-slate-600 normal-case font-normal tracking-normal">
+              max {formatBytes(MAX_FILE_SIZE)} per file
             </span>
           </p>
           <div
             className={`border-2 border-dashed rounded-lg px-6 py-8 text-center transition-colors cursor-pointer ${
               dragging
-                ? 'border-indigo-400 bg-indigo-50'
-                : 'border-slate-300 bg-slate-50 hover:border-slate-400'
+                ? 'border-violet-500 bg-violet-950/20'
+                : 'border-slate-700 bg-slate-800/30 hover:border-slate-600 hover:bg-slate-800/50'
             }`}
             onDragOver={(e) => {
               e.preventDefault();
@@ -436,12 +447,12 @@ export default function UploadPage() {
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <p className="text-slate-500 text-sm">
+            <p className="text-slate-400 text-sm">
               Drag &amp; drop files here, or{' '}
-              <span className="text-indigo-600 font-medium">browse</span>
+              <span className="text-violet-400 font-medium">browse</span>
             </p>
-            <p className="text-slate-400 text-xs mt-1">
-              SHA-256 hash computed in-browser before upload
+            <p className="text-slate-600 text-xs mt-1 font-mono">
+              SHA-256 hashed in-browser · content passed through adapter for M2 compatibility
             </p>
           </div>
           <input
@@ -458,31 +469,31 @@ export default function UploadPage() {
               {files.map((entry, idx) => (
                 <li
                   key={idx}
-                  className="flex items-start gap-3 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                  className="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2.5"
                 >
                   <span className="flex-1 min-w-0">
-                    <span className="font-medium text-slate-900 truncate block">
+                    <span className="font-medium text-slate-200 text-sm truncate block">
                       {entry.file.name}
                     </span>
-                    <span className="text-slate-400 text-xs">{formatBytes(entry.file.size)}</span>
+                    <span className="text-slate-500 text-xs font-mono">{formatBytes(entry.file.size)}</span>
                     {entry.hashStatus === 'computing' && (
-                      <span className="block text-xs text-indigo-500 mt-0.5">
-                        Computing SHA-256…
+                      <span className="block text-xs text-violet-400 font-mono mt-0.5">
+                        computing sha256…
                       </span>
                     )}
                     {entry.hashStatus === 'done' && entry.hash && (
-                      <span className="block text-xs text-slate-400 font-mono mt-0.5 truncate">
-                        {entry.hash.slice(0, 20)}…
+                      <span className="block text-xs text-cyan-400 font-mono mt-0.5 truncate">
+                        {entry.hash.slice(0, 28)}…
                       </span>
                     )}
                     {entry.hashStatus === 'error' && (
-                      <span className="block text-xs text-red-500 mt-0.5">Hash error</span>
+                      <span className="block text-xs text-red-400 font-mono mt-0.5">hash error</span>
                     )}
                   </span>
                   <button
                     type="button"
                     onClick={() => removeFile(idx)}
-                    className="text-slate-300 hover:text-red-400 text-lg leading-none flex-shrink-0"
+                    className="text-slate-600 hover:text-red-400 text-base leading-none flex-shrink-0 mt-0.5 transition-colors"
                     aria-label="Remove file"
                   >
                     ×
@@ -498,13 +509,12 @@ export default function UploadPage() {
           <button
             type="submit"
             disabled={uploading || files.length === 0}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition-colors"
+            className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition-colors"
           >
-            {uploading ? 'Saving…' : 'Save locally (mock Shelby reference)'}
+            {uploading ? 'Saving locally…' : 'Save locally (mock Shelby reference)'}
           </button>
-          <p className="text-center text-xs text-slate-400 mt-2">
-            Local demo upload only. Evidence packs are stored in browser localStorage.{' '}
-            Real Shelby upload (wallet + on-chain + RPC) is blocked until M2.
+          <p className="text-center text-xs text-slate-600 font-mono mt-2">
+            local demo only · localStorage · no wallet · no network · real Shelby blocked until M2
           </p>
         </div>
       </form>
