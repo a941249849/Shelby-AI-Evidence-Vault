@@ -18,15 +18,15 @@ export default function RootLayout({
       lang="en"
       className="h-full antialiased"
     >
-      <body className="min-h-full flex flex-col bg-[#0b0e14] text-slate-200">
+      <body className="min-h-full flex flex-col bg-[#fcfaf8] text-[#161008]">
         <Nav />
         <main className="flex-1">{children}</main>
-        <footer className="bg-slate-950 border-t border-slate-800/60 py-5 mt-auto">
+        <footer className="mt-auto border-t border-[#322312] bg-[#4f192a] py-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-slate-500 text-xs font-mono">
-              shelby-ai-evidence-vault · M1B · local mock upload only · not for production
+            <p className="text-xs text-[#BFC7D8]">
+              Shelby AI Evidence Vault - M1B Demo. Local mock upload only. Not for production use.
             </p>
-            <p className="text-slate-600 text-xs">MIT License</p>
+            <p className="text-xs text-[#6f6258]">MIT License</p>
           </div>
         </footer>
       </body>

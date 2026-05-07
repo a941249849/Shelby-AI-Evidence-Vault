@@ -2,6 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import {
+  ArrowLeft,
+  CalendarClock,
+  Database,
+  FileText,
+  Fingerprint,
+  HardDrive,
+  Hash,
+  Link2,
+  ShieldCheck,
+  Tag,
+} from 'lucide-react';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import { formatBytes, formatDateTime } from '@/lib/utils';
@@ -12,48 +24,56 @@ interface BlobDetailClientProps {
   id: string;
 }
 
-function SourceBadge({ blob }: { blob: BlobRecord }) {
+function DataSourceBadge({ blob }: { blob: BlobRecord }) {
   if (blob.dataSource === 'local') {
     const isTestnet = blob.uploadMode === 'testnet';
     return (
       <span
-        className={`text-xs font-mono font-medium px-2 py-0.5 rounded border ${
+        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
           isTestnet
-            ? 'bg-amber-950/60 text-amber-400 border-amber-800/60'
-            : 'bg-emerald-950/60 text-emerald-400 border-emerald-800/60'
+            ? 'border-[#fd8565]/50 bg-[#ffdcd9] text-[#4f192a]'
+            : 'border-[#de8aff]/25 bg-[#eee2ff] text-[#470b64]'
         }`}
       >
-        {isTestnet ? 'blocked · M2' : 'local upload'}
+        <ShieldCheck className="h-3.5 w-3.5" />
+        {isTestnet ? 'Real Shelby blocked until M2' : 'Local demo upload'}
       </span>
     );
   }
+
   return (
-    <span className="text-xs font-mono font-medium px-2 py-0.5 rounded border bg-slate-800 text-slate-400 border-slate-700">
-      demo data
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#161008]/15 bg-[#fcfaf8] px-3 py-1 text-xs font-semibold text-[#6f6258]">
+      <Database className="h-3.5 w-3.5" />
+      Demo data
     </span>
   );
 }
 
-function Field({
+function Fact({
+  icon: Icon,
   label,
   children,
-  mono = false,
-  accent,
 }: {
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   children: React.ReactNode;
-  mono?: boolean;
-  accent?: string;
 }) {
   return (
-    <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-6 border-b border-slate-800/60 last:border-0">
-      <dt className="text-xs font-mono font-semibold text-slate-600 uppercase tracking-widest w-36 flex-shrink-0 pt-1">
+    <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
+      <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f6258]">
+        <Icon className="h-3.5 w-3.5 text-[#de8aff]" />
         {label}
-      </dt>
-      <dd className={`flex-1 ${mono ? 'font-mono' : ''} ${accent ?? 'text-slate-300'} text-sm break-all`}>
-        {children}
-      </dd>
+      </div>
+      <div className="text-sm leading-6 text-[#161008]">{children}</div>
     </div>
+  );
+}
+
+function MonoBlock({ children }: { children: React.ReactNode }) {
+  return (
+    <code className="block break-all rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-3 py-2 font-mono text-xs text-[#161008]">
+      {children}
+    </code>
   );
 }
 
@@ -62,8 +82,6 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
   const [pack, setPack] = useState<EvidencePack | undefined>(undefined);
 
   useEffect(() => {
-    // Check demo data first (synchronous), then localStorage (browser-only).
-    // Reading localStorage must happen after hydration, hence useEffect.
     const demoBlob = getBlobById(id);
     if (demoBlob) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -71,6 +89,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
       setPack(getEvidencePackById(demoBlob.evidencePackId));
       return;
     }
+
     const localBlob = getLocalBlobById(id);
     if (localBlob) {
       setBlob(localBlob);
@@ -78,6 +97,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
       setPack(localPack ?? getEvidencePackById(localBlob.evidencePackId));
       return;
     }
+
     setBlob(null);
   }, [id]);
 
@@ -87,158 +107,161 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
 
   if (blob === null) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-3xl mb-4 font-mono text-slate-600">404</p>
-        <h1 className="text-lg font-bold text-white mb-2">Blob not found</h1>
-        <p className="text-slate-400 text-sm mb-6">
-          No blob with ID{' '}
-          <code className="font-mono bg-slate-800 px-1.5 py-0.5 rounded text-cyan-400">{id}</code>{' '}
-          exists in demo data or local uploads.
-        </p>
-        <Link
-          href="/dashboard"
-          className="text-violet-400 hover:text-violet-300 font-medium text-sm"
-        >
-          ← Back to Dashboard
-        </Link>
+      <div className="ledger-line min-h-[calc(100vh-4rem)] bg-[#fcfaf8] px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-2xl shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-8 text-center shadow-sm">
+          <div className="mx-auto mb-5 grid h-12 w-12 place-items-center shelby-cut bg-[#4f192a] text-[#9fe878]">
+            <Fingerprint className="h-6 w-6" />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#4f192a]">Blob not found</h1>
+          <p className="mt-3 text-sm leading-6 text-[#6f6258]">
+            No blob with ID <code className="rounded bg-[#fcfaf8] px-1 font-mono">{id}</code>{' '}
+            exists in demo data or local uploads.
+          </p>
+          <Link
+            href="/dashboard"
+            className="mt-6 inline-flex items-center gap-2 shelby-cut bg-[#4f192a] px-4 py-2.5 text-sm font-semibold text-[#fcfaf8] transition hover:bg-[#322312]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to index
+          </Link>
+        </div>
       </div>
     );
   }
 
-  const isDemo = blob.dataSource !== 'local';
-  const refLabel = isDemo ? 'Demo Reference' : 'Mock Reference';
+  const referenceLabel = blob.dataSource === 'local' ? 'Mock Reference' : 'Demo Reference';
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 mb-6 text-xs font-mono text-slate-600">
-        <Link href="/dashboard" className="hover:text-slate-400 transition-colors">
-          vault
-        </Link>
-        {pack && (
-          <>
-            <span>/</span>
+    <div className="ledger-line min-h-[calc(100vh-4rem)] bg-[#fcfaf8] px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8">
+          <div className="mb-5 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#6f6258]">
             <Link
-              href={`/dashboard?pack=${pack.id}`}
-              className="hover:text-slate-400 transition-colors truncate max-w-xs"
+              href="/dashboard"
+              className="inline-flex items-center gap-1 rounded-full border border-[#161008]/15 bg-[#fcfaf8] px-3 py-1 transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
             >
-              {pack.title}
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Dashboard
             </Link>
-          </>
-        )}
-        <span>/</span>
-        <span className="text-slate-500 truncate max-w-xs">{blob.id}</span>
-      </nav>
-
-      {/* Header */}
-      <div className="flex items-start gap-3 mb-6">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-lg font-bold text-white tracking-tight">Blob Receipt</h1>
-            <SourceBadge blob={blob} />
-          </div>
-          <p className="text-xs font-mono text-slate-500">{blob.id}</p>
-        </div>
-      </div>
-
-      {/* Evidence fields */}
-      <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
-        {/* Panel header */}
-        <div className="flex items-center gap-3 px-5 py-3 border-b border-slate-800 bg-slate-950/60">
-          <span className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest">
-            Blob record · {isDemo ? 'demo' : 'local upload'}
-          </span>
-        </div>
-
-        <dl>
-          <Field label="Blob ID" mono accent="text-slate-300">
-            {blob.id}
-          </Field>
-
-          <Field label={refLabel} mono accent={isDemo ? 'text-slate-400' : 'text-violet-400'}>
-            {blob.shelbyRef}
-            <p className="text-xs text-slate-600 mt-1 font-sans">
-              {isDemo
-                ? 'Illustrative demo reference only — not a real Shelby blob identity. Real Shelby identity uses account namespace + blob name (M2+).'
-                : 'Local demo reference only — not a real Shelby blob identity. Real Shelby identity uses account namespace + blob name (M2+).'}
-            </p>
-          </Field>
-
-          <Field label="SHA-256" mono accent="text-cyan-400">
-            {blob.hash}
-          </Field>
-
-          <Field label="Source">
-            {blob.source}
-          </Field>
-
-          <Field label="MIME Type" mono>
-            {blob.mimeType}
-          </Field>
-
-          <Field label="Size">
-            {formatBytes(blob.size)}
-          </Field>
-
-          <Field label="Created">
-            {formatDateTime(blob.createdAt)}
-          </Field>
-
-          <Field label="Evidence Pack">
-            {pack ? (
+            {pack && (
               <Link
                 href={`/dashboard?pack=${pack.id}`}
-                className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
+                className="rounded-full border border-[#161008]/15 bg-[#fcfaf8] px-3 py-1 transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
               >
                 {pack.title}
               </Link>
-            ) : (
-              <span className="text-slate-600">Unknown pack</span>
             )}
-          </Field>
+          </div>
 
-          {blob.tags.length > 0 && (
-            <Field label="Tags">
-              <div className="flex flex-wrap gap-1">
-                {blob.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs text-slate-400 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded font-mono"
-                  >
-                    #{tag}
-                  </span>
-                ))}
+          <div className="grid gap-6 lg:grid-cols-[1fr_340px] lg:items-end">
+            <div>
+              <DataSourceBadge blob={blob} />
+              <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-tight text-[#4f192a]">
+                Blob provenance inspector
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
+                Inspect the local proof surface for one stored evidence object: identity,
+                reference, hash, file metadata, and pack membership.
+              </p>
+            </div>
+            <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+                Blob ID
+              </p>
+              <p className="mt-2 truncate font-mono text-sm font-semibold text-[#161008]">
+                {blob.id}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <section className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-sm">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#4f192a] text-[#9fe878]">
+                <Fingerprint className="h-5 w-5" />
               </div>
-            </Field>
-          )}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+                  Reference boundary
+                </p>
+                <h2 className="text-lg font-semibold text-[#4f192a]">{referenceLabel}</h2>
+              </div>
+            </div>
 
-          {blob.uploadMode && (
-            <Field label="Upload Mode" mono>
-              <span className="text-slate-400">{blob.uploadMode}</span>
-            </Field>
-          )}
+            <MonoBlock>{blob.shelbyRef}</MonoBlock>
+            <p className="mt-3 text-xs leading-5 text-[#6f6258]">
+              {blob.dataSource === 'local'
+                ? 'Local demo reference only. Real Shelby identity uses account namespace plus blob name and requires M2 integration.'
+                : 'Illustrative demo reference only. Real Shelby blob identity is not represented by these M1B sample references.'}
+            </p>
 
-          {blob.network && (
-            <Field label="Network" mono>
-              <span className="text-slate-400">{blob.network}</span>
-            </Field>
-          )}
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <Fact icon={Hash} label="SHA-256 hash">
+                <MonoBlock>{blob.hash}</MonoBlock>
+              </Fact>
+              <Fact icon={FileText} label="Source">
+                <span className="break-all">{blob.source}</span>
+              </Fact>
+            </div>
+          </section>
 
-          {blob.blobName && (
-            <Field label="Blob Name" mono>
-              {blob.blobName}
-            </Field>
-          )}
-        </dl>
-      </div>
+          <aside className="space-y-4">
+            <Fact icon={HardDrive} label="Size">
+              {formatBytes(blob.size)}
+            </Fact>
+            <Fact icon={FileText} label="MIME type">
+              <code className="font-mono text-sm">{blob.mimeType}</code>
+            </Fact>
+            <Fact icon={CalendarClock} label="Created">
+              {formatDateTime(blob.createdAt)}
+            </Fact>
+            <Fact icon={Link2} label="Evidence pack">
+              {pack ? (
+                <Link
+                  href={`/dashboard?pack=${pack.id}`}
+                  className="font-semibold text-[#de8aff] transition hover:text-[#470b64]"
+                >
+                  {pack.title}
+                </Link>
+              ) : (
+                <span className="text-[#6f6258]">Unknown pack</span>
+              )}
+            </Fact>
+          </aside>
+        </div>
 
-      <div className="mt-6">
-        <Link
-          href="/dashboard"
-          className="text-xs text-slate-500 hover:text-slate-300 font-mono transition-colors"
-        >
-          ← back to vault
-        </Link>
+        <section className="mt-6 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-sm">
+          <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+            <Tag className="h-4 w-4 text-[#de8aff]" />
+            Tags and adapter metadata
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {blob.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-2.5 py-1 font-mono text-xs text-[#161008]"
+              >
+                {tag}
+              </span>
+            ))}
+            {blob.uploadMode && (
+              <span className="rounded-md border border-[#de8aff]/25 bg-[#eee2ff] px-2.5 py-1 text-xs font-semibold text-[#470b64]">
+                mode: {blob.uploadMode}
+              </span>
+            )}
+            {blob.network && (
+              <span className="rounded-md border border-[#9fe878]/25 bg-[#dfffcc] px-2.5 py-1 text-xs font-semibold text-[#21351a]">
+                network: {blob.network}
+              </span>
+            )}
+            {blob.blobName && (
+              <span className="rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-2.5 py-1 font-mono text-xs text-[#161008]">
+                blobName: {blob.blobName}
+              </span>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

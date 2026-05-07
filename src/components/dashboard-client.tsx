@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Database, FilePlus2, HardDrive, ShieldCheck } from 'lucide-react';
 import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import EvidencePackCard from '@/components/evidence-pack-card';
-import PageHeader from '@/components/page-header';
 import { getLocalPacks, getLocalBlobsByPackId, resetLocalData } from '@/lib/store/local-store';
 
 interface DashboardClientProps {
@@ -13,12 +13,20 @@ interface DashboardClientProps {
   demoBlobs: BlobRecord[];
 }
 
+function Metric({ label, value, tone }: { label: string; value: string | number; tone: string }) {
+  return (
+    <div className="border-l border-[#161008]/12 px-4 py-2 first:border-l-0">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#6f6258]">{label}</p>
+      <p className={`mt-3 text-4xl font-semibold tracking-tight ${tone}`}>{value}</p>
+    </div>
+  );
+}
+
 export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClientProps) {
   const [localPacks, setLocalPacks] = useState<EvidencePack[]>([]);
   const [resetConfirm, setResetConfirm] = useState(false);
 
   useEffect(() => {
-    // Reading localStorage is browser-only; this must run after hydration.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalPacks(getLocalPacks());
   }, []);
@@ -39,78 +47,98 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
   const activePacks = allPacks.filter((p) => p.status === 'active').length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="flex items-start justify-between gap-4 mb-8">
-        <PageHeader
-          title="Evidence Vault"
-          subtitle="All stored evidence packs. Each pack groups related blobs with metadata and provenance."
-        />
-        <Link
-          href="/upload"
-          className="flex-shrink-0 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-        >
-          + Upload Pack
-        </Link>
-      </div>
-
-      {/* Stats bar */}
-      <div className="grid grid-cols-3 gap-3 mb-8">
-        {[
-          { label: 'Total Packs', value: allPacks.length, accent: 'text-white' },
-          { label: 'Active', value: activePacks, accent: 'text-emerald-400' },
-          { label: 'Total Blobs', value: totalBlobs, accent: 'text-cyan-400' },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-slate-900 border border-slate-800 rounded-lg px-5 py-4"
-          >
-            <p className={`text-2xl font-bold font-mono tabular-nums ${stat.accent}`}>
-              {stat.value}
-            </p>
-            <p className="text-xs text-slate-400 font-mono uppercase tracking-wider mt-1">
-              {stat.label}
+    <main className="relative min-h-[calc(100vh-64px)] overflow-hidden bg-[#fcfaf8] px-4 py-10 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 ledger-line opacity-75" />
+      <div className="absolute right-[-8rem] top-6 h-72 w-72 rotate-[60deg] rounded-[34px] bg-[#ffdfef]" />
+      <div className="absolute bottom-20 left-[-12rem] h-80 w-80 rotate-[60deg] rounded-[34px] bg-[#dfffcc]" />
+      <div className="relative mx-auto max-w-7xl">
+        <div className="mb-9 grid gap-8 lg:grid-cols-[1fr_420px] lg:items-end">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded border border-[#ff77c9]/30 bg-[#ffdfef] px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[#4f192a]">
+              <ShieldCheck size={14} />
+              Evidence index - M1B local mode
+            </div>
+            <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[0.96] tracking-tight text-[#161008] sm:text-6xl">
+              Evidence index for inspectable AI memory.
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
+              Browse demo and locally uploaded evidence packs. Each pack groups blobs, hashes,
+              provenance, and read receipt references.
             </p>
           </div>
-        ))}
-      </div>
-
-      {/* Local uploaded packs */}
-      {localPacks.length > 0 && (
-        <section className="mb-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-mono text-slate-400 uppercase tracking-widest flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              Locally uploaded ({localPacks.length})
-            </h2>
-            <button
-              onClick={handleReset}
-              className="text-xs text-slate-600 hover:text-red-400 font-mono transition-colors"
+          <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-[0_26px_90px_rgba(22,16,8,0.1)] backdrop-blur">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#6f6258]">
+                  Workspace state
+                </p>
+                <p className="mt-2 text-lg font-semibold text-[#161008]">Local proof surface</p>
+              </div>
+              <div className="shelby-hex grid h-12 w-12 place-items-center bg-[#4f192a] text-[#dfffcc]">
+                <HardDrive size={19} />
+              </div>
+            </div>
+            <Link
+              href="/upload"
+              className="shelby-cut-sm inline-flex w-full items-center justify-center gap-2 bg-[#161008] px-4 py-3 text-sm font-semibold text-[#fcfaf8] transition hover:bg-[#4f192a]"
             >
-              {resetConfirm ? '⚠ confirm reset?' : 'reset local data'}
-            </button>
+              <FilePlus2 size={16} />
+              New local pack
+            </Link>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {localPacks.map((pack) => (
+        </div>
+
+        <div className="mb-10 grid gap-5 border-y border-[#161008]/12 bg-[#fcfaf8]/70 py-5 sm:grid-cols-2 lg:grid-cols-4">
+          <Metric label="Packs indexed" value={allPacks.length} tone="text-[#161008]" />
+          <Metric label="Active packs" value={activePacks} tone="text-[#21351a]" />
+          <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#21351a]" />
+          <Metric label="Storage mode" value="Local" tone="text-[#470b64]" />
+        </div>
+
+        {localPacks.length > 0 && (
+          <section className="mb-10">
+            <div className="mb-4 flex items-end justify-between gap-4">
+              <div>
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-[#161008]">
+                  <HardDrive size={18} className="text-[#ff77c9]" />
+                  Local demo uploads
+                </h2>
+                <p className="mt-1 text-sm text-[#6f6258]">
+                  Stored in this browser only. Mock references are not real Shelby blobs.
+                </p>
+              </div>
+              <button
+                onClick={handleReset}
+                className="shelby-cut-sm border border-[#161008]/12 bg-[#fcfaf8] px-3 py-2 text-xs font-semibold text-[#6f6258] transition hover:border-red-300 hover:text-red-600"
+              >
+                {resetConfirm ? 'Click again to reset' : 'Reset local data'}
+              </button>
+            </div>
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {localPacks.map((pack) => (
+                <EvidencePackCard key={pack.id} pack={pack} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section>
+          <div className="mb-4">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#161008]">
+              <Database size={18} className="text-[#de8aff]" />
+              Built-in demo evidence
+            </h2>
+            <p className="mt-1 text-sm text-[#6f6258]">
+              Illustrative evidence packs with demo references for product walkthroughs.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {demoPacks.map((pack) => (
               <EvidencePackCard key={pack.id} pack={pack} />
             ))}
           </div>
         </section>
-      )}
-
-      {/* Built-in demo packs */}
-      <section>
-        {localPacks.length > 0 && (
-          <h2 className="text-xs font-mono text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
-            Built-in demo data ({demoPacks.length})
-          </h2>
-        )}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {demoPacks.map((pack) => (
-            <EvidencePackCard key={pack.id} pack={pack} />
-          ))}
-        </div>
-      </section>
-    </div>
+      </div>
+    </main>
   );
 }
