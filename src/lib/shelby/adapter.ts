@@ -20,8 +20,7 @@ export const mockShelbyAdapter: ShelbyAdapter = {
       shelbyRef: `shelby://testnet/blob/${id}`,
       hash: `sha256:${hashHex}`,
       timestamp: new Date().toISOString(),
-      ...metadata,
-    } as ShelbyUploadResult;
+    };
   },
 
   getBlobRef(id: string): string {

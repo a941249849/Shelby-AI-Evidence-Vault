@@ -10,9 +10,6 @@ export const metadata = {
 export default function DashboardPage() {
   const packs = getEvidencePacks();
   const activePacks = packs.filter((p) => p.status === 'active').length;
-  const totalBlobs = packs.reduce((sum, p) => sum + p.blobCount, 0);
-
-  // Compute actual blob totals from service
   const allBlobs = packs.flatMap((p) => getBlobsByPackId(p.id));
 
   return (
@@ -35,7 +32,7 @@ export default function DashboardPage() {
         {[
           { label: 'Total Packs', value: packs.length },
           { label: 'Active Packs', value: activePacks },
-          { label: 'Total Blobs', value: allBlobs.length || totalBlobs },
+          { label: 'Total Blobs', value: allBlobs.length },
         ].map((stat) => (
           <div
             key={stat.label}
