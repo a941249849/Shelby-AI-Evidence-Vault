@@ -1,25 +1,7 @@
 import Link from 'next/link';
 import { getBlobById, getEvidencePackById } from '@/lib/evidence/service';
+import { formatBytes, formatDateTime } from '@/lib/utils';
 import PageHeader from '@/components/page-header';
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  });
-}
 
 interface BlobPageProps {
   params: Promise<{ id: string }>;
@@ -94,7 +76,7 @@ export default async function BlobPage({ params }: BlobPageProps) {
           <span className="text-sm text-slate-700">{formatBytes(blob.size)}</span>
         </Row>
         <Row label="Created At">
-          <span className="text-sm text-slate-700">{formatDate(blob.createdAt)}</span>
+          <span className="text-sm text-slate-700">{formatDateTime(blob.createdAt)}</span>
         </Row>
         <Row label="Evidence Pack">
           {pack ? (

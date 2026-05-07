@@ -1,17 +1,7 @@
 import Link from 'next/link';
 import { getReadReceiptById, getEvidencePackById } from '@/lib/evidence/service';
+import { formatDateTime } from '@/lib/utils';
 import PageHeader from '@/components/page-header';
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  });
-}
 
 interface ReadReceiptPageProps {
   params: Promise<{ id: string }>;
@@ -78,7 +68,7 @@ export default async function ReadReceiptPage({ params }: ReadReceiptPageProps) 
           <code className="font-mono text-sm text-slate-800">{receipt.runId}</code>
         </Row>
         <Row label="Timestamp">
-          <span className="text-sm text-slate-700">{formatDate(receipt.timestamp)}</span>
+          <span className="text-sm text-slate-700">{formatDateTime(receipt.timestamp)}</span>
         </Row>
         <Row label="Agent Version">
           <code className="font-mono text-sm text-slate-700">{receipt.agentVersion}</code>

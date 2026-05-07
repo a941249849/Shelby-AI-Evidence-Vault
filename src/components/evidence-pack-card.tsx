@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { EvidencePack } from '@/lib/evidence/types';
+import { formatDate } from '@/lib/utils';
 import Badge from './badge';
 import StatusBadge from './status-badge';
 
@@ -16,22 +17,6 @@ const categoryVariantMap: Record<
   document: 'default',
   manifest: 'warning',
 };
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
 
 export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
   return (
@@ -81,5 +66,3 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
     </div>
   );
 }
-
-export { formatBytes, formatDate };
