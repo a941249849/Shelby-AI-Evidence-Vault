@@ -6,41 +6,57 @@ Shelby AI Evidence Vault integrates with Shelby testnet through an adapter patte
 
 ---
 
+## Shelbynet network context
+
+Shelby runs on **shelbynet** — an isolated Aptos-derived network. This is not the public Aptos testnet, and Aptos testnet URLs are incompatible with Shelby.
+
+| Resource | URL |
+|---|---|
+| Shelby RPC (blob storage) | `https://api.shelbynet.shelby.xyz/shelby` |
+| Aptos fullnode (shelbynet) | `https://api.shelbynet.shelby.xyz/v1` |
+| Indexer GraphQL (shelbynet) | `https://api.shelbynet.shelby.xyz/v1/graphql` |
+| Explorer | `https://explorer.shelby.xyz/shelbynet` |
+| Coordination contract | `0xc63d6a5efb0080a6029403131715bd4971e1149f7cc099aac69bb0069b3ddbf5` |
+
+---
+
 ## Two-plane architecture
 
 Shelby integration spans two distinct network planes. These must not be conflated in environment variable naming, documentation, or code:
 
 ### Plane 1 — Shelby storage / RPC plane
 
-Shelby's own blob storage and API layer. Responsible for:
-- Blob upload and retrieval
-- `shelby://testnet/blob/{id}` reference generation
+Shelby's own blob storage and API layer running on shelbynet. Responsible for:
+- Blob upload and retrieval via `SHELBY_RPC_URL`
+- `shelby://shelbynet/blob/{id}` reference generation
 - Storage-side read receipts and provenance
 
 Environment variables:
 ```
-SHELBY_RPC_URL          # Shelby's storage/API RPC endpoint
-SHELBY_API_KEY          # Authentication for Shelby API (server-side only)
-SHELBY_ACCOUNT_ADDRESS  # Your Shelby storage account address
+SHELBY_NETWORK=shelbynet          # Network label for Shelby storage operations
+SHELBY_RPC_URL=                   # https://api.shelbynet.shelby.xyz/shelby
+SHELBY_API_KEY=                   # Authentication (server-side only)
+SHELBY_ACCOUNT_ADDRESS=           # Your Shelby account address
+SHELBY_BLOB_EXPIRATION_MICROS=    # Required for real uploads (e.g. 1800000000 = 30 min)
 ```
 
-### Plane 2 — Aptos testnet coordination plane
+### Plane 2 — Shelbynet / Aptos coordination plane
 
-The Aptos blockchain layer used for on-chain coordination of Shelby state. Responsible for:
-- Reading on-chain Shelby state via Aptos fullnode
-- (Future) coordinating storage proofs or references on-chain
-- Aptos account identity for coordination purposes
+The Aptos-layer network connectivity on shelbynet for on-chain coordination. Responsible for:
+- On-chain blob commitment registration (required before putBlob in M2+)
+- Aptos transaction submission for Shelby coordination events
+- Aptos account identity on shelbynet
 
 Environment variables:
 ```
-APTOS_NETWORK          # Network label (e.g. "testnet")
-APTOS_FULLNODE_URL     # Aptos fullnode REST endpoint (read-only in M1)
-APTOS_INDEXER_URL      # Aptos indexer GraphQL endpoint (optional)
-APTOS_FAUCET_URL       # Testnet faucet for account funding (dev only)
-APTOS_ACCOUNT_ADDRESS  # Your Aptos account address
+APTOS_NETWORK=shelbynet                  # Must be "shelbynet", not "testnet"
+SHELBYNET_APTOS_FULLNODE_URL=            # https://api.shelbynet.shelby.xyz/v1
+SHELBYNET_INDEXER_URL=                   # https://api.shelbynet.shelby.xyz/v1/graphql
+SHELBYNET_FAUCET_URL=                    # Shelbynet faucet for test account funding
+SHELBYNET_ACCOUNT_ADDRESS=               # Your Aptos account address on shelbynet
 ```
 
-> **M1 scope:** Aptos coordination plane variables are defined and documented in M1 but not consumed by any adapter code yet. Aptos transaction signing and on-chain submission are deferred to a future milestone and require a secure server-side or wallet-based signing approach — **not** committed private keys.
+> **M1 scope:** Plane 2 variables are defined and documented in M1 but not consumed by any adapter code yet. Aptos transaction signing and on-chain submission are deferred to a future milestone. When required, signing must be handled server-side or via a secure wallet integration — **never** by committing private keys or seed phrases.
 
 ---
 
@@ -71,7 +87,7 @@ SHELBY_MODE=mock npm run dev
 
 In mock mode:
 - SHA-256 hash is computed in-browser using the Web Crypto API.
-- A `shelby://testnet/blob/{id}` reference is derived deterministically from the first 32 hex characters of the SHA-256 hash.
+- A `shelby://shelbynet/blob/{id}` reference is derived deterministically from the first 32 hex characters of the SHA-256 hash.
 - The same file always produces the same shelby ref.
 - No network calls are made to any external service.
 - Uploaded evidence packs and blobs are stored in browser `localStorage`.
@@ -90,9 +106,14 @@ In mock mode:
 
    ```env
    SHELBY_MODE=testnet
-   SHELBY_RPC_URL=https://rpc.shelby.example.com
+   SHELBY_NETWORK=shelbynet
+   SHELBY_RPC_URL=https://api.shelbynet.shelby.xyz/shelby
    SHELBY_API_KEY=your_api_key_here
    SHELBY_ACCOUNT_ADDRESS=0xYourAddress
+   SHELBY_BLOB_EXPIRATION_MICROS=1800000000
+   APTOS_NETWORK=shelbynet
+   SHELBYNET_APTOS_FULLNODE_URL=https://api.shelbynet.shelby.xyz/v1
+   SHELBYNET_INDEXER_URL=https://api.shelbynet.shelby.xyz/v1/graphql
    ```
 
 3. Start the dev server:
@@ -103,13 +124,13 @@ In mock mode:
 
 The upload page will show a green **"Shelby testnet mode"** indicator.
 
-> **M1 note:** The real testnet adapter (`src/lib/shelby/testnet-adapter.ts`) is a documented placeholder in M1. Setting `SHELBY_MODE=testnet` will return an error on upload because the official Shelby TypeScript SDK was not available at M1 implementation time. See the file for implementation notes on wiring in the real SDK (M2+).
+> **M1 note:** The real testnet adapter (`src/lib/shelby/testnet-adapter.ts`) is a documented placeholder in M1. Setting `SHELBY_MODE=testnet` will return an error on upload. See the file for the full M2+ implementation guide, including the multi-step upload flow and signing/funding prerequisites.
 
 ---
 
 ## What happens if testnet config is missing?
 
-If `SHELBY_MODE=testnet` is set but no `SHELBY_API_KEY` or `SHELBY_RPC_URL` is provided, the testnet adapter will fail at upload time with a clear error message. The upload page will display this error. Mock mode is unaffected.
+If `SHELBY_MODE=testnet` is set but `SHELBY_RPC_URL` or `SHELBY_API_KEY` is not provided, the testnet adapter will fail at upload time with a clear error message. The upload page will display this error. Mock mode is unaffected.
 
 ---
 
@@ -156,7 +177,7 @@ To clear local data, use the **"Reset local demo data"** button on the dashboard
 
 ## Implementing the real testnet adapter (M2+)
 
-See `src/lib/shelby/testnet-adapter.ts` for step-by-step implementation notes. The interface to implement is:
+See `src/lib/shelby/testnet-adapter.ts` for the full implementation guide. The interface to implement is:
 
 ```typescript
 interface ShelbyAdapter {
@@ -167,12 +188,52 @@ interface ShelbyAdapter {
 }
 ```
 
-Once the real SDK is available:
-1. Install the official SDK using the package name confirmed in the Shelby documentation.
-2. Initialise the SDK client using `config.apiKey` and `config.rpcUrl` (Plane 1 — Shelby storage API).
-3. If Aptos coordination is needed, wire `getAptosConfig()` from `config.ts` separately (Plane 2).
-4. Fill in `createTestnetAdapter()` in `testnet-adapter.ts`.
-5. No changes needed in the adapter interface, server action, or UI.
+### Real upload flow
+
+Shelby blob upload is a coordinated multi-step flow, not a single HTTP call:
+
+1. **Generate blob commitments** from the file bytes.
+2. **Register the blob on-chain** via the Aptos coordination layer on shelbynet (requires APT for gas; uses `@aptos-labs/ts-sdk` with `APTOS_NETWORK=shelbynet` and `SHELBYNET_APTOS_FULLNODE_URL`).
+3. **Wait for the Aptos transaction** to be confirmed on shelbynet.
+4. **Call `rpc.putBlob()`** via `SHELBY_RPC_URL`. The Shelby RPC validates the commitment status before accepting the upload (requires ShelbyUSD or SHEL tokens).
+
+The Node SDK (`@shelby-protocol/sdk`) provides a `ShelbyNodeClient.upload()` method that handles all four steps internally.
+
+### SDK packages
+
+```bash
+npm install @shelby-protocol/sdk @aptos-labs/ts-sdk
+# Browser flows:
+npm install @shelby-protocol/react
+```
+
+### Payload fields already available
+
+The `ShelbyUploadPayload` in `adapter.ts` already carries all fields the SDK needs:
+
+| Field | SDK parameter |
+|---|---|
+| `data.content` | `blobData` (decode: `Buffer.from(data.content, 'base64')`) |
+| `data.fileName` | `blobName` |
+| `data.hash` | content fingerprint reference |
+| `data.size` | file size in bytes |
+| `data.mimeType` | MIME type |
+| `config.blobExpirationMicros` | `expirationMicros` (required — set `SHELBY_BLOB_EXPIRATION_MICROS`) |
+
+### Funding prerequisites
+
+Real uploads to shelbynet require:
+- **APT** on shelbynet: for on-chain commitment registration gas fees.
+- **ShelbyUSD or SHEL tokens**: for Shelby storage operations.
+- Use `SHELBYNET_FAUCET_URL` for test account funding during development.
+
+### Signing security (M2+ design decision)
+
+Uploading requires an Aptos account signer on shelbynet. This must be handled:
+- Server-side using a funded account whose private key is stored as an env secret (never in source code).
+- Or via a secure wallet/browser signing integration (e.g. `@shelby-protocol/react` for browser flows).
+
+**Never commit private keys, seed phrases, or mnemonic phrases.** This is a M2+ security design decision outside M1 scope.
 
 ---
 

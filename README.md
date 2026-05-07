@@ -57,26 +57,28 @@ cp .env.example .env.local
 
 Shelby integration spans two distinct planes. See `.env.example` for full comments.
 
-**Plane 1 — Shelby storage / RPC plane**
+**Plane 1 — Shelby storage / RPC plane (shelbynet)**
 
 | Variable | Default | Description |
 |---|---|---|
 | `SHELBY_MODE` | `mock` | Set to `testnet` to use the Shelby testnet adapter |
-| `SHELBY_RPC_URL` | — | Shelby storage/API RPC endpoint (server-side only) |
+| `SHELBY_NETWORK` | `shelbynet` | Shelby network name — use `shelbynet` for Shelby operations |
+| `SHELBY_RPC_URL` | — | Shelby blob API endpoint — `https://api.shelbynet.shelby.xyz/shelby` |
 | `SHELBY_API_KEY` | — | Shelby API key — **server-side only, never commit** |
-| `SHELBY_ACCOUNT_ADDRESS` | — | Your Shelby storage account address |
+| `SHELBY_ACCOUNT_ADDRESS` | — | Your Shelby account address on shelbynet |
+| `SHELBY_BLOB_EXPIRATION_MICROS` | — | Blob expiration (microseconds) required for real uploads (M2+) |
 
-**Plane 2 — Aptos testnet coordination plane** (documented for M2+, not consumed in M1)
+**Plane 2 — Shelbynet / Aptos coordination plane** (documented for M2+, not consumed in M1)
 
 | Variable | Default | Description |
 |---|---|---|
-| `APTOS_NETWORK` | `testnet` | Aptos network label |
-| `APTOS_FULLNODE_URL` | — | Aptos fullnode REST endpoint |
-| `APTOS_INDEXER_URL` | — | Aptos indexer GraphQL endpoint (optional) |
-| `APTOS_FAUCET_URL` | — | Aptos testnet faucet (dev only) |
-| `APTOS_ACCOUNT_ADDRESS` | — | Your Aptos account address |
+| `APTOS_NETWORK` | `shelbynet` | Must be `shelbynet` — not generic Aptos testnet |
+| `SHELBYNET_APTOS_FULLNODE_URL` | — | Shelbynet Aptos fullnode — `https://api.shelbynet.shelby.xyz/v1` |
+| `SHELBYNET_INDEXER_URL` | — | Shelbynet indexer — `https://api.shelbynet.shelby.xyz/v1/graphql` |
+| `SHELBYNET_FAUCET_URL` | — | Shelbynet faucet for test account funding |
+| `SHELBYNET_ACCOUNT_ADDRESS` | — | Your Aptos account address on shelbynet |
 
-> **M1 note:** The real testnet adapter is a documented placeholder. `SHELBY_MODE=testnet` will show an error on upload until the SDK is wired in. Mock mode always works with zero env vars. Aptos signing is not part of M1.
+> **M1 note:** The real testnet adapter is a documented placeholder. `SHELBY_MODE=testnet` will show an error on upload until the SDK is wired in. Mock mode always works with zero env vars. Aptos signing, APT gas funding, and ShelbyUSD/SHEL token requirements are M2+ prerequisites.
 
 ---
 
