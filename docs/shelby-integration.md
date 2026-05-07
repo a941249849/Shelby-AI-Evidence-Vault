@@ -6,6 +6,44 @@ Shelby AI Evidence Vault integrates with Shelby testnet through an adapter patte
 
 ---
 
+## Two-plane architecture
+
+Shelby integration spans two distinct network planes. These must not be conflated in environment variable naming, documentation, or code:
+
+### Plane 1 — Shelby storage / RPC plane
+
+Shelby's own blob storage and API layer. Responsible for:
+- Blob upload and retrieval
+- `shelby://testnet/blob/{id}` reference generation
+- Storage-side read receipts and provenance
+
+Environment variables:
+```
+SHELBY_RPC_URL          # Shelby's storage/API RPC endpoint
+SHELBY_API_KEY          # Authentication for Shelby API (server-side only)
+SHELBY_ACCOUNT_ADDRESS  # Your Shelby storage account address
+```
+
+### Plane 2 — Aptos testnet coordination plane
+
+The Aptos blockchain layer used for on-chain coordination of Shelby state. Responsible for:
+- Reading on-chain Shelby state via Aptos fullnode
+- (Future) coordinating storage proofs or references on-chain
+- Aptos account identity for coordination purposes
+
+Environment variables:
+```
+APTOS_NETWORK          # Network label (e.g. "testnet")
+APTOS_FULLNODE_URL     # Aptos fullnode REST endpoint (read-only in M1)
+APTOS_INDEXER_URL      # Aptos indexer GraphQL endpoint (optional)
+APTOS_FAUCET_URL       # Testnet faucet for account funding (dev only)
+APTOS_ACCOUNT_ADDRESS  # Your Aptos account address
+```
+
+> **M1 scope:** Aptos coordination plane variables are defined and documented in M1 but not consumed by any adapter code yet. Aptos transaction signing and on-chain submission are deferred to a future milestone and require a secure server-side or wallet-based signing approach — **not** committed private keys.
+
+---
+
 ## Architecture
 
 ```
@@ -52,7 +90,7 @@ In mock mode:
 
    ```env
    SHELBY_MODE=testnet
-   SHELBY_TESTNET_RPC_URL=https://testnet.shelby.example.com
+   SHELBY_RPC_URL=https://rpc.shelby.example.com
    SHELBY_API_KEY=your_api_key_here
    SHELBY_ACCOUNT_ADDRESS=0xYourAddress
    ```
@@ -71,7 +109,7 @@ The upload page will show a green **"Shelby testnet mode"** indicator.
 
 ## What happens if testnet config is missing?
 
-If `SHELBY_MODE=testnet` is set but no `SHELBY_API_KEY` or `SHELBY_TESTNET_RPC_URL` is provided, the testnet adapter will fail at upload time with a clear error message. The upload page will display this error. Mock mode is unaffected.
+If `SHELBY_MODE=testnet` is set but no `SHELBY_API_KEY` or `SHELBY_RPC_URL` is provided, the testnet adapter will fail at upload time with a clear error message. The upload page will display this error. Mock mode is unaffected.
 
 ---
 
@@ -130,9 +168,11 @@ interface ShelbyAdapter {
 ```
 
 Once the real SDK is available:
-1. `npm install @shelby/sdk` (use actual package name from official docs)
-2. Fill in `createTestnetAdapter()` in `testnet-adapter.ts`
-3. No changes needed in the adapter interface, server action, or UI
+1. Install the official SDK using the package name confirmed in the Shelby documentation.
+2. Initialise the SDK client using `config.apiKey` and `config.rpcUrl` (Plane 1 — Shelby storage API).
+3. If Aptos coordination is needed, wire `getAptosConfig()` from `config.ts` separately (Plane 2).
+4. Fill in `createTestnetAdapter()` in `testnet-adapter.ts`.
+5. No changes needed in the adapter interface, server action, or UI.
 
 ---
 

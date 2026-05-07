@@ -123,9 +123,16 @@ interface ShelbyAdapter {
 
 **Mock:** `mockShelbyAdapter` — derives `shelby://` ref from content hash; deterministic; no network calls.
 
-**Testnet (M1 placeholder):** `createTestnetAdapter()` — always throws with an actionable error message describing how to implement the real SDK calls (M2+).
+**Testnet (M1 placeholder):** `createTestnetAdapter()` — always throws with an actionable error message until the real SDK is confirmed and wired in (M2+).
 
 `getAdapter()` in `index.ts` reads `process.env.SHELBY_MODE` and returns the appropriate adapter. It must only be called from server-side code.
+
+### Two-plane architecture
+
+Shelby integration involves two distinct network planes. These are kept separate in `config.ts`, `.env.example`, and docs:
+
+- **Plane 1 — Shelby storage/RPC** (`SHELBY_RPC_URL`, `SHELBY_API_KEY`, `SHELBY_ACCOUNT_ADDRESS`): Shelby's own blob storage and API layer. Used by `testnet-adapter.ts` in M2+.
+- **Plane 2 — Aptos coordination** (`APTOS_FULLNODE_URL`, `APTOS_INDEXER_URL`, etc.): The Aptos blockchain layer for on-chain coordination. Defined in `config.ts` via `getAptosConfig()` for reference; not consumed in M1. Aptos signing/transactions are deferred to a future milestone.
 
 ---
 

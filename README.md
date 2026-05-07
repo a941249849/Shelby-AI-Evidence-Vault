@@ -55,14 +55,28 @@ Copy `.env.example` to `.env.local` (never commit `.env.local`):
 cp .env.example .env.local
 ```
 
+Shelby integration spans two distinct planes. See `.env.example` for full comments.
+
+**Plane 1 — Shelby storage / RPC plane**
+
 | Variable | Default | Description |
 |---|---|---|
 | `SHELBY_MODE` | `mock` | Set to `testnet` to use the Shelby testnet adapter |
-| `SHELBY_TESTNET_RPC_URL` | — | Testnet RPC endpoint (testnet mode only) |
-| `SHELBY_API_KEY` | — | API key — **server-side only, never commit** |
-| `SHELBY_ACCOUNT_ADDRESS` | — | Your Shelby testnet account address |
+| `SHELBY_RPC_URL` | — | Shelby storage/API RPC endpoint (server-side only) |
+| `SHELBY_API_KEY` | — | Shelby API key — **server-side only, never commit** |
+| `SHELBY_ACCOUNT_ADDRESS` | — | Your Shelby storage account address |
 
-> **M1 note:** The real testnet adapter is a documented placeholder. `SHELBY_MODE=testnet` will show an error on upload until the SDK is wired in. Mock mode always works.
+**Plane 2 — Aptos testnet coordination plane** (documented for M2+, not consumed in M1)
+
+| Variable | Default | Description |
+|---|---|---|
+| `APTOS_NETWORK` | `testnet` | Aptos network label |
+| `APTOS_FULLNODE_URL` | — | Aptos fullnode REST endpoint |
+| `APTOS_INDEXER_URL` | — | Aptos indexer GraphQL endpoint (optional) |
+| `APTOS_FAUCET_URL` | — | Aptos testnet faucet (dev only) |
+| `APTOS_ACCOUNT_ADDRESS` | — | Your Aptos account address |
+
+> **M1 note:** The real testnet adapter is a documented placeholder. `SHELBY_MODE=testnet` will show an error on upload until the SDK is wired in. Mock mode always works with zero env vars. Aptos signing is not part of M1.
 
 ---
 
