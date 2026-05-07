@@ -1,5 +1,5 @@
 /**
- * Shelby testnet adapter — M1 placeholder.
+ * Shelby testnet adapter — M1B placeholder (blocked until M2).
  *
  * This adapter stub fails fast with a clear error message so that:
  *   1. Mock mode continues to work without any code changes.
@@ -7,7 +7,7 @@
  *      touching any other layer (server action, UI, validation).
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * SHELBYNET NETWORK CONTEXT (M2+ reference)
+ * SHELBYNET NETWORK CONTEXT (M2+ reference — verify against official docs)
  * ─────────────────────────────────────────────────────────────────────────────
  * Shelby runs on "shelbynet" — an isolated Aptos-derived network.
  * Do NOT use generic Aptos testnet URLs; they are incompatible with Shelby.
@@ -16,7 +16,10 @@
  *   Aptos fullnode:        https://api.shelbynet.shelby.xyz/v1
  *   Indexer (GraphQL):     https://api.shelbynet.shelby.xyz/v1/graphql
  *   Explorer:              https://explorer.shelby.xyz/shelbynet
- *   Coordination contract: 0xc63d6a5efb0080a6029403131715bd4971e1149f7cc099aac69bb0069b3ddbf5
+ *
+ * NOTE: Contract address and network details must be verified against the
+ * official Shelby docs at M2 implementation time. Do not treat any address
+ * committed here as confirmed — network/contract details are an M2 blocker.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * REAL UPLOAD FLOW (M2+ implementation guide)
@@ -60,7 +63,7 @@
  *   - ShelbyUSD or SHEL tokens: required for Shelby storage operations.
  *   - Use the shelbynet faucet (SHELBYNET_FAUCET_URL) for test account funding.
  *
- * SIGNING SECURITY (M2+ design decision — NOT part of M1):
+ * SIGNING SECURITY (M2+ design decision — NOT part of M1B):
  *   Real upload requires an Aptos account signer on shelbynet. This must be
  *   handled server-side (e.g. via a funded server account whose private key is
  *   an env secret) or via a secure wallet integration. NEVER commit private
@@ -88,10 +91,10 @@ export function createTestnetAdapter(
       _metadata: Record<string, string>  // eslint-disable-line @typescript-eslint/no-unused-vars
     ): Promise<ShelbyUploadResult> {
       throw new Error(
-        'Shelby testnet adapter is not yet implemented. ' +
-          'Set SHELBY_MODE=mock to use the deterministic mock adapter, ' +
-          'or implement the real SDK calls in src/lib/shelby/testnet-adapter.ts. ' +
-          'See the file header for the shelbynet upload flow and M2+ implementation guide.'
+        'Real Shelby upload is blocked until M2. ' +
+          'Official integration requires commitment generation, on-chain registration, ' +
+          'RPC upload, network selection, signer/wallet design, API key handling, and funding. ' +
+          'Set SHELBY_MODE=mock to use the local demo adapter.'
       );
     },
 

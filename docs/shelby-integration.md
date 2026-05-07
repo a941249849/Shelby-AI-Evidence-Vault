@@ -1,12 +1,36 @@
-# Shelby Integration — M1 Guide
+# Shelby Integration — M1B Guide
 
 ## Overview
 
-Shelby AI Evidence Vault integrates with Shelby testnet through an adapter pattern. All Shelby-specific code lives in `src/lib/shelby/`. The rest of the app calls the adapter through a server action (`src/app/actions/upload.ts`) so API keys are never exposed to the browser.
+Shelby AI Evidence Vault integrates with Shelby through an adapter pattern. All Shelby-specific code lives in `src/lib/shelby/`. The rest of the app calls the adapter through a server action (`src/app/actions/upload.ts`) so API keys are never exposed to the browser.
+
+**M1B is a local demo milestone only.** Real Shelby upload is not implemented. The app stores evidence packs in browser `localStorage` with deterministic mock Shelby references (`shelby://mock/blob/{id}`). No wallet signing, no network calls, no real Shelby blobs in M1B.
 
 ---
 
-## Shelbynet network context
+## M1B scope — what is and is not implemented
+
+| Feature | M1B status |
+|---|---|
+| File select + drag-drop | ✅ Implemented |
+| Browser SHA-256 hash preview | ✅ Implemented |
+| Local EvidencePack creation | ✅ Implemented |
+| Local BlobRecord creation | ✅ Implemented |
+| Deterministic mock ref (`shelby://mock/blob/`) | ✅ Implemented |
+| `localStorage` persistence | ✅ Implemented |
+| Dashboard demo/local separation | ✅ Implemented |
+| Blob detail demo/local resolution | ✅ Implemented |
+| Reset local demo data | ✅ Implemented |
+| Validation helpers | ✅ Implemented |
+| Real Shelby SDK upload | ❌ Blocked until M2 |
+| Wallet signing | ❌ Blocked until M2 |
+| On-chain commitment registration | ❌ Blocked until M2 |
+| Shelbynet network calls | ❌ Blocked until M2 |
+| APT / ShelbyUSD token funding | ❌ Blocked until M2 |
+
+---
+
+## Shelbynet network context (M2+ reference — verify at implementation time)
 
 Shelby runs on **shelbynet** — an isolated Aptos-derived network. This is not the public Aptos testnet, and Aptos testnet URLs are incompatible with Shelby.
 
@@ -16,7 +40,7 @@ Shelby runs on **shelbynet** — an isolated Aptos-derived network. This is not 
 | Aptos fullnode (shelbynet) | `https://api.shelbynet.shelby.xyz/v1` |
 | Indexer GraphQL (shelbynet) | `https://api.shelbynet.shelby.xyz/v1/graphql` |
 | Explorer | `https://explorer.shelby.xyz/shelbynet` |
-| Coordination contract | `0xc63d6a5efb0080a6029403131715bd4971e1149f7cc099aac69bb0069b3ddbf5` |
+| Coordination contract | Verify against official Shelby docs at M2 — do not hardcode unverified values |
 
 ---
 
@@ -28,7 +52,7 @@ Shelby integration spans two distinct network planes. These must not be conflate
 
 Shelby's own blob storage and API layer running on shelbynet. Responsible for:
 - Blob upload and retrieval via `SHELBY_RPC_URL`
-- `shelby://shelbynet/blob/{id}` reference generation
+- `shelby://shelbynet/blob/{id}` reference generation (real uploads, M2+)
 - Storage-side read receipts and provenance
 
 Environment variables:
@@ -56,7 +80,7 @@ SHELBYNET_FAUCET_URL=                    # Shelbynet faucet for test account fun
 SHELBYNET_ACCOUNT_ADDRESS=               # Your Aptos account address on shelbynet
 ```
 
-> **M1 scope:** Plane 2 variables are defined and documented in M1 but not consumed by any adapter code yet. Aptos transaction signing and on-chain submission are deferred to a future milestone. When required, signing must be handled server-side or via a secure wallet integration — **never** by committing private keys or seed phrases.
+> **M1B scope:** All Plane 2 variables are defined and documented in M1B but not consumed by any adapter code yet. Aptos transaction signing and on-chain submission are deferred to M2. When required, signing must be handled server-side or via a secure wallet integration — **never** by committing private keys or seed phrases.
 
 ---
 
@@ -66,8 +90,8 @@ SHELBYNET_ACCOUNT_ADDRESS=               # Your Aptos account address on shelbyn
 src/lib/shelby/
   adapter.ts          # ShelbyAdapter interface + payload/result types
   config.ts           # Reads SHELBY_MODE and related env vars (server-side only)
-  mock-adapter.ts     # Deterministic mock: derives shelby:// ref from content hash
-  testnet-adapter.ts  # Real testnet adapter (M1 placeholder — see implementation notes)
+  mock-adapter.ts     # Deterministic mock: derives shelby://mock/blob/ ref from content hash
+  testnet-adapter.ts  # Real testnet adapter (M1B blocked — see implementation notes)
   index.ts            # getAdapter() factory + re-exports
 ```
 
@@ -87,14 +111,21 @@ SHELBY_MODE=mock npm run dev
 
 In mock mode:
 - SHA-256 hash is computed in-browser using the Web Crypto API.
-- A `shelby://shelbynet/blob/{id}` reference is derived deterministically from the first 32 hex characters of the SHA-256 hash.
-- The same file always produces the same shelby ref.
+- A `shelby://mock/blob/{id}` reference is derived deterministically from the first 32 hex characters of the SHA-256 hash.
+- The same file always produces the same mock ref.
 - No network calls are made to any external service.
 - Uploaded evidence packs and blobs are stored in browser `localStorage`.
+- Mock refs are clearly labeled as demo/local in the UI — not real Shelby blob identities.
 
 ---
 
-## Configuring Shelby testnet mode
+## Configuring Shelby testnet mode (blocked until M2)
+
+Setting `SHELBY_MODE=testnet` will cause uploads to fail with a clear blocked message. This is intentional — the real adapter is a documented placeholder until M2.
+
+> **M1B:** The real testnet adapter (`src/lib/shelby/testnet-adapter.ts`) is blocked until M2. See the file for the full M2+ implementation guide, including the multi-step upload flow and signing/funding prerequisites.
+
+If you want to prepare the environment for future M2 testing:
 
 1. Copy `.env.example` to `.env.local` (never commit `.env.local`):
 
@@ -102,7 +133,7 @@ In mock mode:
    cp .env.example .env.local
    ```
 
-2. Edit `.env.local`:
+2. Edit `.env.local` (values for reference only — uploads will still fail until M2):
 
    ```env
    SHELBY_MODE=testnet
@@ -116,21 +147,17 @@ In mock mode:
    SHELBYNET_INDEXER_URL=https://api.shelbynet.shelby.xyz/v1/graphql
    ```
 
-3. Start the dev server:
-
-   ```bash
-   npm run dev
-   ```
-
-The upload page will show a green **"Shelby testnet mode"** indicator.
-
-> **M1 note:** The real testnet adapter (`src/lib/shelby/testnet-adapter.ts`) is a documented placeholder in M1. Setting `SHELBY_MODE=testnet` will return an error on upload. See the file for the full M2+ implementation guide, including the multi-step upload flow and signing/funding prerequisites.
-
 ---
 
-## What happens if testnet config is missing?
+## What happens when SHELBY_MODE=testnet
 
-If `SHELBY_MODE=testnet` is set but `SHELBY_RPC_URL` or `SHELBY_API_KEY` is not provided, the testnet adapter will fail at upload time with a clear error message. The upload page will display this error. Mock mode is unaffected.
+The upload page shows a red/amber **"Real Shelby upload blocked until M2"** indicator. Any upload attempt returns:
+
+```
+Real Shelby upload is blocked until M2. Official integration requires commitment
+generation, on-chain registration, RPC upload, network selection, signer/wallet
+design, API key handling, and funding. Set SHELBY_MODE=mock to use the local demo adapter.
+```
 
 ---
 
@@ -147,12 +174,33 @@ If `SHELBY_MODE=testnet` is set but `SHELBY_RPC_URL` or `SHELBY_API_KEY` is not 
 
 1. User selects files on the upload page (up to 5 MB each).
 2. SHA-256 hash is computed in-browser for each file using `crypto.subtle.digest`.
-3. On submit, the client calls the `shelbyUploadAction` Server Action with the hash, size, and metadata.
-4. The server action calls `getAdapter()` (reads `SHELBY_MODE` env var) and calls `adapter.upload()`.
-5. The server action returns a serialisable result to the client.
-6. The client builds `EvidencePack` and `BlobRecord` objects using `buildEvidencePack()` / `buildBlobRecord()` from `src/lib/validation.ts`.
-7. Records are saved to browser `localStorage` via `src/lib/store/local-store.ts`.
-8. The upload page shows a success state with links to the new blob detail pages.
+3. File content is read as chunked base64 (32 KB chunks) for future M2 use.
+4. On submit, the client calls the `shelbyUploadAction` Server Action with the hash, size, metadata, and file content.
+5. The server action calls `getAdapter()` (reads `SHELBY_MODE` env var) and calls `adapter.upload()`.
+6. The server action returns a serialisable result to the client.
+7. The client builds `EvidencePack` and `BlobRecord` objects using `buildEvidencePack()` / `buildBlobRecord()` from `src/lib/validation.ts`.
+8. Records are saved to browser `localStorage` via `src/lib/store/local-store.ts`.
+9. The upload page shows a success state labeled "Local Demo Upload Complete" with links to the new blob detail pages.
+
+---
+
+## BlobRecord — future-compatible fields
+
+`BlobRecord` already carries optional fields reserved for M2+ real upload identity:
+
+| Field | M1B value | M2+ value |
+|---|---|---|
+| `shelbyRef` | `shelby://mock/blob/{id}` (mock) | Real Shelby ref after on-chain registration |
+| `mockRef` | Same as shelbyRef (mock ref copy) | undefined |
+| `blobName` | Original file name | Shelby blobName (account namespace key) |
+| `network` | `'mock'` | `'shelbynet'` |
+| `accountAddress` | undefined | Shelby account address |
+| `transactionHash` | undefined | Aptos tx hash from commitment registration |
+| `expirationMicros` | undefined | Expiration set at upload time |
+| `storageStatus` | undefined | Shelby RPC storage status after putBlob |
+| `commitmentRoot` | undefined | Commitment root from Shelby commitment step |
+
+> **Important:** `shelby://mock/blob/{id}` strings are demo/local references only — not confirmed official Shelby blob identities. Official Shelby identity uses account namespace + blob name (see `blobName` / `accountAddress`).
 
 ---
 
@@ -233,13 +281,14 @@ Uploading requires an Aptos account signer on shelbynet. This must be handled:
 - Server-side using a funded account whose private key is stored as an env secret (never in source code).
 - Or via a secure wallet/browser signing integration (e.g. `@shelby-protocol/react` for browser flows).
 
-**Never commit private keys, seed phrases, or mnemonic phrases.** This is a M2+ security design decision outside M1 scope.
+**Never commit private keys, seed phrases, or mnemonic phrases.** This is a M2+ security design decision outside M1B scope.
 
 ---
 
-## M1 limitations
+## M1B limitations
 
-- Real Shelby testnet upload is not functional — it is a documented placeholder.
+- Real Shelby testnet upload is not functional — it is a documented placeholder blocked until M2.
+- Mock refs (`shelby://mock/blob/{id}`) are local demo identifiers only, not real Shelby blob identities.
 - File size is capped at 5 MB per file for browser performance.
 - Evidence packs persist in `localStorage` only — they are browser-specific and tab-private.
 - No authentication or rate limiting on uploads.

@@ -49,9 +49,11 @@ function ModeIndicator({ mode }: { mode: 'mock' | 'testnet' | null }) {
       <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3 mb-8">
         <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
         <span>
-          <strong>Shelby testnet mode</strong> — testnet SDK integration is a placeholder in M1.
-          Uploads will fail with a clear error until the SDK is wired in (M2). File content is
-          passed through the adapter interface so M2 can use it without redesigning the pipeline.
+          <strong>Real Shelby upload blocked until M2</strong> — Official integration requires
+          commitment generation, on-chain registration, RPC upload, network selection,
+          signer/wallet design, API key handling, and funding. Uploads will fail with a clear
+          error. Set <code className="font-mono text-xs bg-amber-100 px-1 rounded">SHELBY_MODE=mock</code>{' '}
+          for local demo mode.
         </span>
       </div>
     );
@@ -60,10 +62,11 @@ function ModeIndicator({ mode }: { mode: 'mock' | 'testnet' | null }) {
     <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-800 text-sm rounded-lg px-4 py-3 mb-8">
       <span className="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0" />
       <span>
-        <strong>Mock mode</strong> — Shelby refs are generated deterministically from your file
-        hash. Set{' '}
+        <strong>Local demo upload</strong> — Files are saved to browser localStorage with a
+        deterministic mock Shelby reference. No wallet signing, no network calls, no real Shelby
+        integration in M1B.{' '}
         <code className="font-mono text-xs bg-indigo-100 px-1 rounded">SHELBY_MODE=testnet</code>{' '}
-        to use the real testnet.
+        is blocked until M2.
       </span>
     </div>
   );
@@ -232,11 +235,13 @@ export default function UploadPage() {
           evidencePackId: pack.id,
           hash,
           shelbyRef: actionResult.result.shelbyRef,
+          mockRef: actionResult.result.mockRef,
           fileName: entry.file.name,
           size: entry.file.size,
           mimeType,
           tags,
           uploadMode: actionResult.mode,
+          network: actionResult.result.network,
         });
 
         addLocalBlob(blob);
@@ -263,12 +268,13 @@ export default function UploadPage() {
   if (uploadResult) {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
-        <PageHeader title="Upload Complete" subtitle="Your evidence pack has been stored locally." />
+        <PageHeader title="Local Demo Upload Complete" subtitle="Evidence pack saved to browser localStorage with a mock Shelby reference." />
         <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mb-6">
           <p className="text-emerald-800 font-semibold mb-1">✓ {uploadResult.packTitle}</p>
           <p className="text-emerald-700 text-sm">
             {uploadResult.blobIds.length} blob{uploadResult.blobIds.length !== 1 ? 's' : ''}{' '}
-            uploaded in <strong>{mode === 'testnet' ? 'Shelby testnet' : 'mock'}</strong> mode.
+            saved locally with a <strong>mock Shelby reference</strong>. No wallet signing or
+            network upload in M1B.
           </p>
         </div>
         <div className="space-y-3">
@@ -309,7 +315,7 @@ export default function UploadPage() {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
       <PageHeader
         title="Upload Evidence Pack"
-        subtitle="Package your dataset, agent output, or document with metadata and send it to Shelby."
+        subtitle="Package your dataset, agent output, or document with metadata. Saved locally with a mock Shelby reference — real Shelby upload is blocked until M2."
       />
 
       <ModeIndicator mode={mode} />
@@ -494,10 +500,11 @@ export default function UploadPage() {
             disabled={uploading || files.length === 0}
             className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition-colors"
           >
-            {uploading ? 'Uploading…' : 'Upload to Shelby'}
+            {uploading ? 'Saving…' : 'Save locally (mock Shelby reference)'}
           </button>
           <p className="text-center text-xs text-slate-400 mt-2">
-            Evidence packs are stored in browser localStorage for demo use.
+            Local demo upload only. Evidence packs are stored in browser localStorage.{' '}
+            Real Shelby upload (wallet + on-chain + RPC) is blocked until M2.
           </p>
         </div>
       </form>

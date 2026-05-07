@@ -1,6 +1,19 @@
 export interface BlobRecord {
   id: string;
+  /**
+   * For demo data: a placeholder `shelby://testnet/blob/{id}` string for illustration.
+   * For local mock uploads: a deterministic `shelby://mock/blob/{id}` string.
+   * For future real uploads (M2+): the official Shelby blob reference after on-chain registration.
+   * These strings are demo/mock references only in M1B — not confirmed official Shelby identity.
+   * Official Shelby identity uses account namespace + blob name (see blobName/accountAddress below).
+   */
   shelbyRef: string;
+  /**
+   * Deterministic mock reference generated from the file hash.
+   * Populated for local mock uploads; undefined for demo data and future real uploads.
+   * Distinct from shelbyRef to make clear this is a local-only identifier.
+   */
+  mockRef?: string;
   hash: string;
   source: string;
   tags: string[];
@@ -12,6 +25,27 @@ export interface BlobRecord {
   dataSource?: 'demo' | 'local';
   /** The adapter mode used when this blob was registered. */
   uploadMode?: 'mock' | 'testnet';
+  /**
+   * Future-compatible fields for M2+ real Shelby upload identity.
+   * All optional and undefined in M1B — reserved for when real upload is wired.
+   * Official Shelby identity uses account namespace + blob name, not only a ref string.
+   */
+  /** Shelby blob name (account namespace key). Required for real Shelby uploads (M2+).
+   * TypeScript-optional to maintain backward compatibility with demo data records.
+   * All new local uploads populate this field from the original file name. */
+  blobName?: string;
+  /** Shelby account address that owns this blob on shelbynet (M2+). */
+  accountAddress?: string;
+  /** Network context: 'mock' for local demo, 'shelbynet' for real uploads (M2+). */
+  network?: 'mock' | 'shelbynet';
+  /** Aptos transaction hash from on-chain commitment registration (M2+). */
+  transactionHash?: string;
+  /** Blob expiration in microseconds as set at upload time (M2+). */
+  expirationMicros?: string;
+  /** Storage status from the Shelby RPC after putBlob (M2+). */
+  storageStatus?: string;
+  /** Commitment root hash from the Shelby commitment generation step (M2+). */
+  commitmentRoot?: string;
 }
 
 export const blobs: BlobRecord[] = [

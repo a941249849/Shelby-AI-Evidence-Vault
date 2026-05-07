@@ -83,11 +83,14 @@ export interface BuildBlobInput {
   evidencePackId: string;
   hash: string;
   shelbyRef: string;
+  mockRef?: string;
   fileName: string;
   size: number;
   mimeType: string;
   tags: string[];
   uploadMode: 'mock' | 'testnet';
+  /** Network context: populated for local uploads. */
+  network?: 'mock' | 'shelbynet';
 }
 
 /**
@@ -102,6 +105,7 @@ export function buildBlobRecord(input: BuildBlobInput): BlobRecord {
   return {
     id: `local-blob-${crypto.randomUUID()}`,
     shelbyRef: input.shelbyRef,
+    mockRef: input.mockRef ?? (input.uploadMode === 'mock' ? input.shelbyRef : undefined),
     hash: input.hash,
     source: `local://upload/${input.fileName}`,
     tags: input.tags,
@@ -111,5 +115,7 @@ export function buildBlobRecord(input: BuildBlobInput): BlobRecord {
     mimeType: input.mimeType || 'application/octet-stream',
     dataSource: 'local',
     uploadMode: input.uploadMode,
+    blobName: input.fileName,
+    network: input.network ?? (input.uploadMode === 'mock' ? 'mock' : undefined),
   };
 }

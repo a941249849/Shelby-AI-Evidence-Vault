@@ -12,7 +12,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-indigo-950 border border-indigo-800 text-indigo-300 text-xs font-mono px-3 py-1 rounded-full mb-6">
             <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
-            M1 Demo — Shelby Testnet
+            M1B Demo — Local mock upload · Real Shelby blocked until M2
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6 leading-tight">
             AI agents need{' '}
@@ -20,8 +20,9 @@ export default function HomePage() {
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
             Shelby AI Evidence Vault stores the datasets, agent outputs, and read receipts that
-            power your AI pipelines — with cryptographic references on Shelby testnet. Every blob,
-            every query, every answer is auditable.
+            power your AI pipelines — with cryptographic hash verification and locally persisted
+            mock Shelby references. Every blob, every query, every answer is auditable. Real
+            Shelby testnet registration is deferred to M2.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
@@ -111,7 +112,7 @@ export default function HomePage() {
               {
                 title: 'Shelby Blob References',
                 icon: '🔗',
-                body: 'Every stored file gets a shelby:// reference and SHA-256 hash. References are stable, content-addressable, and testnet-registered.',
+                body: 'Every stored file gets a SHA-256 hash and a mock shelby:// reference in M1B. In M2+, references will be real Shelby blob identities registered on shelbynet via the official SDK.',
               },
               {
                 title: 'Read Receipts',
@@ -148,8 +149,8 @@ export default function HomePage() {
               },
               {
                 step: '02',
-                title: 'Blob is registered on Shelby testnet',
-                body: 'The file is hashed, given a shelby:// reference, and registered on Shelby testnet. The reference is permanent and content-addressable.',
+                title: 'A mock Shelby reference is generated locally',
+                body: 'The file is SHA-256 hashed in-browser and given a deterministic mock shelby://mock/blob/{id} reference. The pack and blobs are saved to browser localStorage. No wallet signing or network call in M1B.',
               },
               {
                 step: '03',
@@ -205,15 +206,16 @@ export default function HomePage() {
       {/* Built with Shelby */}
       <section className="py-16 px-4 bg-white border-t border-slate-100">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-xl font-bold text-slate-900 mb-3">Built on Shelby testnet</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-3">Built toward Shelby — M1B status</h2>
           <p className="text-slate-500 text-sm leading-relaxed max-w-xl mx-auto">
-            Shelby is a content-addressable blob storage testnet designed for AI ecosystem
-            tooling. Blob references use the{' '}
+            Shelby is a content-addressable blob storage network designed for AI ecosystem
+            tooling. In M1B this demo uses local browser storage and generates deterministic{' '}
             <code className="font-mono bg-slate-100 px-1 py-0.5 rounded text-slate-700 text-xs">
-              {'shelby://testnet/blob/{id}'}
+              shelby://mock/blob/{'{id}'}
             </code>{' '}
-            scheme. This vault is a public demo of the Shelby ecosystem. M1 will wire up real
-            testnet registration.
+            references — not real Shelby blob identities. Real on-chain registration via the
+            official SDK (commitment generation → shelbynet coordination → RPC putBlob) is an M2
+            milestone.
           </p>
         </div>
       </section>
@@ -233,9 +235,10 @@ npm run dev
 # Open http://localhost:3000`}</code>
           </pre>
           <p className="text-slate-400 text-sm mt-4 text-center">
-            No environment variables required for mock mode. Set{' '}
-            <code className="font-mono text-emerald-300 text-xs">SHELBY_MODE=testnet</code> to
-            enable the real testnet adapter.
+            No environment variables required for local demo mode.{' '}
+            <code className="font-mono text-emerald-300 text-xs">SHELBY_MODE=testnet</code> is
+            blocked until M2 — real Shelby upload requires wallet signing, on-chain registration,
+            and token funding.
           </p>
         </div>
       </section>

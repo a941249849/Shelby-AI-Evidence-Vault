@@ -15,10 +15,10 @@ interface BlobDetailClientProps {
 
 function DataSourceBadge({ blob }: { blob: BlobRecord }) {
   if (blob.dataSource === 'local') {
-    const label = blob.uploadMode === 'testnet' ? 'Testnet upload' : 'Local (mock)';
+    const label = blob.uploadMode === 'testnet' ? 'Real Shelby upload blocked until M2' : 'Local demo upload';
     const color =
       blob.uploadMode === 'testnet'
-        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+        ? 'bg-amber-50 text-amber-700 border-amber-200'
         : 'bg-indigo-50 text-indigo-700 border-indigo-200';
     return (
       <span className={`text-xs font-medium px-2 py-0.5 rounded border ${color}`}>{label}</span>
@@ -123,8 +123,14 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
         <Row label="Blob ID">
           <code className="font-mono text-sm text-slate-800">{blob.id}</code>
         </Row>
-        <Row label="Shelby Reference">
+        <Row label={blob.dataSource === 'local' ? 'Mock Reference' : 'Shelby Reference'}>
           <code className="font-mono text-sm text-indigo-700 break-all">{blob.shelbyRef}</code>
+          {blob.dataSource === 'local' && (
+            <p className="text-xs text-slate-400 mt-1">
+              Local demo reference only — not a real Shelby blob identity. Real Shelby identity
+              uses account namespace + blob name (M2+).
+            </p>
+          )}
         </Row>
         <Row label="SHA-256 Hash">
           <code className="font-mono text-xs text-slate-600 break-all">{blob.hash}</code>
@@ -168,6 +174,16 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
         {blob.uploadMode && (
           <Row label="Upload Mode">
             <span className="text-sm text-slate-700 capitalize">{blob.uploadMode}</span>
+          </Row>
+        )}
+        {blob.network && (
+          <Row label="Network">
+            <span className="text-sm text-slate-700">{blob.network}</span>
+          </Row>
+        )}
+        {blob.blobName && (
+          <Row label="Blob Name">
+            <code className="font-mono text-sm text-slate-700">{blob.blobName}</code>
           </Row>
         )}
       </div>
