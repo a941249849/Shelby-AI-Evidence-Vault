@@ -8,6 +8,10 @@ export interface BlobRecord {
   createdAt: string;
   size: number;
   mimeType: string;
+  /** Indicates the origin of this record. Undefined means built-in demo data. */
+  dataSource?: 'demo' | 'local';
+  /** The adapter mode used when this blob was registered. */
+  uploadMode?: 'mock' | 'testnet';
 }
 
 export const blobs: BlobRecord[] = [

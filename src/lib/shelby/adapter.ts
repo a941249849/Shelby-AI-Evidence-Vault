@@ -1,3 +1,15 @@
+/**
+ * Shared Shelby adapter interface and result types.
+ * All adapters (mock, testnet) must implement ShelbyAdapter.
+ */
+
+export interface ShelbyUploadPayload {
+  /** SHA-256 hash of the file content, prefixed with "sha256:" */
+  hash: string;
+  /** File size in bytes */
+  size: number;
+}
+
 export interface ShelbyUploadResult {
   shelbyRef: string;
   hash: string;
@@ -5,29 +17,12 @@ export interface ShelbyUploadResult {
 }
 
 export interface ShelbyAdapter {
-  upload(data: unknown, metadata: Record<string, string>): Promise<ShelbyUploadResult>;
+  upload(
+    data: ShelbyUploadPayload,
+    metadata: Record<string, string>
+  ): Promise<ShelbyUploadResult>;
   getBlobRef(id: string): string;
   isConnected(): boolean;
+  /** Returns the current operating mode for display purposes. */
+  getMode(): 'mock' | 'testnet';
 }
-
-export const mockShelbyAdapter: ShelbyAdapter = {
-  async upload(_data: unknown, metadata: Record<string, string>): Promise<ShelbyUploadResult> {
-    const id = Math.random().toString(36).slice(2, 18);
-    const hashHex = Array.from({ length: 64 }, () =>
-      Math.floor(Math.random() * 16).toString(16)
-    ).join('');
-    return {
-      shelbyRef: `shelby://testnet/blob/${id}`,
-      hash: `sha256:${hashHex}`,
-      timestamp: new Date().toISOString(),
-    };
-  },
-
-  getBlobRef(id: string): string {
-    return `shelby://testnet/blob/${id}`;
-  },
-
-  isConnected(): boolean {
-    return false;
-  },
-};

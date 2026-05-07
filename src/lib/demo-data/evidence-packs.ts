@@ -8,6 +8,8 @@ export interface EvidencePack {
   blobCount: number;
   status: 'active' | 'archived' | 'pending';
   description: string;
+  /** Indicates the origin of this record. Undefined means built-in demo data. */
+  dataSource?: 'demo' | 'local';
 }
 
 export const evidencePacks: EvidencePack[] = [

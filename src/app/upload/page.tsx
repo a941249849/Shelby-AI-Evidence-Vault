@@ -1,7 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import PageHeader from '@/components/page-header';
+import { shelbyUploadAction, getShelbyModeAction } from '@/app/actions/upload';
+import { parseTags, buildEvidencePack, buildBlobRecord } from '@/lib/validation';
+import { addLocalPack, addLocalBlob } from '@/lib/store/local-store';
+import { formatBytes } from '@/lib/utils';
 
 type Category = 'dataset' | 'agent-run' | 'document' | 'manifest';
 type SourceType = 'web-scrape' | 'api-export' | 'agent-output' | 'manual-upload';
@@ -14,6 +19,52 @@ interface FormState {
   description: string;
 }
 
+interface FileEntry {
+  file: File;
+  hash: string | null;
+  hashStatus: 'pending' | 'computing' | 'done' | 'error';
+}
+
+interface UploadedResult {
+  packId: string;
+  packTitle: string;
+  blobIds: string[];
+}
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+async function computeSHA256(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return 'sha256:' + hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function ModeIndicator({ mode }: { mode: 'mock' | 'testnet' | null }) {
+  if (mode === null) return null;
+  if (mode === 'testnet') {
+    return (
+      <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-lg px-4 py-3 mb-8">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+        <span>
+          <strong>Shelby testnet mode</strong> — uploads will be registered on the testnet.
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-800 text-sm rounded-lg px-4 py-3 mb-8">
+      <span className="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0" />
+      <span>
+        <strong>Mock mode</strong> — Shelby refs are generated deterministically from your file
+        hash. Set{' '}
+        <code className="font-mono text-xs bg-indigo-100 px-1 rounded">SHELBY_MODE=testnet</code>{' '}
+        to use the real testnet.
+      </span>
+    </div>
+  );
+}
+
 export default function UploadPage() {
   const [form, setForm] = useState<FormState>({
     title: '',
@@ -22,30 +73,227 @@ export default function UploadPage() {
     tags: '',
     description: '',
   });
+  const [files, setFiles] = useState<FileEntry[]>([]);
+  const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<UploadedResult | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [mode, setMode] = useState<'mock' | 'testnet' | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function handleChange(
+  // Load adapter mode on mount
+  useEffect(() => {
+    getShelbyModeAction().then(setMode).catch(() => setMode('mock'));
+  }, []);
+
+  function handleFormChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  const addFiles = useCallback((incoming: File[]) => {
+    const valid = incoming.filter((f) => f.size <= MAX_FILE_SIZE);
+    const oversized = incoming.filter((f) => f.size > MAX_FILE_SIZE);
+    if (oversized.length > 0) {
+      setUploadError(
+        `${oversized.length} file(s) skipped: files must be ≤ ${formatBytes(MAX_FILE_SIZE)}.`
+      );
+    }
+    const entries: FileEntry[] = valid.map((f) => ({
+      file: f,
+      hash: null,
+      hashStatus: 'pending',
+    }));
+    setFiles((prev) => [...prev, ...entries]);
+
+    // Compute hashes asynchronously
+    entries.forEach((entry) => {
+      setFiles((prev) => {
+        const next = [...prev];
+        const pos = next.findIndex((e) => e.file === entry.file);
+        if (pos !== -1) next[pos] = { ...next[pos], hashStatus: 'computing' };
+        return next;
+      });
+      computeSHA256(entry.file)
+        .then((hash) => {
+          setFiles((prev) => {
+            const next = [...prev];
+            const pos = next.findIndex((e) => e.file === entry.file);
+            if (pos !== -1) next[pos] = { ...next[pos], hash, hashStatus: 'done' };
+            return next;
+          });
+        })
+        .catch(() => {
+          setFiles((prev) => {
+            const next = [...prev];
+            const pos = next.findIndex((e) => e.file === entry.file);
+            if (pos !== -1) next[pos] = { ...next[pos], hashStatus: 'error' };
+            return next;
+          });
+        });
+    });
+  }, []);
+
+  function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const chosen = Array.from(e.target.files ?? []);
+    if (chosen.length) addFiles(chosen);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragging(false);
+    const dropped = Array.from(e.dataTransfer.files);
+    if (dropped.length) addFiles(dropped);
+  }
+
+  function removeFile(index: number) {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setUploadError(null);
+
+    if (!form.title.trim()) {
+      setUploadError('Pack title is required.');
+      return;
+    }
+    if (files.length === 0) {
+      setUploadError('Please select at least one file.');
+      return;
+    }
+    const notReady = files.some((f) => f.hashStatus !== 'done');
+    if (notReady) {
+      setUploadError('Please wait for SHA-256 computation to complete.');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const tags = parseTags(form.tags);
+
+      // Build the pack first
+      const pack = buildEvidencePack({
+        title: form.title,
+        category: form.category,
+        sourceType: form.sourceType,
+        tags,
+        description: form.description,
+        blobCount: files.length,
+      });
+
+      const blobIds: string[] = [];
+
+      for (const entry of files) {
+        const hash = entry.hash!;
+        const mimeType = entry.file.type || 'application/octet-stream';
+
+        const actionResult = await shelbyUploadAction(hash, entry.file.size, {
+          packId: pack.id,
+          fileName: entry.file.name,
+          mimeType,
+        });
+
+        if (!actionResult.success) {
+          throw new Error(actionResult.error);
+        }
+
+        const blob = buildBlobRecord({
+          evidencePackId: pack.id,
+          hash,
+          shelbyRef: actionResult.result.shelbyRef,
+          fileName: entry.file.name,
+          size: entry.file.size,
+          mimeType,
+          tags,
+          uploadMode: actionResult.mode,
+        });
+
+        addLocalBlob(blob);
+        blobIds.push(blob.id);
+      }
+
+      addLocalPack(pack);
+      setUploadResult({ packId: pack.id, packTitle: pack.title, blobIds });
+      setFiles([]);
+      setForm({
+        title: '',
+        category: 'dataset',
+        sourceType: 'manual-upload',
+        tags: '',
+        description: '',
+      });
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed.');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  if (uploadResult) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+        <PageHeader title="Upload Complete" subtitle="Your evidence pack has been stored locally." />
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mb-6">
+          <p className="text-emerald-800 font-semibold mb-1">✓ {uploadResult.packTitle}</p>
+          <p className="text-emerald-700 text-sm">
+            {uploadResult.blobIds.length} blob{uploadResult.blobIds.length !== 1 ? 's' : ''}{' '}
+            uploaded in <strong>{mode === 'testnet' ? 'Shelby testnet' : 'mock'}</strong> mode.
+          </p>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
+              Blob detail pages
+            </p>
+            {uploadResult.blobIds.map((blobId) => (
+              <Link
+                key={blobId}
+                href={`/blob/${blobId}`}
+                className="block text-sm text-indigo-600 hover:text-indigo-800 font-mono mb-1"
+              >
+                /blob/{blobId}
+              </Link>
+            ))}
+          </div>
+          <div className="flex gap-3 pt-4">
+            <Link
+              href="/dashboard"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              View Dashboard
+            </Link>
+            <button
+              onClick={() => setUploadResult(null)}
+              className="border border-slate-300 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+            >
+              Upload Another Pack
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
       <PageHeader
         title="Upload Evidence Pack"
-        subtitle="Package your dataset, agent output, or document with metadata and send it to Shelby testnet."
+        subtitle="Package your dataset, agent output, or document with metadata and send it to Shelby."
       />
 
-      {/* M0 info banner */}
-      <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3 mb-8">
-        <span className="text-amber-500 mt-0.5 flex-shrink-0">ℹ️</span>
-        <p>
-          <strong>M0 Demo:</strong> Upload is mocked. Real Shelby testnet integration coming in M1.
-          No files will be stored.
-        </p>
-      </div>
+      <ModeIndicator mode={mode} />
 
-      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+      {uploadError && (
+        <div className="bg-red-50 border border-red-200 text-red-800 text-sm rounded-lg px-4 py-3 mb-6">
+          {uploadError}
+        </div>
+      )}
+
+      <form className="space-y-6" onSubmit={handleSubmit}>
         {/* Pack title */}
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-1">
@@ -56,7 +304,7 @@ export default function UploadPage() {
             name="title"
             type="text"
             value={form.title}
-            onChange={handleChange}
+            onChange={handleFormChange}
             placeholder="e.g. Common Crawl Sample — Web Text 2024-Q1"
             className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
@@ -71,7 +319,7 @@ export default function UploadPage() {
             id="category"
             name="category"
             value={form.category}
-            onChange={handleChange}
+            onChange={handleFormChange}
             className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="dataset">Dataset</option>
@@ -90,7 +338,7 @@ export default function UploadPage() {
             id="sourceType"
             name="sourceType"
             value={form.sourceType}
-            onChange={handleChange}
+            onChange={handleFormChange}
             className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="web-scrape">Web Scrape</option>
@@ -111,7 +359,7 @@ export default function UploadPage() {
             name="tags"
             type="text"
             value={form.tags}
-            onChange={handleChange}
+            onChange={handleFormChange}
             placeholder="e.g. nlp, training-data, 2024"
             className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
@@ -127,37 +375,102 @@ export default function UploadPage() {
             name="description"
             rows={3}
             value={form.description}
-            onChange={handleChange}
+            onChange={handleFormChange}
             placeholder="Describe the contents, source, and intended use of this evidence pack."
             className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
           />
         </div>
 
-        {/* File drop area */}
+        {/* File selector */}
         <div>
-          <p className="block text-sm font-medium text-slate-700 mb-1">Files</p>
-          <div className="border-2 border-dashed border-slate-300 rounded-lg px-6 py-10 text-center bg-slate-50">
-            <p className="text-slate-400 text-sm">
-              Drag and drop files here — M0 placeholder
+          <p className="block text-sm font-medium text-slate-700 mb-1">
+            Files{' '}
+            <span className="text-slate-400 font-normal text-xs">
+              (max {formatBytes(MAX_FILE_SIZE)} per file)
+            </span>
+          </p>
+          <div
+            className={`border-2 border-dashed rounded-lg px-6 py-8 text-center transition-colors cursor-pointer ${
+              dragging
+                ? 'border-indigo-400 bg-indigo-50'
+                : 'border-slate-300 bg-slate-50 hover:border-slate-400'
+            }`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <p className="text-slate-500 text-sm">
+              Drag &amp; drop files here, or{' '}
+              <span className="text-indigo-600 font-medium">browse</span>
             </p>
-            <p className="text-slate-300 text-xs mt-1">
-              Real file upload coming in M1 with Shelby testnet integration
+            <p className="text-slate-400 text-xs mt-1">
+              SHA-256 hash computed in-browser before upload
             </p>
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={handleFileInput}
+          />
+
+          {/* File list */}
+          {files.length > 0 && (
+            <ul className="mt-3 space-y-2">
+              {files.map((entry, idx) => (
+                <li
+                  key={idx}
+                  className="flex items-start gap-3 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                >
+                  <span className="flex-1 min-w-0">
+                    <span className="font-medium text-slate-900 truncate block">
+                      {entry.file.name}
+                    </span>
+                    <span className="text-slate-400 text-xs">{formatBytes(entry.file.size)}</span>
+                    {entry.hashStatus === 'computing' && (
+                      <span className="block text-xs text-indigo-500 mt-0.5">
+                        Computing SHA-256…
+                      </span>
+                    )}
+                    {entry.hashStatus === 'done' && entry.hash && (
+                      <span className="block text-xs text-slate-400 font-mono mt-0.5 truncate">
+                        {entry.hash.slice(0, 20)}…
+                      </span>
+                    )}
+                    {entry.hashStatus === 'error' && (
+                      <span className="block text-xs text-red-500 mt-0.5">Hash error</span>
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeFile(idx)}
+                    className="text-slate-300 hover:text-red-400 text-lg leading-none flex-shrink-0"
+                    aria-label="Remove file"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Submit */}
         <div>
           <button
             type="submit"
-            disabled
-            title="Real upload coming in M1"
-            className="w-full bg-indigo-400 text-white font-semibold py-2.5 px-4 rounded-lg text-sm cursor-not-allowed opacity-60"
+            disabled={uploading || files.length === 0}
+            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition-colors"
           >
-            Upload to Shelby Testnet
+            {uploading ? 'Uploading…' : 'Upload to Shelby'}
           </button>
           <p className="text-center text-xs text-slate-400 mt-2">
-            Disabled in M0 — real upload coming in M1
+            Evidence packs are stored in browser localStorage for demo use.
           </p>
         </div>
       </form>

@@ -12,7 +12,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-indigo-950 border border-indigo-800 text-indigo-300 text-xs font-mono px-3 py-1 rounded-full mb-6">
             <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
-            M0 Demo — Shelby Testnet
+            M1 Demo — Shelby Testnet
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6 leading-tight">
             AI agents need{' '}
@@ -233,7 +233,9 @@ npm run dev
 # Open http://localhost:3000`}</code>
           </pre>
           <p className="text-slate-400 text-sm mt-4 text-center">
-            No environment variables required for M0. All data is mock.
+            No environment variables required for mock mode. Set{' '}
+            <code className="font-mono text-emerald-300 text-xs">SHELBY_MODE=testnet</code> to
+            enable the real testnet adapter.
           </p>
         </div>
       </section>
