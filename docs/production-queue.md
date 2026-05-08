@@ -31,8 +31,9 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - M3 browser-wallet Shelby testnet upload is merged: `use-shelby-upload.ts`, `browser-client.ts`, `providers.tsx`.
 - C3 smoke harness is merged: `scripts/shelby-smoke.mjs`, `src/lib/shelby/status-map.ts`, `docs/c3-smoke-test-guide.md`.
 - M4 read receipt binding is merged: `ReadReceiptClient`, localStorage receipt persistence, BlobRecord identity surface.
-- M5 public ecosystem package is the current stage: README rewrite, demo script update, architecture update, ecosystem submission pack.
-- UI redesign remains paused — Task X2 is deferred until protocol boundaries stabilize.
+- M5 public ecosystem package is merged in PR #14: README rewrite, demo script update, architecture update, ecosystem submission pack.
+- C7 SQLite backend persistence is the current stage: `lib/server/db.ts`, `lib/server/evidence-store.ts`, `app/actions/persist.ts`.
+- UI redesign remains paused — Task X2 is deferred until backend state is stable.
 
 ## Stage Gate
 
@@ -324,13 +325,13 @@ Deliverables:
 - `docs/production-queue.md` — C4 task documented
 - `docs/m4-read-receipt-binding.md` — model and verification guide
 
-### Task C5: M5 public ecosystem package (current)
+### Task C5: M5 public ecosystem package
 
 Owner: Copilot
 
 Size: Large
 
-Status: **In progress** — this PR.
+Status: **Complete** — merged in PR #14.
 
 Goal:
 
@@ -360,6 +361,60 @@ Acceptance:
 - Architecture doc matches current code.
 - Ecosystem submission pack exists and is ready for public handoff.
 - Production queue no longer points at C2 as immediate next action.
+- `npm run lint` passes.
+- `npm run build` passes.
+
+### Task C7: Backend persistence foundation with SQLite
+
+Owner: Copilot
+
+Size: Large
+
+Status: **Complete** — implemented in this PR.
+
+When to start:
+
+After C5 (M5) merges.
+
+Goal:
+
+Add a server-side SQLite persistence foundation for user-created EvidencePack, BlobRecord, and ReadReceipt records. Uploads survive browser refresh and localStorage resets via a local SQLite database.
+
+Scope:
+
+- `src/lib/server/db.ts` — SQLite connection and schema init via `better-sqlite3`. WAL mode. Tables: `evidence_packs`, `blob_records` (indexed by pack), `read_receipts`. Each row stores full typed object as JSON `payload`.
+- `src/lib/server/evidence-store.ts` — server-only CRUD helpers: `insertPack`, `insertBlob`, `insertReceipt`, `getPacks`, `getBlobById`, `getBlobsByPackId`, `getReceiptById`.
+- `src/app/actions/persist.ts` — server actions: `persistUploadAction` (pack + blobs + receipt in one call), `getPersistedPacksAction`, `getPersistedBlobAction`, `getPersistedBlobsByPackAction`, `getPersistedReceiptAction`.
+- `src/app/upload/page.tsx` — accumulate built blobs, call `persistUploadAction` after successful upload (non-fatal on failure).
+- `src/components/dashboard-client.tsx` — call `getPersistedPacksAction` on mount; deduplicate against localStorage; merge with demo data.
+- `src/components/blob-detail-client.tsx` — fall through to `getPersistedBlobAction` if not found in demo data or localStorage.
+- `src/components/read-receipt-client.tsx` — fall through to `getPersistedReceiptAction` (and per-blob `getPersistedBlobAction`) if not in demo data or localStorage.
+- `.gitignore` — `data/*.sqlite` and WAL/SHM variants added.
+- `.env.example` — `SHELBY_DB_PATH` documented.
+- `docs/architecture.md` and `docs/production-queue.md` updated to reflect C7.
+
+Hard boundaries:
+
+- No UI redesign or theme overhaul.
+- No real LLM/API calls.
+- No authentication system.
+- No private key, seed phrase, or server signer.
+- No wallet payment UX.
+- No marketplace/trading/token features.
+- Shelby testnet upload protocol behavior unchanged.
+- Database file not committed.
+
+Acceptance:
+
+- Mock mode remains default and works with zero env vars.
+- A successful local mock upload creates one EvidencePack, its BlobRecord(s), and one ReadReceipt in SQLite.
+- A successful testnet browser-wallet upload persists real Shelby identity fields.
+- Dashboard shows persisted user-created packs after page refresh.
+- Blob detail pages resolve persisted blobs by ID.
+- Read receipt pages resolve persisted receipts and their associated blobs.
+- Built-in demo data works unchanged.
+- Existing localStorage records do not crash the app.
+- Database path is documented and gitignored.
 - `npm run lint` passes.
 - `npm run build` passes.
 
@@ -395,13 +450,12 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-M5 documentation/packaging is the current stage (this PR).
+C7 SQLite persistence is the current stage (this PR).
 
-After M5 merges, the next Copilot task options include:
+After C7 merges, the next task options include:
 
-- **X2 (Codex):** UI redesign pass — now that protocol boundaries are stable through M4.
+- **X2 (Codex):** UI redesign pass — now that protocol boundaries are stable through C7.
 - **C6:** Search and filter on the dashboard (operator-requested feature).
-- **C7:** Real backend persistence with SQLite for cross-browser evidence packs.
 - **C8:** Agent run integration example — a scripted agent that produces an evidence pack and read receipt.
 
 Do not dispatch small patch tasks to Copilot. Next Copilot task should be a large bounded implementation with clear acceptance criteria.

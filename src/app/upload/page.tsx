@@ -20,12 +20,14 @@ import {
 import { Network } from '@aptos-labs/ts-sdk';
 import type { AdapterWallet, AdapterNotDetectedWallet } from '@aptos-labs/wallet-adapter-react';
 import { shelbyUploadAction, getShelbyModeAction } from '@/app/actions/upload';
+import { persistUploadAction } from '@/app/actions/persist';
 import { parseTags, buildEvidencePack, buildBlobRecord } from '@/lib/validation';
 import { addLocalPack, addLocalBlob, addLocalReadReceipt } from '@/lib/store/local-store';
 import { formatBytes } from '@/lib/utils';
 import { useShelbyUpload } from '@/lib/shelby/use-shelby-upload';
 import UploadProviders from './providers';
 import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
+import type { BlobRecord } from '@/lib/demo-data/blobs';
 
 type Category = 'dataset' | 'agent-run' | 'document' | 'manifest';
 type SourceType = 'web-scrape' | 'api-export' | 'agent-output' | 'manual-upload';
@@ -424,6 +426,7 @@ function UploadPageContent() {
       });
 
       const blobIds: string[] = [];
+      const builtBlobs: BlobRecord[] = [];
 
       for (const entry of files) {
         const hash = entry.hash!;
@@ -461,6 +464,7 @@ function UploadPageContent() {
           });
 
           addLocalBlob(blob);
+          builtBlobs.push(blob);
           blobIds.push(blob.id);
         } else {
           // ── Mock path: server action with deterministic local reference ──
@@ -507,6 +511,7 @@ function UploadPageContent() {
           });
 
           addLocalBlob(blob);
+          builtBlobs.push(blob);
           blobIds.push(blob.id);
         }
       }
@@ -525,6 +530,15 @@ function UploadPageContent() {
         receiptMode: mode === 'testnet' ? 'shelby-testnet' : 'local',
       };
       addLocalReadReceipt(receipt);
+
+      // Persist to SQLite (server-side) so uploads survive localStorage resets
+      // and are visible across browser sessions.  Errors are non-fatal.
+      try {
+        await persistUploadAction(pack, builtBlobs, receipt);
+      } catch {
+        // SQLite persistence failure is non-fatal — localStorage already holds
+        // the records and the upload itself succeeded.
+      }
 
       setUploadResult({ packId: pack.id, packTitle: pack.title, blobIds, mode: mode ?? 'mock', receiptId: receipt.id });
       setFiles([]);

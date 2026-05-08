@@ -7,6 +7,7 @@ import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import EvidencePackCard from '@/components/evidence-pack-card';
 import { getLocalPacks, getLocalBlobsByPackId, resetLocalData } from '@/lib/store/local-store';
+import { getPersistedPacksAction } from '@/app/actions/persist';
 
 interface DashboardClientProps {
   demoPacks: EvidencePack[];
@@ -24,11 +25,20 @@ function Metric({ label, value, tone }: { label: string; value: string | number;
 
 export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClientProps) {
   const [localPacks, setLocalPacks] = useState<EvidencePack[]>([]);
+  const [persistedPacks, setPersistedPacks] = useState<EvidencePack[]>([]);
   const [resetConfirm, setResetConfirm] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalPacks(getLocalPacks());
+    getPersistedPacksAction()
+      .then((packs) => {
+        setPersistedPacks(packs);
+      })
+      .catch((err) => {
+        // SQLite unavailable — silently degrade to localStorage only
+        console.error('[DashboardClient] getPersistedPacksAction failed', err);
+      });
   }, []);
 
   function handleReset() {
@@ -41,9 +51,17 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
     setResetConfirm(false);
   }
 
-  const allPacks = [...localPacks, ...demoPacks];
+  // Merge: localStorage packs first (newest), then SQLite packs (dedup by id),
+  // then built-in demo packs.
+  const localIds = new Set(localPacks.map((p) => p.id));
+  const dedupedPersisted = persistedPacks.filter((p) => !localIds.has(p.id));
+  const allUserPacks = [...localPacks, ...dedupedPersisted];
+  const allPacks = [...allUserPacks, ...demoPacks];
+
   const localBlobs = localPacks.flatMap((p) => getLocalBlobsByPackId(p.id));
-  const totalBlobs = localBlobs.length + demoBlobs.length;
+  // Count blobs from SQLite-only packs (not in localStorage) using their stored blobCount.
+  const persistedBlobCount = dedupedPersisted.reduce((sum, p) => sum + p.blobCount, 0);
+  const totalBlobs = localBlobs.length + persistedBlobCount + demoBlobs.length;
   const activePacks = allPacks.filter((p) => p.status === 'active').length;
 
   return (
@@ -95,7 +113,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           <Metric label="Storage mode" value="Local" tone="text-[#470b64]" />
         </div>
 
-        {localPacks.length > 0 && (
+        {allUserPacks.length > 0 && (
           <section className="mb-10">
             <div className="mb-4 flex items-end justify-between gap-4">
               <div>
@@ -104,7 +122,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
                   Local demo uploads
                 </h2>
                 <p className="mt-1 text-sm text-[#6f6258]">
-                  Stored in this browser only. Mock references are not real Shelby blobs.
+                  Stored locally. Mock references are not real Shelby blobs.
                 </p>
               </div>
               <button
@@ -115,7 +133,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               </button>
             </div>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {localPacks.map((pack) => (
+              {allUserPacks.map((pack) => (
                 <EvidencePackCard key={pack.id} pack={pack} />
               ))}
             </div>

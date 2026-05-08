@@ -44,3 +44,8 @@ next-env.d.ts
 # smoke harness runtime output (gitignored — never commit real test results)
 /tmp/
 /artifacts/shelby-smoke/
+
+# SQLite database (runtime artifact — never commit)
+/data/*.sqlite
+/data/*.sqlite-shm
+/data/*.sqlite-wal

@@ -22,6 +22,7 @@ import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import { formatDateTime } from '@/lib/utils';
 import { getLocalReadReceiptById, getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getReadReceiptById, getBlobById, getEvidencePackById } from '@/lib/evidence/service';
+import { getPersistedReceiptAction, getPersistedBlobAction, getPersistedPackAction } from '@/app/actions/persist';
 
 interface ReadReceiptClientProps {
   id: string;
@@ -276,7 +277,46 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
       return;
     }
 
-    setResolved(null);
+    // Fall through to SQLite-persisted records (survive localStorage resets)
+    getPersistedReceiptAction(id)
+      .then(async (persistedReceipt) => {
+        if (!persistedReceipt) {
+          setResolved(null);
+          return;
+        }
+
+        // Resolve each referenced blob — check localStorage first, then SQLite.
+        const resolvedBlobs: BlobRecord[] = [];
+        for (const bid of persistedReceipt.referencedBlobIds) {
+          const b =
+            getLocalBlobById(bid) ??
+            getBlobById(bid) ??
+            (await getPersistedBlobAction(bid).catch((err) => {
+              console.error('[ReadReceiptClient] getPersistedBlobAction failed for', bid, err);
+              return null;
+            }));
+          if (b) resolvedBlobs.push(b);
+        }
+
+        const resolvedPacks: EvidencePack[] = [];
+        for (const pid of persistedReceipt.evidencePackIds) {
+          const p =
+            getLocalPackById(pid) ??
+            getEvidencePackById(pid) ??
+            (await getPersistedPackAction(pid).catch(() => null));
+          if (p) resolvedPacks.push(p);
+        }
+
+        setResolved({
+          receipt: persistedReceipt,
+          blobs: resolvedBlobs,
+          packs: resolvedPacks,
+        });
+      })
+      .catch((err) => {
+        console.error('[ReadReceiptClient] getPersistedReceiptAction failed', err);
+        setResolved(null);
+      });
   }, [id]);
 
   // Loading state — renders nothing until localStorage is checked
