@@ -7,15 +7,17 @@
  *      touching any other layer (server action, UI, validation).
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * SHELBYNET NETWORK CONTEXT (M2+ reference — verify against official docs)
+ * TESTNET NETWORK CONTEXT (M2+ reference — verify against official docs)
  * ─────────────────────────────────────────────────────────────────────────────
- * Shelby runs on "shelbynet" — an isolated Aptos-derived network.
- * Do NOT use generic Aptos testnet URLs; they are incompatible with Shelby.
+ * Shelby previously exposed "shelbynet" as a developer prototype network.
+ * Current real-integration planning should target the official Shelby testnet
+ * endpoint family unless the latest SDK/docs say otherwise. Do not mix
+ * shelbynet and testnet endpoint values in one runtime config.
  *
- *   Shelby RPC endpoint:   https://api.shelbynet.shelby.xyz/shelby
- *   Aptos fullnode:        https://api.shelbynet.shelby.xyz/v1
- *   Indexer (GraphQL):     https://api.shelbynet.shelby.xyz/v1/graphql
- *   Explorer:              https://explorer.shelby.xyz/shelbynet
+ *   Shelby RPC endpoint:   https://api.testnet.shelby.xyz/shelby
+ *   Aptos fullnode:        https://api.testnet.aptoslabs.com/v1
+ *   Indexer (GraphQL):     https://api.testnet.aptoslabs.com/v1/graphql
+ *   Explorer:              https://explorer.shelby.xyz/testnet
  *
  * NOTE: Contract address and network details must be verified against the
  * official Shelby docs at M2 implementation time. Do not treat any address
@@ -42,9 +44,9 @@
  *
  * OPTION B — Manual Node flow (low-level):
  *   1. Generate blob commitments from blobData.
- *   2. Register the blob via the coordination layer (on-chain Aptos tx on shelbynet).
- *      This uses @aptos-labs/ts-sdk with APTOS_NETWORK=shelbynet and the
- *      shelbynet fullnode URL. Requires APT on shelbynet for gas.
+ *   2. Register the blob via the coordination layer (on-chain Aptos tx).
+ *      This uses @aptos-labs/ts-sdk with APTOS_NETWORK=testnet and the
+ *      Aptos testnet fullnode URL. Requires testnet APT for gas.
  *   3. Wait for the Aptos transaction to be confirmed.
  *   4. Call rpc.putBlob({ account, blobName, blobData }).
  *      This uses SHELBY_RPC_URL. Requires ShelbyUSD or SHEL tokens for storage.
@@ -59,12 +61,12 @@
  *   config.blobExpirationMicros → expirationMicros (required; set SHELBY_BLOB_EXPIRATION_MICROS)
  *
  * FUNDING PREREQUISITES (M2+ setup):
- *   - APT on shelbynet: required for on-chain registration gas fees.
+ *   - Testnet APT: required for on-chain registration gas fees.
  *   - ShelbyUSD or SHEL tokens: required for Shelby storage operations.
- *   - Use the shelbynet faucet (SHELBYNET_FAUCET_URL) for test account funding.
+ *   - Verify the current Shelby/testnet funding path before wiring any UI.
  *
  * SIGNING SECURITY (M2+ design decision — NOT part of M1B):
- *   Real upload requires an Aptos account signer on shelbynet. This must be
+ *   Real upload requires an Aptos account signer on the selected network. This must be
  *   handled server-side (e.g. via a funded server account whose private key is
  *   an env secret) or via a secure wallet integration. NEVER commit private
  *   keys, seed phrases, or mnemonic phrases to source code or env examples.

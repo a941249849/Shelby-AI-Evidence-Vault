@@ -30,16 +30,16 @@ Shelby AI Evidence Vault integrates with Shelby through an adapter pattern. All 
 
 ---
 
-## Shelbynet network context (M2+ reference — verify at implementation time)
+## Network context (M2+ reference — verify at implementation time)
 
-Shelby runs on **shelbynet** — an isolated Aptos-derived network. This is not the public Aptos testnet, and Aptos testnet URLs are incompatible with Shelby.
+Shelby previously exposed **shelbynet** as a developer prototype network. Current M2/M3 real integration should target the official **testnet** endpoint family unless the latest SDK/docs say otherwise. Do not mix `shelbynet` and `testnet` endpoint values in one runtime config.
 
 | Resource | URL |
 |---|---|
-| Shelby RPC (blob storage) | `https://api.shelbynet.shelby.xyz/shelby` |
-| Aptos fullnode (shelbynet) | `https://api.shelbynet.shelby.xyz/v1` |
-| Indexer GraphQL (shelbynet) | `https://api.shelbynet.shelby.xyz/v1/graphql` |
-| Explorer | `https://explorer.shelby.xyz/shelbynet` |
+| Shelby RPC (blob storage) | `https://api.testnet.shelby.xyz/shelby` |
+| Aptos fullnode (testnet) | `https://api.testnet.aptoslabs.com/v1` |
+| Indexer GraphQL (testnet) | `https://api.testnet.aptoslabs.com/v1/graphql` |
+| Explorer | `https://explorer.shelby.xyz/testnet` |
 | Coordination contract | Verify against official Shelby docs at M2 — do not hardcode unverified values |
 
 ---
@@ -50,34 +50,34 @@ Shelby integration spans two distinct network planes. These must not be conflate
 
 ### Plane 1 — Shelby storage / RPC plane
 
-Shelby's own blob storage and API layer running on shelbynet. Responsible for:
+Shelby's own blob storage and API layer. Responsible for:
 - Blob upload and retrieval via `SHELBY_RPC_URL`
-- `shelby://shelbynet/blob/{id}` reference generation (real uploads, M2+)
+- account-address + blob-name identity after real upload (M2+)
 - Storage-side read receipts and provenance
 
 Environment variables:
 ```
-SHELBY_NETWORK=shelbynet          # Network label for Shelby storage operations
-SHELBY_RPC_URL=                   # https://api.shelbynet.shelby.xyz/shelby
+SHELBY_NETWORK=testnet            # Network label for Shelby storage operations
+SHELBY_RPC_URL=                   # https://api.testnet.shelby.xyz/shelby
 SHELBY_API_KEY=                   # Authentication (server-side only)
 SHELBY_ACCOUNT_ADDRESS=           # Your Shelby account address
 SHELBY_BLOB_EXPIRATION_MICROS=    # Required for real uploads (e.g. 1800000000 = 30 min)
 ```
 
-### Plane 2 — Shelbynet / Aptos coordination plane
+### Plane 2 — Aptos coordination plane
 
-The Aptos-layer network connectivity on shelbynet for on-chain coordination. Responsible for:
+The Aptos-layer network connectivity for on-chain coordination. Responsible for:
 - On-chain blob commitment registration (required before putBlob in M2+)
 - Aptos transaction submission for Shelby coordination events
-- Aptos account identity on shelbynet
+- Aptos account identity on the selected network
 
 Environment variables:
 ```
-APTOS_NETWORK=shelbynet                  # Must be "shelbynet", not "testnet"
-SHELBYNET_APTOS_FULLNODE_URL=            # https://api.shelbynet.shelby.xyz/v1
-SHELBYNET_INDEXER_URL=                   # https://api.shelbynet.shelby.xyz/v1/graphql
-SHELBYNET_FAUCET_URL=                    # Shelbynet faucet for test account funding
-SHELBYNET_ACCOUNT_ADDRESS=               # Your Aptos account address on shelbynet
+APTOS_NETWORK=testnet                    # Current Shelby testnet coordination target
+SHELBY_APTOS_FULLNODE_URL=               # https://api.testnet.aptoslabs.com/v1
+SHELBY_INDEXER_URL=                      # https://api.testnet.aptoslabs.com/v1/graphql
+SHELBY_FAUCET_URL=                       # Faucet/funding URL if documented
+SHELBY_COORDINATION_ACCOUNT_ADDRESS=     # Your Aptos coordination account address
 ```
 
 > **M1B scope:** All Plane 2 variables are defined and documented in M1B but not consumed by any adapter code yet. Aptos transaction signing and on-chain submission are deferred to M2. When required, signing must be handled server-side or via a secure wallet integration — **never** by committing private keys or seed phrases.
@@ -137,14 +137,14 @@ If you want to prepare the environment for future M2 testing:
 
    ```env
    SHELBY_MODE=testnet
-   SHELBY_NETWORK=shelbynet
-   SHELBY_RPC_URL=https://api.shelbynet.shelby.xyz/shelby
+   SHELBY_NETWORK=testnet
+   SHELBY_RPC_URL=https://api.testnet.shelby.xyz/shelby
    SHELBY_API_KEY=your_api_key_here
    SHELBY_ACCOUNT_ADDRESS=0xYourAddress
    SHELBY_BLOB_EXPIRATION_MICROS=1800000000
-   APTOS_NETWORK=shelbynet
-   SHELBYNET_APTOS_FULLNODE_URL=https://api.shelbynet.shelby.xyz/v1
-   SHELBYNET_INDEXER_URL=https://api.shelbynet.shelby.xyz/v1/graphql
+   APTOS_NETWORK=testnet
+   SHELBY_APTOS_FULLNODE_URL=https://api.testnet.aptoslabs.com/v1
+   SHELBY_INDEXER_URL=https://api.testnet.aptoslabs.com/v1/graphql
    ```
 
 ---
@@ -193,7 +193,7 @@ design, API key handling, and funding. Set SHELBY_MODE=mock to use the local dem
 | `shelbyRef` | `shelby://mock/blob/{id}` (mock) | Real Shelby ref after on-chain registration |
 | `mockRef` | Same as shelbyRef (mock ref copy) | undefined |
 | `blobName` | Original file name | Shelby blobName (account namespace key) |
-| `network` | `'mock'` | `'shelbynet'` |
+| `network` | `'mock'` | `'testnet'` |
 | `accountAddress` | undefined | Shelby account address |
 | `transactionHash` | undefined | Aptos tx hash from commitment registration |
 | `expirationMicros` | undefined | Expiration set at upload time |
@@ -241,8 +241,8 @@ interface ShelbyAdapter {
 Shelby blob upload is a coordinated multi-step flow, not a single HTTP call:
 
 1. **Generate blob commitments** from the file bytes.
-2. **Register the blob on-chain** via the Aptos coordination layer on shelbynet (requires APT for gas; uses `@aptos-labs/ts-sdk` with `APTOS_NETWORK=shelbynet` and `SHELBYNET_APTOS_FULLNODE_URL`).
-3. **Wait for the Aptos transaction** to be confirmed on shelbynet.
+2. **Register the blob on-chain** via the Aptos coordination layer (requires testnet APT for gas; uses `@aptos-labs/ts-sdk` with `APTOS_NETWORK=testnet` and `SHELBY_APTOS_FULLNODE_URL`).
+3. **Wait for the Aptos transaction** to be confirmed on the selected network.
 4. **Call `rpc.putBlob()`** via `SHELBY_RPC_URL`. The Shelby RPC validates the commitment status before accepting the upload (requires ShelbyUSD or SHEL tokens).
 
 The Node SDK (`@shelby-protocol/sdk`) provides a `ShelbyNodeClient.upload()` method that handles all four steps internally.
@@ -270,14 +270,14 @@ The `ShelbyUploadPayload` in `adapter.ts` already carries all fields the SDK nee
 
 ### Funding prerequisites
 
-Real uploads to shelbynet require:
-- **APT** on shelbynet: for on-chain commitment registration gas fees.
+Real uploads to Shelby testnet require:
+- **Testnet APT**: for on-chain commitment registration gas fees.
 - **ShelbyUSD or SHEL tokens**: for Shelby storage operations.
-- Use `SHELBYNET_FAUCET_URL` for test account funding during development.
+- Verify the current Shelby/testnet funding path before wiring any funding UI.
 
 ### Signing security (M2+ design decision)
 
-Uploading requires an Aptos account signer on shelbynet. This must be handled:
+Uploading requires an Aptos account signer on the selected network. This must be handled:
 - Server-side using a funded account whose private key is stored as an env secret (never in source code).
 - Or via a secure wallet/browser signing integration (e.g. `@shelby-protocol/react` for browser flows).
 

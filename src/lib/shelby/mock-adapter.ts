@@ -5,7 +5,7 @@
  * file always produces the same ref in mock mode. No network calls are made.
  *
  * The `shelby://mock/blob/{id}` scheme makes it unambiguous that this is a
- * local demo reference only — NOT a real Shelby blob on shelbynet.
+ * local demo reference only — NOT a real Shelby blob.
  * Real Shelby identity uses account namespace + blob name (M2+).
  */
 

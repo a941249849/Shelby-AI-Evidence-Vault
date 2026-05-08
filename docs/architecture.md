@@ -121,7 +121,7 @@ interface ShelbyAdapter {
 }
 ```
 
-**Mock:** `mockShelbyAdapter` — derives `shelby://shelbynet/blob/{id}` ref from content hash; deterministic; no network calls.
+**Mock:** `mockShelbyAdapter` — derives `shelby://mock/blob/{id}` ref from content hash; deterministic; no network calls.
 
 **Testnet (M1 placeholder):** `createTestnetAdapter()` — always throws with an actionable error message. See `testnet-adapter.ts` for the full M2+ implementation guide including the multi-step upload flow.
 
@@ -129,10 +129,10 @@ interface ShelbyAdapter {
 
 ### Two-plane architecture
 
-Shelby runs on **shelbynet** — an isolated Aptos-derived network (not generic Aptos testnet). Two distinct planes are kept separate in `config.ts`, `.env.example`, and docs:
+Shelby real integration is planned against the official **testnet** endpoint family by default. Older `shelbynet` endpoints remain useful as developer-prototype context, but must not be mixed with testnet values. Two distinct planes are kept separate in `config.ts`, `.env.example`, and docs:
 
-- **Plane 1 — Shelby storage/RPC** (`SHELBY_NETWORK`, `SHELBY_RPC_URL`, `SHELBY_API_KEY`, `SHELBY_ACCOUNT_ADDRESS`, `SHELBY_BLOB_EXPIRATION_MICROS`): Shelby's own blob storage and API layer on shelbynet. Official RPC: `https://api.shelbynet.shelby.xyz/shelby`
-- **Plane 2 — Shelbynet/Aptos coordination** (`APTOS_NETWORK=shelbynet`, `SHELBYNET_APTOS_FULLNODE_URL`, `SHELBYNET_INDEXER_URL`, etc.): The Aptos coordination layer on shelbynet. Official fullnode: `https://api.shelbynet.shelby.xyz/v1`. Defined in `config.ts` via `getShelbynetCoordinationConfig()` for reference; not consumed in M1. Aptos signing/transactions are deferred to a future milestone.
+- **Plane 1 — Shelby storage/RPC** (`SHELBY_NETWORK`, `SHELBY_RPC_URL`, `SHELBY_API_KEY`, `SHELBY_ACCOUNT_ADDRESS`, `SHELBY_BLOB_EXPIRATION_MICROS`): Shelby's own blob storage and API layer. Official testnet RPC: `https://api.testnet.shelby.xyz/shelby`
+- **Plane 2 — Aptos coordination** (`APTOS_NETWORK=testnet`, `SHELBY_APTOS_FULLNODE_URL`, `SHELBY_INDEXER_URL`, etc.): The Aptos coordination layer for on-chain metadata, commitments, and payment. Official testnet fullnode: `https://api.testnet.aptoslabs.com/v1`. Defined in `config.ts` via `getShelbyCoordinationConfig()` for reference; not consumed in M1. Aptos signing/transactions are deferred to a future milestone.
 
 ---
 
@@ -165,4 +165,3 @@ Upload form
 - **Adapter isolation.** All Shelby-specific code is behind the `ShelbyAdapter` interface. The real SDK can be wired in `testnet-adapter.ts` without touching any other layer.
 - **localStorage for M1.** No server database is needed for the demo. Uploads survive page refresh but are browser-specific.
 - **Tailwind v4.** Uses CSS-first configuration (`@import "tailwindcss"` in globals.css). No `tailwind.config.js` needed.
-

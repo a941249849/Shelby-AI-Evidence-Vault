@@ -90,7 +90,7 @@ export interface BuildBlobInput {
   tags: string[];
   uploadMode: 'mock' | 'testnet';
   /** Network context: populated for local uploads. */
-  network?: 'mock' | 'shelbynet';
+  network?: 'mock' | 'testnet';
 }
 
 /**

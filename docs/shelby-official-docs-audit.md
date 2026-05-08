@@ -15,7 +15,7 @@ The official docs confirm four architectural facts that matter for the next phas
 3. Shelby blob identity is account namespace + blob name, not just a standalone opaque ref string.
 4. Real uploads require signer/account context, expiration, APT for gas, and ShelbyUSD or SHEL/Shelby token payment context depending on route.
 
-Important correction: Issue #5 listed `0xc63d6a5e...b3ddbf5` as a preliminary contract account to verify. The current official `Networks` page lists the Shelby Smart Contract account for `shelbynet` as `0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8bb4988e6a`. Treat the old `0xc63...` value as stale/unverified and do not hardcode either value in M1B code.
+Important correction: Issue #5 listed `0xc63d6a5e...b3ddbf5` as a preliminary contract account to verify. The current official `Networks` page lists the Shelby Smart Contract account for both `testnet` and `shelbynet` as `0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8bb4988e6a`. Treat the old `0xc63...` value as stale/unverified and do not hardcode either value in M1B code.
 
 Strategy correction after the devnet/testnet transition: the product strategy remains correct, but M2 real integration should prioritize Shelby **testnet** as the main target when possible. `shelbynet` should be treated as legacy/developer-prototype context, useful for architecture clues and explorer inspection, not as the default assumption for production-shaped integration.
 
@@ -44,12 +44,12 @@ Strategy correction after the devnet/testnet transition: the product strategy re
 | CLI | Uploads | https://docs.shelby.xyz/tools/cli/commands/uploads | Confirms `shelby upload`, expiration requirement, recursive mode, and SHEL charging language. |
 | CLI | Downloads | https://docs.shelby.xyz/tools/cli/commands/downloads | Confirms account-scoped CLI downloads and direct REST download path for other accounts. |
 | CLI | Faucet | https://docs.shelby.xyz/tools/cli/commands/faucet | Confirms faucet command works on `shelbynet`. |
-| API | Shelbynet API | https://docs.shelby.xyz/apis/rpc/shelbynet | Confirms Shelby RPC base `https://api.shelbynet.shelby.xyz/shelby`. |
+| API | Shelbynet API | https://docs.shelby.xyz/apis/rpc/shelbynet | Confirms the REST endpoint shapes; Networks page must supply the selected base URL. |
 | API | Upload blob | https://docs.shelby.xyz/apis/rpc/shelbynet/storage/uploadBlob | Confirms `PUT /v1/blobs/{account}/{blobName}` and `Content-Length`. |
 | API | Retrieve blob | https://docs.shelby.xyz/apis/rpc/shelbynet/storage/getBlob | Confirms `GET /v1/blobs/{account}/{blobName}` and optional byte range. |
 | API | Multipart start | https://docs.shelby.xyz/apis/rpc/shelbynet/multipart-uploads/startMultipartUpload | Confirms multipart session endpoint and `uploadId` response. |
 | API | S3 Gateway Uploads | https://docs.shelby.xyz/tools/s3-gateway/uploads | Confirms S3-compatible write path still requires Aptos signer and expiration. |
-| Explorer | Shelbynet Explorer | https://explorer.shelby.xyz/shelbynet | Confirms beta explorer, wallet connect entry, live blob/events/storage/provider counters, and blob states. |
+| Explorer | Shelby Explorer | https://explorer.shelby.xyz/testnet | Confirms beta explorer, wallet connect entry, live blob/events/storage/provider counters, and blob states on testnet. |
 
 ## Architecture Findings
 
@@ -123,8 +123,8 @@ The two-plane model remains correct:
 
 | Plane | Purpose | Current official signals |
 |---|---|---|
-| Shelby RPC/storage plane | User-facing blob upload/retrieval and RPC-to-provider coordination | `https://api.shelbynet.shelby.xyz/shelby`, REST `GET/PUT /v1/blobs/{account}/{blobName}`, multipart endpoints |
-| Aptos/Shelbynet coordination plane | On-chain metadata, commitments, payments, provider state, audits | `https://api.shelbynet.shelby.xyz/v1`, `https://api.shelbynet.shelby.xyz/v1/graphql`, smart contract account from Networks page |
+| Shelby RPC/storage plane | User-facing blob upload/retrieval and RPC-to-provider coordination | `https://api.testnet.shelby.xyz/shelby`, REST `GET/PUT /v1/blobs/{account}/{blobName}`, multipart endpoints |
+| Aptos coordination plane | On-chain metadata, commitments, payments, provider state, audits | `https://api.testnet.aptoslabs.com/v1`, `https://api.testnet.aptoslabs.com/v1/graphql`, smart contract account from Networks page |
 
 M1B correctly keeps these separate in `.env.example`, `config.ts`, and docs.
 
@@ -148,7 +148,7 @@ Shelby Smart Contract: 0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8
 
 The page still says `shelbynet` is a developer prototype network that may be wiped roughly weekly or faster. It is isolated from Aptos mainnet, testnet, and devnet. The same page now also exposes a separate `testnet` section. If Shelby team guidance says the March testnet topology is close to mainnet topology, then M2/M3 should use testnet as the production-shaped integration target and keep shelbynet as historical/prototype context.
 
-Shelby Explorer at `https://explorer.shelby.xyz/shelbynet` is beta, has a "Connect Wallet" entry, and displays live stats such as total blobs, total storage used, blob events, slices, placement groups, and storage providers. At review time it showed 16 storage providers and live blob/event tables with blob states like Registered, Complete, Pending, and Ready.
+Shelby Explorer at `https://explorer.shelby.xyz/testnet` is beta, has a "Connect Wallet" entry, and displays live stats such as total blobs, total storage used, blob events, slices, placement groups, and storage providers. At review time it showed 34 storage providers and live blob/event tables with blob states like Registered, Complete, Pending, and Ready. The older `https://explorer.shelby.xyz/shelbynet` view remains accessible for developer-prototype context.
 
 Implementation impact:
 
@@ -288,10 +288,10 @@ Key properties:
 
 ### Base URL
 
-Shelbynet RPC base:
+Selected testnet RPC base:
 
 ```txt
-https://api.shelbynet.shelby.xyz/shelby
+https://api.testnet.shelby.xyz/shelby
 ```
 
 ### Blob Upload
@@ -405,7 +405,7 @@ Implementation impact:
 - It must not claim real testnet/Shelbynet upload works.
 - It must not claim `shelby://mock/blob/{id}` or `shelby://demo/blob/{id}` are official Shelby identities.
 - It must not freeze any smart-contract account into code.
-- It must not imply `Network.TESTNET` examples are automatically correct for shelbynet. Official docs contain both testnet and shelbynet references; M2 must resolve the exact SDK network constant/config for the currently selected network.
+- It must not imply any SDK `Network` example is automatically correct without checking the selected network. Official docs contain both testnet and shelbynet references; M2 must resolve the exact SDK network constant/config for the currently selected network.
 
 ### What Can Be Kept for M1B
 
@@ -499,8 +499,8 @@ Deliverables:
 
 ## Open Questions for M2
 
-1. Which SDK `Network` value should be used for shelbynet in the current package version? Some docs examples show `Network.TESTNET`, while the Networks page says `shelbynet` is isolated and should be used as the network name.
-2. Is the current official smart-contract account still `0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8bb4988e6a` when implementation begins, or has the weekly-wiped network changed?
+1. Which SDK `Network` value and config object should be used for the current Shelby testnet package version?
+2. Is the current official smart-contract account still `0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8bb4988e6a` when implementation begins?
 3. Is the Google email / chain abstraction path exposed through Aptos Wallet Adapter, Petra, an Aptos Labs product, or Shelby-specific onboarding code?
 4. Should the public demo use browser wallet signing, or should real upload be reserved for a server-side controlled demo account?
 5. What API key type is safe for browser use, if any, and what rate limits apply to anonymous mode?

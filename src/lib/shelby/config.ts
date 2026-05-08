@@ -9,34 +9,36 @@
  * PLANE 1 — Shelby storage / RPC plane:
  *   SHELBY_NETWORK, SHELBY_RPC_URL, SHELBY_API_KEY,
  *   SHELBY_ACCOUNT_ADDRESS, SHELBY_BLOB_EXPIRATION_MICROS
- *   These point to Shelby's own blob storage / API layer on shelbynet.
- *   The official shelbynet RPC endpoint: https://api.shelbynet.shelby.xyz/shelby
+ *   These point to Shelby's own blob storage / API layer.
+ *   Official testnet RPC endpoint: https://api.testnet.shelby.xyz/shelby
  *
- * PLANE 2 — Shelbynet / Aptos coordination plane:
- *   APTOS_NETWORK, SHELBYNET_APTOS_FULLNODE_URL, SHELBYNET_INDEXER_URL,
- *   SHELBYNET_FAUCET_URL, SHELBYNET_ACCOUNT_ADDRESS
- *   Shelbynet is an isolated Aptos-derived network — NOT generic Aptos testnet.
- *   Official shelbynet Aptos fullnode: https://api.shelbynet.shelby.xyz/v1
- *   Official shelbynet indexer:        https://api.shelbynet.shelby.xyz/v1/graphql
+ * PLANE 2 — Aptos coordination plane:
+ *   APTOS_NETWORK, SHELBY_APTOS_FULLNODE_URL, SHELBY_INDEXER_URL,
+ *   SHELBY_FAUCET_URL, SHELBY_ACCOUNT_ADDRESS
+ *   Official Shelby testnet uses Aptos testnet fullnode/indexer URLs plus
+ *   Shelby's own testnet RPC URL. Do not mix testnet and shelbynet endpoint
+ *   families in a single runtime config.
+ *   Official testnet Aptos fullnode: https://api.testnet.aptoslabs.com/v1
+ *   Official testnet indexer:        https://api.testnet.aptoslabs.com/v1/graphql
  *   These are not consumed in M1 — defined here for M2+ reference.
  *   Aptos signing/transactions are NOT part of M1.
  *
  * Shelby coordination contract/account:
  *   Must be verified against current official Shelby docs and explorer
  *   at M2 implementation time. Do not hardcode earlier audit values in M1B.
- *   Explorer: https://explorer.shelby.xyz/shelbynet (verify at M2)
+ *   Explorer: https://explorer.shelby.xyz/testnet (verify at M2)
  */
 
-/** Default Shelby network. Shelbynet is the official Shelby testnet network. */
-export const DEFAULT_SHELBY_NETWORK = 'shelbynet' as const;
+/** Default real-integration target. Real upload remains blocked until M2. */
+export const DEFAULT_SHELBY_NETWORK = 'testnet' as const;
 
 export type ShelbyMode = 'mock' | 'testnet';
 
 export interface ShelbyConfig {
   mode: ShelbyMode;
-  /** Shelby network name. Official testnet network: "shelbynet". */
+  /** Shelby network name. Official current real-integration target: "testnet". */
   network?: string;
-  /** Shelby storage/API RPC endpoint (Plane 1). Official: https://api.shelbynet.shelby.xyz/shelby */
+  /** Shelby storage/API RPC endpoint (Plane 1). Official: https://api.testnet.shelby.xyz/shelby */
   rpcUrl?: string;
   apiKey?: string;
   accountAddress?: string;
@@ -63,12 +65,13 @@ export function getShelbyConfig(): ShelbyConfig {
 }
 
 /**
- * Shelbynet / Aptos coordination plane configuration (Plane 2).
+ * Aptos coordination plane configuration (Plane 2).
  * Read-only in M1 — not consumed by any adapter yet.
  * Defined here to make the architectural boundary explicit.
  *
- * Shelbynet is an isolated Aptos-derived network, not the public Aptos testnet.
- * Do NOT use generic Aptos testnet endpoints with Shelby.
+ * Current Shelby testnet uses Aptos testnet fullnode/indexer URLs alongside
+ * Shelby's own testnet RPC URL. Older shelbynet endpoints are legacy prototype
+ * context and must not be mixed with testnet endpoint values.
  *
  * Aptos signing and transaction submission are NOT part of M1.
  * When required in M2+, signing must be handled server-side or via a secure
@@ -76,31 +79,39 @@ export function getShelbyConfig(): ShelbyConfig {
  *
  * SDK packages needed for M2+ coordination:
  *   @shelby-protocol/sdk  — Shelby Node/browser SDK
- *   @aptos-labs/ts-sdk    — Aptos TypeScript SDK for shelbynet coordination
+ *   @aptos-labs/ts-sdk    — Aptos TypeScript SDK for testnet coordination
  */
-export interface ShelbynetConfig {
-  /** Aptos network label. Must be "shelbynet" for Shelby operations. */
+export interface ShelbyCoordinationConfig {
+  /** Aptos network label. Use "testnet" for the current Shelby testnet target. */
   aptosNetwork?: string;
-  /** Shelbynet Aptos fullnode REST URL. Official: https://api.shelbynet.shelby.xyz/v1 */
+  /** Aptos fullnode REST URL. Official testnet: https://api.testnet.aptoslabs.com/v1 */
   aptosFullnodeUrl?: string;
-  /** Shelbynet indexer GraphQL URL. Official: https://api.shelbynet.shelby.xyz/v1/graphql */
+  /** Aptos indexer GraphQL URL. Official testnet: https://api.testnet.aptoslabs.com/v1/graphql */
   indexerUrl?: string;
   faucetUrl?: string;
   accountAddress?: string;
 }
 
-export function getShelbynetCoordinationConfig(): ShelbynetConfig {
+export function getShelbyCoordinationConfig(): ShelbyCoordinationConfig {
   return {
     aptosNetwork: process.env.APTOS_NETWORK ?? DEFAULT_SHELBY_NETWORK,
-    aptosFullnodeUrl: process.env.SHELBYNET_APTOS_FULLNODE_URL,
-    indexerUrl: process.env.SHELBYNET_INDEXER_URL,
-    faucetUrl: process.env.SHELBYNET_FAUCET_URL,
-    accountAddress: process.env.SHELBYNET_ACCOUNT_ADDRESS,
+    aptosFullnodeUrl:
+      process.env.SHELBY_APTOS_FULLNODE_URL ?? process.env.SHELBYNET_APTOS_FULLNODE_URL,
+    indexerUrl: process.env.SHELBY_INDEXER_URL ?? process.env.SHELBYNET_INDEXER_URL,
+    faucetUrl: process.env.SHELBY_FAUCET_URL ?? process.env.SHELBYNET_FAUCET_URL,
+    accountAddress: process.env.SHELBY_COORDINATION_ACCOUNT_ADDRESS ?? process.env.SHELBYNET_ACCOUNT_ADDRESS,
   };
 }
 
 /**
- * @deprecated Use getShelbynetCoordinationConfig() instead.
+ * @deprecated Use getShelbyCoordinationConfig() instead.
+ * Kept as a compatibility alias for the earlier shelbynet-specific name.
+ */
+export const getShelbynetCoordinationConfig: typeof getShelbyCoordinationConfig =
+  getShelbyCoordinationConfig;
+
+/**
+ * @deprecated Use getShelbyCoordinationConfig() instead.
  * Kept as a re-export alias for callers using the old getAptosConfig() name.
  */
-export const getAptosConfig: typeof getShelbynetCoordinationConfig = getShelbynetCoordinationConfig;
+export const getAptosConfig: typeof getShelbyCoordinationConfig = getShelbyCoordinationConfig;

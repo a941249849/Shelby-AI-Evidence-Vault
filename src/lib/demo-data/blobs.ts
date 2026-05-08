@@ -34,10 +34,10 @@ export interface BlobRecord {
    * TypeScript-optional to maintain backward compatibility with demo data records.
    * All new local uploads populate this field from the original file name. */
   blobName?: string;
-  /** Shelby account address that owns this blob on shelbynet (M2+). */
+  /** Shelby account address that owns this blob on the selected network (M2+). */
   accountAddress?: string;
-  /** Network context: 'mock' for local demo, 'shelbynet' for real uploads (M2+). */
-  network?: 'mock' | 'shelbynet';
+  /** Network context: 'mock' for local demo, 'testnet' for real uploads (M2+). */
+  network?: 'mock' | 'testnet';
   /** Aptos transaction hash from on-chain commitment registration (M2+). */
   transactionHash?: string;
   /** Blob expiration in microseconds as set at upload time (M2+). */

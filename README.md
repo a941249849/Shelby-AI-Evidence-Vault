@@ -57,28 +57,28 @@ cp .env.example .env.local
 
 Shelby integration spans two distinct planes. See `.env.example` for full comments.
 
-**Plane 1 — Shelby storage / RPC plane (shelbynet)**
+**Plane 1 — Shelby storage / RPC plane (testnet target)**
 
 | Variable | Default | Description |
 |---|---|---|
 | `SHELBY_MODE` | `mock` | Set to `testnet` to see the blocked-until-M2 error message |
-| `SHELBY_NETWORK` | `shelbynet` | Shelby network name — use `shelbynet` for Shelby operations |
-| `SHELBY_RPC_URL` | — | Shelby blob API endpoint — `https://api.shelbynet.shelby.xyz/shelby` |
+| `SHELBY_NETWORK` | `testnet` | Shelby network name for the current production-shaped testnet target |
+| `SHELBY_RPC_URL` | — | Shelby blob API endpoint — `https://api.testnet.shelby.xyz/shelby` |
 | `SHELBY_API_KEY` | — | Shelby API key — **server-side only, never commit** |
-| `SHELBY_ACCOUNT_ADDRESS` | — | Your Shelby account address on shelbynet |
+| `SHELBY_ACCOUNT_ADDRESS` | — | Your Shelby account address on the selected network |
 | `SHELBY_BLOB_EXPIRATION_MICROS` | — | Blob expiration (microseconds) required for real uploads (M2+) |
 
-**Plane 2 — Shelbynet / Aptos coordination plane** (documented for M2+, not consumed in M1B)
+**Plane 2 — Aptos coordination plane** (documented for M2+, not consumed in M1B)
 
 | Variable | Default | Description |
 |---|---|---|
-| `APTOS_NETWORK` | `shelbynet` | Must be `shelbynet` — not generic Aptos testnet |
-| `SHELBYNET_APTOS_FULLNODE_URL` | — | Shelbynet Aptos fullnode — `https://api.shelbynet.shelby.xyz/v1` |
-| `SHELBYNET_INDEXER_URL` | — | Shelbynet indexer — `https://api.shelbynet.shelby.xyz/v1/graphql` |
-| `SHELBYNET_FAUCET_URL` | — | Shelbynet faucet for test account funding |
-| `SHELBYNET_ACCOUNT_ADDRESS` | — | Your Aptos account address on shelbynet |
+| `APTOS_NETWORK` | `testnet` | Aptos network for the current Shelby testnet target |
+| `SHELBY_APTOS_FULLNODE_URL` | — | Aptos testnet fullnode — `https://api.testnet.aptoslabs.com/v1` |
+| `SHELBY_INDEXER_URL` | — | Aptos testnet indexer — `https://api.testnet.aptoslabs.com/v1/graphql` |
+| `SHELBY_FAUCET_URL` | — | Faucet/funding URL, if documented for the selected network |
+| `SHELBY_COORDINATION_ACCOUNT_ADDRESS` | — | Your Aptos coordination account address |
 
-> **M1B note:** Real Shelby upload is not implemented. `SHELBY_MODE=testnet` shows a "blocked until M2" error on any upload attempt. Mock mode always works with zero env vars. Wallet signing, APT gas funding, and ShelbyUSD/SHEL token requirements are M2+ prerequisites. Contract address and network details must be verified at M2 implementation time.
+> **M1B note:** Real Shelby upload is not implemented. `SHELBY_MODE=testnet` shows a "blocked until M2" error on any upload attempt. Mock mode always works with zero env vars. Wallet signing, APT gas funding, and ShelbyUSD/SHEL token requirements are M2+ prerequisites. Contract address and network details must be verified at M2 implementation time. Older shelbynet endpoints are legacy prototype context; do not mix them with testnet endpoints.
 
 ---
 
@@ -159,7 +159,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Reset local demo data button on dashboard
 - Mode indicator on upload page (local demo / testnet blocked)
 - Future-compatible blob model with M2+ fields (blobName, accountAddress, mockRef, network, etc.)
-- `.env.example` with documented placeholders for Shelby RPC + shelbynet coordination planes
+- `.env.example` with documented placeholders for Shelby RPC + Aptos coordination planes
 
 ---
 

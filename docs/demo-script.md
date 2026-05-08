@@ -145,7 +145,7 @@ Key message: "When M2 comes with real Shelby SDK access, only `testnet-adapter.t
 ## Talking points
 
 - **Why evidence packs?** Grouping related blobs into packs gives you a unit of provenance — one pack = one dataset or one agent run.
-- **Why Shelby refs?** In M1B, `shelby://mock/blob/{id}` is a local demo identifier derived from the SHA-256 hash. In M2+, real Shelby identity uses account namespace + blob name registered on shelbynet.
+- **Why Shelby refs?** In M1B, `shelby://mock/blob/{id}` is a local demo identifier derived from the SHA-256 hash. In M2+, real Shelby identity uses account namespace + blob name registered on the selected network, with testnet as the default real-integration target.
 - **Why read receipts?** AI outputs are only as trustworthy as their inputs. Read receipts make the input-output chain inspectable.
 - **Why localStorage?** For M1B demo purposes, localStorage is sufficient — uploads survive refresh, no server needed. M2 can add a real backend.
 - **Why mock mode by default?** Zero setup. Any developer can clone, run, and upload in under a minute with no accounts or API keys.

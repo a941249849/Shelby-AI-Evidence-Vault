@@ -29,8 +29,8 @@ export interface ShelbyUploadResult {
   shelbyRef: string;
   /** Deterministic mock reference for local mock uploads. Same as shelbyRef in mock mode. */
   mockRef?: string;
-  /** Network context: 'mock' for local demo, 'shelbynet' for real uploads (M2+). */
-  network?: 'mock' | 'shelbynet';
+  /** Network context: 'mock' for local demo, 'testnet' for real uploads (M2+). */
+  network?: 'mock' | 'testnet';
   hash: string;
   timestamp: string;
 }
