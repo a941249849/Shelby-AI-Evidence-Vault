@@ -27,12 +27,12 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - M0 is merged.
 - M1A official docs audit is complete in `docs/shelby-official-docs-audit.md`.
 - M1B is merged from PR #4.
-- The frozen post-M1B architecture plan is `docs/m2-m4-product-architecture-plan.md`.
-- M2 implementation design is complete in `docs/m2-shelby-testnet-integration-design.md`.
-- M1B scope is local/mock only.
-- UI is frozen for now.
-- Real Shelby upload remains blocked until M3 implementation.
-- Current real-integration target should be Shelby testnet, not the older shelbynet developer-prototype default.
+- M2 design is complete in `docs/m2-shelby-testnet-integration-design.md`.
+- M3 browser-wallet Shelby testnet upload is merged: `use-shelby-upload.ts`, `browser-client.ts`, `providers.tsx`.
+- C3 smoke harness is merged: `scripts/shelby-smoke.mjs`, `src/lib/shelby/status-map.ts`, `docs/c3-smoke-test-guide.md`.
+- M4 read receipt binding is merged: `ReadReceiptClient`, localStorage receipt persistence, BlobRecord identity surface.
+- M5 public ecosystem package is the current stage: README rewrite, demo script update, architecture update, ecosystem submission pack.
+- UI redesign remains paused — Task X2 is deferred until protocol boundaries stabilize.
 
 ## Stage Gate
 
@@ -184,6 +184,8 @@ Owner: Copilot
 
 Size: Large
 
+Status: **Complete** — implemented (browser-wallet Shelby testnet upload path, M3).
+
 When to start:
 
 Now that Codex has completed `docs/m2-shelby-testnet-integration-design.md`, this is the next Copilot-sized production task.
@@ -322,11 +324,52 @@ Deliverables:
 - `docs/production-queue.md` — C4 task documented
 - `docs/m4-read-receipt-binding.md` — model and verification guide
 
+### Task C5: M5 public ecosystem package (current)
+
+Owner: Copilot
+
+Size: Large
+
+Status: **In progress** — this PR.
+
+Goal:
+
+Update all public-facing documentation to accurately reflect the M4/M5 product state. No new app features or protocol behavior changes.
+
+Scope:
+
+- Rewrite README.md: remove M1B-only framing, add M4/M5 feature list, update architecture tree, add verification commands.
+- Update docs/demo-script.md: remove M1B-only scope, add testnet operator demo section, add C3 smoke follow-up.
+- Update docs/architecture.md: add browser-wallet path, read-receipt-client, localStorage receipts, providers, status-map.
+- Create docs/ecosystem-submission-pack.md: English + Chinese positioning, elevator pitch, 3-minute narrative, milestone matrix, out-of-scope list, links.
+- Update docs/production-queue.md: mark M4 complete, add M5 task, fix stale Immediate Next Action.
+
+Hard boundaries:
+
+- No UI redesign.
+- No new app features.
+- No real LLM/API calls.
+- No production database/auth.
+- No private key or server signer.
+- No dependency changes.
+
+Acceptance:
+
+- README reflects M4/M5 reality.
+- Demo script matches actual app behavior.
+- Architecture doc matches current code.
+- Ecosystem submission pack exists and is ready for public handoff.
+- Production queue no longer points at C2 as immediate next action.
+- `npm run lint` passes.
+- `npm run build` passes.
+
 ## Codex Task Queue
 
 ### Task X1: M1B merge-readiness review
 
 Owner: Codex
+
+Status: **Complete.**
 
 Goal:
 
@@ -344,12 +387,21 @@ After protocol boundaries stabilize, redesign the app UI toward a stronger Shelb
 
 Owner: Codex
 
+Status: **Complete.**
+
 Goal:
 
 Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-Do not give Copilot small patch tasks.
+M5 documentation/packaging is the current stage (this PR).
 
-Dispatch Task C2 as one large Copilot production task when ready.
+After M5 merges, the next Copilot task options include:
+
+- **X2 (Codex):** UI redesign pass — now that protocol boundaries are stable through M4.
+- **C6:** Search and filter on the dashboard (operator-requested feature).
+- **C7:** Real backend persistence with SQLite for cross-browser evidence packs.
+- **C8:** Agent run integration example — a scripted agent that produces an evidence pack and read receipt.
+
+Do not dispatch small patch tasks to Copilot. Next Copilot task should be a large bounded implementation with clear acceptance criteria.

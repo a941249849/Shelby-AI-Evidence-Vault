@@ -1,8 +1,8 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **M1B local demo** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **M4/M5 evidence vault** to stakeholders or the community.
 
-> **M1B scope:** This is a local mock upload demo. No real Shelby blobs are stored. Real Shelby upload is blocked until M2. Built-in demo data uses illustrative `shelby://demo/blob/` references — these are not real Shelby blob identities.
+> **Current scope:** Local mock upload works with zero configuration — the default. A browser-wallet Shelby testnet upload path exists for operators with funded wallets. Built-in demo data uses illustrative `shelby://demo/blob/` references. Local uploads get `shelby://mock/blob/{id}` references. Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require operator prerequisites.
 
 ## Prerequisites
 
@@ -23,13 +23,12 @@ Open `http://localhost:3000`.
 
 **Point out:**
 - The hero section: "AI agents need verifiable data memory."
-- The **M1B Demo** badge (top of hero): "M1B Demo — Local mock upload · Real Shelby blocked until M2"
 - The three CTA buttons: Launch Demo, View GitHub, Read Docs
 - Scroll down to the **Problem** section — explain why data provenance matters for AI
 - Scroll to **Solution** — evidence packs, Shelby blob references, read receipts
 - Scroll to **How it Works** — the 4-step flow
 - Scroll to **Sample evidence packs** — show 3 live cards from demo data
-- Scroll to **Developer Quickstart** — show the 5-line git clone snippet
+- Scroll to **Developer Quickstart** — show the git clone snippet
 
 ---
 
@@ -54,7 +53,7 @@ Navigate to `/blob/blob-001`.
 
 **Point out:**
 - The full blob metadata table
-- **Demo Reference** row: `shelby://demo/blob/a1b2c3d4...` — an illustrative demo reference, not a real Shelby blob identity. Real Shelby identity uses account namespace + blob name and requires M2 integration.
+- **Demo Reference** row: `shelby://demo/blob/a1b2c3d4...` — an illustrative demo reference, not a real Shelby blob identity
 - **SHA-256 Hash** row: the content fingerprint
 - **Source** row: the original URL from Common Crawl S3
 - **MIME Type**: `application/warc`
@@ -73,7 +72,7 @@ Navigate to `/read-receipt/rr-001`.
 - The **Query** block (large, prominent): the agent's question
 - The **Answer Summary** block: what the agent found
 - **Run ID** (monospace): the unique agent run identifier
-- **Referenced Blobs**: clickable links to `/blob/blob-003` — trace from answer back to source
+- **Referenced Blobs**: clickable links to `/blob/blob-003` — trace from answer back to source; shows Shelby ref, SHA-256 hash, and data-source badge
 - **Evidence Packs**: link to the pack that was consulted
 - **Agent Version**: `shelby-agent/0.3.0 gpt-4o-2024-01-25`
 
@@ -81,13 +80,13 @@ Explain: "Every time an agent runs, we can produce this receipt. It's a full aud
 
 ---
 
-## Step 5 — Upload page (`/upload`) — **NEW in M1B (local demo)**
+## Step 5 — Upload page (`/upload`) — local mock demo
 
 Navigate to `/upload`.
 
 **Point out:**
-- The **mode indicator** at the top — shows "Local demo upload" (mock) or "Real Shelby upload blocked until M2" (testnet)
-- In local demo mode: "Files are hashed in-browser and saved locally. No Shelby network call is made."
+- The **mode indicator** at the top — shows "Local demo upload active" (mock mode) — no wallet required
+- "Files are saved to browser localStorage with deterministic mock Shelby references. No wallet signing, no network calls, and no real Shelby upload."
 - The working form: title, category, source type, tags, description
 - The **file drop area**: drag & drop or click to browse
 - File size limit: 5 MB per file
@@ -102,12 +101,27 @@ Navigate to `/upload`.
    - Number of blobs saved
    - Mode (local demo)
    - Links to blob detail pages
+   - **A read receipt link** — click it to see the auto-generated receipt
 
 **Click a blob link** — it opens `/blob/local-blob-...` and shows the full detail with a **"Local demo upload"** badge and a **Mock Reference** row that says `shelby://mock/blob/{id}` — a local demo identifier, not a real Shelby blob.
 
 ---
 
-## Step 6 — Return to Dashboard
+## Step 6 — Verify the read receipt
+
+The success screen shows a **Read receipt** link. Click it (or navigate to `/read-receipt/local-rr-{uuid}`).
+
+**Point out:**
+- The **Receipt mode** badge: "Local demo upload"
+- The **Query** block: the upload description you entered
+- **Referenced blobs** section: shows the blob's Shelby ref, SHA-256 hash, source, and a "Local mock" data-source badge
+- **Run ID**: `upload-{packId}` — tied to the upload that created this receipt
+
+**Refresh the page** — the receipt must still resolve (persisted in localStorage). This demonstrates that read receipts survive browser refresh.
+
+---
+
+## Step 7 — Return to Dashboard
 
 Navigate back to `/dashboard`.
 
@@ -115,51 +129,104 @@ Navigate back to `/dashboard`.
 - A new **"Locally uploaded (1)"** section at the top with a green indicator dot
 - Your uploaded pack appears as a card
 - Stats bar now shows updated counts
-- The **"Reset local demo data"** button (top-right of local section)
+- The **"Reset local data"** button (top-right of local section)
   - Click once → "Click again to confirm reset"
-  - Click again → local packs disappear; demo data remains
+  - Click again → local packs disappear; demo data remains; local receipts also cleared
 
 ---
 
-## Step 7 — Code walkthrough (optional, for technical audience)
+## Step 8 — Code walkthrough (optional, for technical audience)
 
 Open the repo in your editor.
 
 1. **`src/lib/demo-data/`** — TypeScript types and static demo arrays (illustrative `shelby://demo/blob/` refs)
 2. **`src/lib/evidence/service.ts`** — service functions (clean, no framework)
-3. **`src/lib/shelby/`** — the dual-mode adapter structure:
+3. **`src/lib/shelby/`** — the adapter and browser-wallet layer:
    - `adapter.ts` — interface and types
    - `mock-adapter.ts` — deterministic local mock (produces `shelby://mock/blob/` refs)
-   - `testnet-adapter.ts` — blocked until M2 (throws canonical error on any upload attempt)
+   - `testnet-adapter.ts` — legacy server-side testnet placeholder
+   - `browser-client.ts` — browser-side Shelby client config (NEXT_PUBLIC_ vars only)
+   - `use-shelby-upload.ts` — React hook: browser wallet + useUploadBlobs
+   - `status-map.ts` — conservative storage status mapping utilities
    - `config.ts` — reads `SHELBY_MODE` env var; two-plane architecture docs
    - `index.ts` — `getAdapter()` factory
 4. **`src/app/actions/upload.ts`** — Server Action (API key stays server-side)
-5. **`src/lib/validation.ts`** — `buildEvidencePack()`, `buildBlobRecord()`, `parseTags()`
-6. **`src/lib/store/local-store.ts`** — localStorage read/write helpers
-7. **`src/components/dashboard-client.tsx`** — merges demo + localStorage packs
+5. **`src/app/upload/providers.tsx`** — QueryClient + AptosWalletAdapterProvider (testnet path)
+6. **`src/lib/validation.ts`** — `buildEvidencePack()`, `buildBlobRecord()`, `parseTags()`
+7. **`src/lib/store/local-store.ts`** — localStorage read/write helpers for packs, blobs, and receipts
+8. **`src/components/dashboard-client.tsx`** — merges demo + localStorage packs
+9. **`src/components/read-receipt-client.tsx`** — resolves receipts from demo data or localStorage
 
-Key message: "When M2 comes with real Shelby SDK access, only `testnet-adapter.ts` changes. The server action, validation, store, and UI stay the same."
+Key message: "Mock mode is the default and requires zero configuration. The browser-wallet testnet path is isolated behind the adapter and hook boundary — operators can activate it with wallet + testnet config."
 
 ---
 
 ## Talking points
 
 - **Why evidence packs?** Grouping related blobs into packs gives you a unit of provenance — one pack = one dataset or one agent run.
-- **Why Shelby refs?** In M1B, `shelby://mock/blob/{id}` is a local demo identifier derived from the SHA-256 hash. In M2+, real Shelby identity uses account namespace + blob name registered on the selected network, with testnet as the default real-integration target.
-- **Why read receipts?** AI outputs are only as trustworthy as their inputs. Read receipts make the input-output chain inspectable.
-- **Why localStorage?** For M1B demo purposes, localStorage is sufficient — uploads survive refresh, no server needed. M2 can add a real backend.
+- **Why Shelby refs?** In local mode, `shelby://mock/blob/{id}` is a deterministic demo identifier. In testnet mode, `shelby://testnet/{account}/{blobName}` is a real Shelby blob identity registered on-chain.
+- **Why read receipts?** AI outputs are only as trustworthy as their inputs. Read receipts make the input-output chain inspectable — and now they bind to real BlobRecord identity.
+- **Why localStorage?** For demo purposes, localStorage is sufficient — uploads survive refresh, no server needed. A real backend is a future operator decision.
 - **Why mock mode by default?** Zero setup. Any developer can clone, run, and upload in under a minute with no accounts or API keys.
 
 ---
 
-## Enabling testnet mode (for technical demos)
+## Testnet mode operator demo (advanced — requires prerequisites)
+
+> **Honest prerequisites:** This path requires an Aptos testnet wallet, testnet APT for gas fees, Shelby storage credits, and manual browser interaction. CI does not and cannot run this path. Do not claim CI performed a real upload.
+
+### Prerequisites
+- [Petra wallet](https://petra.app/) or compatible Aptos wallet browser extension
+- Testnet APT (from [Aptos testnet faucet](https://aptoslabs.com/testnet-faucet))
+- Shelby storage credits on the connected account
+- `.env.local` with:
+  ```env
+  SHELBY_MODE=testnet
+  NEXT_PUBLIC_SHELBY_NETWORK=testnet
+  ```
+
+### Steps
+1. Start the dev server: `npm run dev`
+2. Navigate to `/upload`
+3. The mode indicator shows **"Shelby testnet upload"** — a wallet connect section appears
+4. Click to connect your Aptos wallet (Petra or similar); ensure it is on **Aptos Testnet**
+5. Select a small test file, fill in the form, and click **Upload**
+6. Your wallet prompts you to sign an Aptos transaction — approve it
+7. On success, the app shows:
+   - `accountAddress`: your wallet address
+   - `blobName`: e.g. `evidence/pack-id/abcdef01-test-file.json`
+   - `shelbyRef`: `shelby://testnet/0x.../evidence/...`
+   - `storageStatus`: `registered`
+   - `explorerUrl`: Shelby explorer link
+   - A **read receipt link** with `receiptMode: 'shelby-testnet'`
+
+### Follow-up: C3 smoke harness
+
+After a successful manual upload, you can verify retrieval with the smoke harness:
 
 ```bash
-cp .env.example .env.local
-# Edit .env.local:
-# SHELBY_MODE=testnet
-# SHELBY_API_KEY=...
-npm run dev
+# Copy accountAddress and blobName from the upload success screen into .env.local:
+# SHELBY_SMOKE=true
+# SHELBY_SMOKE_ACCOUNT_ADDRESS=0xYourAddress
+# SHELBY_SMOKE_BLOB_NAME=evidence/pack-id/abcdef01-test-file.json
+# SHELBY_RPC_URL=https://api.testnet.shelby.xyz/shelby
+# SHELBY_NETWORK=testnet
+
+npm run smoke
 ```
 
-> **M1B note:** The real testnet adapter is blocked until M2. Any upload attempt with `SHELBY_MODE=testnet` will show the canonical error: "Real Shelby upload is blocked until M2. Official integration requires commitment generation, on-chain registration, RPC upload, network selection, signer/wallet design, API key handling, and funding." Mock mode continues to work.
+See `docs/c3-smoke-test-guide.md` for full instructions, expected output, and exit code documentation.
+
+---
+
+## Verification (CI-safe)
+
+These commands verify the app without requiring a funded wallet:
+
+```bash
+npm run lint   # Must pass
+npm run build  # Must pass
+```
+
+The smoke harness is opt-in and disabled unless `SHELBY_SMOKE=true` is explicitly set.
+
