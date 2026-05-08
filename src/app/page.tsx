@@ -1,255 +1,214 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
-import { ArrowRight, Braces, FileWarning, Fingerprint, Network, ShieldCheck } from 'lucide-react';
+import {
+  ArrowRight,
+  Braces,
+  CheckCircle2,
+  Database,
+  Fingerprint,
+  Network,
+  ReceiptText,
+  ShieldCheck,
+  UploadCloud,
+} from 'lucide-react';
 import { evidencePacks } from '@/lib/demo-data';
 import EvidencePackCard from '@/components/evidence-pack-card';
 
 const demoPacks = evidencePacks.slice(0, 3);
 
-function ShelbyGlyph() {
+function SystemMetric({ label, value, tone }: { label: string; value: string; tone: string }) {
   return (
-    <div className="shelby-hex relative h-28 w-28 bg-[#4f192a] shadow-[0_28px_80px_rgba(79,25,42,0.18)]">
-      <div className="shelby-hex absolute inset-3 bg-[#fd8565]" />
-      <div className="absolute inset-0 grid place-items-center">
-        <div className="h-9 w-9 rounded-full bg-[#fcfaf8] shadow-[inset_0_0_0_8px_rgba(222,138,255,0.45)]" />
+    <div className="border-l border-white/10 px-4 py-3 first:border-l-0">
+      <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">{label}</p>
+      <p className={`mt-2 text-2xl font-semibold ${tone}`}>{value}</p>
+    </div>
+  );
+}
+
+function ProofStep({
+  index,
+  title,
+  body,
+  icon: Icon,
+}: {
+  index: string;
+  title: string;
+  body: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="trace-line grid grid-cols-[2.3rem_1fr] gap-4">
+      <div className="grid h-9 w-9 place-items-center border border-[#9fe878]/35 bg-[#9fe878]/10 text-[#9fe878]">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="border-b border-white/10 pb-5">
+        <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">{index}</p>
+        <h3 className="mt-1 text-base font-semibold text-[#f4f0e8]">{title}</h3>
+        <p className="mt-1 text-sm leading-6 text-[#9d9a92]">{body}</p>
       </div>
     </div>
   );
 }
 
-function ProofRow({
-  step,
+function Capability({
   title,
   body,
-  tone,
+  accent,
 }: {
-  step: string;
   title: string;
   body: string;
-  tone: 'violet' | 'green' | 'pink' | 'coral';
-}) {
-  const tones = {
-    violet: 'bg-[#eee2ff] text-[#470b64] border-[#de8aff]/45',
-    green: 'bg-[#dfffcc] text-[#21351a] border-[#9fe878]/55',
-    pink: 'bg-[#ffdfef] text-[#4f192a] border-[#ff77c9]/45',
-    coral: 'bg-[#ffdcd9] text-[#4f192a] border-[#fd8565]/45',
-  };
-
-  return (
-    <div className="shelby-cut-sm grid gap-3 border border-[#161008]/12 bg-[#fcfaf8] p-4 sm:grid-cols-[72px_1fr]">
-      <div className={`shelby-hex grid h-12 w-12 place-items-center border font-mono text-xs ${tones[tone]}`}>
-        {step}
-      </div>
-      <div>
-        <p className="text-sm font-semibold text-[#161008]">{title}</p>
-        <p className="mt-1 text-sm leading-6 text-[#6f6258]">{body}</p>
-      </div>
-    </div>
-  );
-}
-
-function ProblemCard({
-  icon,
-  title,
-  body,
-}: {
-  icon: ReactNode;
-  title: string;
-  body: string;
+  accent: string;
 }) {
   return (
-    <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8] p-5 shadow-[0_18px_54px_rgba(22,16,8,0.045)]">
-      <div className="mb-6 flex h-10 w-10 items-center justify-center rounded bg-[#ffdcd9] text-[#4f192a]">
-        {icon}
-      </div>
-      <h2 className="text-base font-semibold text-[#161008]">{title}</h2>
-      <p className="mt-2 text-sm leading-7 text-[#6f6258]">{body}</p>
+    <div className="shelby-cut border border-white/10 bg-[#15161c] p-5">
+      <div className={`mb-7 h-1.5 w-20 ${accent}`} />
+      <h3 className="text-base font-semibold text-[#f4f0e8]">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-[#9d9a92]">{body}</p>
     </div>
   );
 }
 
 export default function HomePage() {
-  return (
-    <div className="bg-[#fcfaf8] text-[#161008]">
-      <section className="relative overflow-hidden px-4">
-        <div className="absolute inset-0 ledger-line opacity-80" />
-        <div className="absolute right-[-12rem] top-[-10rem] h-[32rem] w-[32rem] rotate-[60deg] rounded-[44px] bg-[#eee2ff]" />
-        <div className="absolute bottom-[-18rem] left-[-10rem] h-[30rem] w-[30rem] rotate-[60deg] rounded-[44px] bg-[#dfffcc]" />
+  const blobCount = evidencePacks.reduce((sum, pack) => sum + pack.blobCount, 0);
 
-        <div className="relative mx-auto grid min-h-[calc(100vh-64px)] max-w-7xl items-center gap-10 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:py-20">
-          <div>
-            <div className="mb-7 flex items-center gap-4">
-              <ShelbyGlyph />
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.24em] text-[#4f192a]">
-                  Built to hold, made to move
-                </p>
-                <p className="mt-2 text-sm text-[#6f6258]">
-                  M1B local demo. Real Shelby upload remains blocked until M2.
-                </p>
+  return (
+    <div className="kinetic-grid min-h-screen text-[#f4f0e8]">
+      <section className="relative overflow-hidden px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#9fe878]/60 to-transparent" />
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch">
+          <div className="flex min-h-[calc(100vh-8rem)] flex-col justify-between py-4">
+            <div>
+              <div className="mb-8 flex items-center gap-4">
+                <div className="shelby-mark h-16 w-16">
+                  <span />
+                </div>
+                <div>
+                  <p className="font-mono text-xs font-semibold uppercase text-[#9fe878]">
+                    Shelby proof interface
+                  </p>
+                  <p className="mt-1 text-sm text-[#9d9a92]">
+                    Evidence packs, blob identity, read receipts
+                  </p>
+                </div>
+              </div>
+
+              <h1 className="max-w-4xl text-5xl font-semibold leading-[0.95] text-[#f4f0e8] sm:text-6xl lg:text-7xl">
+                Verifiable memory for AI systems.
+              </h1>
+              <p className="mt-6 max-w-2xl text-base leading-8 text-[#c7c1b8]">
+                A product demo for storing AI evidence on a Shelby-shaped path: local mock by
+                default, browser-wallet testnet upload when configured, and SQLite persistence for
+                user-created records.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link href="/dashboard" className="ui-button shelby-cut-sm">
+                  Open evidence index
+                  <ArrowRight size={16} />
+                </Link>
+                <Link href="/upload" className="ui-button ui-button-secondary shelby-cut-sm">
+                  Upload evidence
+                  <UploadCloud size={16} />
+                </Link>
+                <Link
+                  href="/read-receipt/rr-001"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 px-3 text-sm font-semibold text-[#9fe878] transition hover:text-[#de8aff]"
+                >
+                  Inspect receipt
+                  <ReceiptText size={16} />
+                </Link>
               </div>
             </div>
 
-            <h1 className="max-w-5xl text-[3.35rem] font-semibold leading-[0.94] tracking-tight text-[#161008] sm:text-[4.5rem] lg:text-[6.8rem]">
-              Verifiable memory for AI evidence.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-[#4f192a] sm:text-lg">
-              Evidence packs, hash fingerprints, mock Shelby references, and read receipts in one
-              inspectable trail. Warm product surface, strict protocol boundary.
-            </p>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/dashboard"
-                className="shelby-cut-sm inline-flex items-center justify-center gap-2 bg-[#161008] px-5 py-3 text-sm font-semibold text-[#fcfaf8] transition hover:bg-[#4f192a]"
-              >
-                Open evidence vault
-                <ArrowRight size={16} />
-              </Link>
-              <Link
-                href="/upload"
-                className="shelby-cut-sm inline-flex items-center justify-center gap-2 border border-[#161008]/18 bg-[#fcfaf8] px-5 py-3 text-sm font-semibold text-[#161008] transition hover:border-[#fd8565] hover:bg-[#ffdcd9]"
-              >
-                Upload local pack
-              </Link>
-              <Link
-                href="/read-receipt/rr-001"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-[#470b64] transition hover:text-[#ff77c9]"
-              >
-                Read receipt demo
-              </Link>
+            <div className="mt-10 grid border-y border-white/10 bg-white/[0.035] sm:grid-cols-3">
+              <SystemMetric label="Demo packs" value={String(evidencePacks.length)} tone="text-[#f4f0e8]" />
+              <SystemMetric label="Tracked blobs" value={String(blobCount)} tone="text-[#9fe878]" />
+              <SystemMetric label="Runtime store" value="SQLite" tone="text-[#de8aff]" />
             </div>
           </div>
 
-          <div className="relative">
-            <div className="absolute -right-4 -top-4 h-20 w-20 rotate-[60deg] rounded-[14px] bg-[#ff77c9]" />
-            <div className="absolute -bottom-5 left-10 h-28 w-28 rotate-[60deg] rounded-[18px] bg-[#9fe878]" />
-            <div className="shelby-cut relative border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-[0_34px_120px_rgba(22,16,8,0.14)] backdrop-blur">
-              <div className="mb-6 grid gap-4 border-b border-[#161008]/10 pb-5 sm:grid-cols-[1fr_auto] sm:items-start">
+          <div className="grid gap-4 lg:grid-rows-[1fr_auto]">
+            <div className="shelby-surface shelby-cut p-5 sm:p-6">
+              <div className="mb-6 flex items-start justify-between gap-4 border-b border-white/10 pb-5">
                 <div>
-                  <p className="font-mono text-xs uppercase tracking-[0.24em] text-[#6f6258]">
+                  <div className="ui-chip">
+                    <Network size={13} />
                     Evidence chain
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#161008]">
-                    Query to proof, visible at every step.
+                  </div>
+                  <h2 className="mt-4 max-w-xl text-2xl font-semibold text-[#f4f0e8]">
+                    Every answer can point back to the data it touched.
                   </h2>
                 </div>
-                <div className="shelby-hex grid h-14 w-14 place-items-center bg-[#4f192a] text-[#dfffcc]">
-                  <ShieldCheck size={22} />
+                <div className="hidden border border-[#9fe878]/30 bg-[#9fe878]/10 p-3 text-[#9fe878] sm:block">
+                  <ShieldCheck size={24} />
                 </div>
               </div>
 
-              <div className="grid gap-3">
-                <ProofRow
-                  step="01"
-                  title="Evidence pack"
-                  body="Dataset, document, or agent output grouped with metadata."
-                  tone="violet"
+              <div className="space-y-5">
+                <ProofStep
+                  index="Stage 01"
+                  title="Pack the source material"
+                  body="Datasets, documents, exports, and agent outputs become evidence packs."
+                  icon={Database}
                 />
-                <ProofRow
-                  step="02"
-                  title="Blob fingerprint"
-                  body="SHA-256 hash plus illustrative shelby://demo or local mock reference."
-                  tone="green"
+                <ProofStep
+                  index="Stage 02"
+                  title="Bind file identity"
+                  body="Each blob carries hash, reference, source, size, mode, and network metadata."
+                  icon={Fingerprint}
                 />
-                <ProofRow
-                  step="03"
-                  title="Agent usage"
-                  body="The answer run records exactly which blobs were referenced."
-                  tone="pink"
+                <ProofStep
+                  index="Stage 03"
+                  title="Persist the proof surface"
+                  body="SQLite keeps user-created packs, blobs, and receipts beyond browser storage."
+                  icon={CheckCircle2}
                 />
-                <ProofRow
-                  step="04"
-                  title="Read receipt"
-                  body="Query, evidence references, and answer summary become inspectable."
-                  tone="coral"
+                <ProofStep
+                  index="Stage 04"
+                  title="Resolve read receipts"
+                  body="Receipts connect questions, responses, referenced blobs, and pack lineage."
+                  icon={ReceiptText}
                 />
               </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Capability
+                title="Mock-first runtime"
+                body="No wallet or key required for the default local flow."
+                accent="bg-[#9fe878]"
+              />
+              <Capability
+                title="Testnet path"
+                body="Browser wallet upload path keeps signing material out of the app."
+                accent="bg-[#de8aff]"
+              />
+              <Capability
+                title="Receipt binding"
+                body="Receipts resolve BlobRecord identity across demo, local, and SQLite records."
+                accent="bg-[#fd8565]"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-7 max-w-3xl">
-            <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#4f192a]">
-              Why this exists
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#161008]">
-              AI output needs a proof surface, not just a file list.
-            </h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            <ProblemCard
-              icon={<Fingerprint size={20} />}
-              title="Untracked provenance"
-              body="Models consume datasets, exports, and agent outputs without a durable chain of custody."
-            />
-            <ProblemCard
-              icon={<FileWarning size={20} />}
-              title="Weak source proof"
-              body="Files may carry names and folders, but not a compact trail of hash, origin, and reference."
-            />
-            <ProblemCard
-              icon={<Network size={20} />}
-              title="Lost answer context"
-              body="A query can produce an answer without preserving the evidence it actually referenced."
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="px-4 py-16">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="shelby-cut bg-[#4f192a] p-6 text-[#fcfaf8]">
-            <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#ffc2ad]">
-              Product model
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              A vault for evidence, not another upload folder.
-            </h2>
-            <p className="mt-4 text-sm leading-7 text-[#ffdfef]">
-              M1B proves the workflow locally. M2 wires the official Shelby path once SDK, wallet,
-              funding, commitment, and RPC details are ready.
-            </p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {[
-              ['Evidence Packs', 'Datasets, documents, and agent runs grouped with metadata.'],
-              ['Mock References', 'Deterministic local refs plus SHA-256 fingerprints.'],
-              ['Read Receipts', 'A query, its evidence, and the answer summary in one trail.'],
-            ].map(([title, body], index) => (
-              <div key={title} className="shelby-cut-sm border border-[#161008]/12 bg-[#fcfaf8] p-5">
-                <div className="mb-8 font-mono text-xs text-[#470b64]">0{index + 1}</div>
-                <h3 className="font-semibold text-[#161008]">{title}</h3>
-                <p className="mt-2 text-sm leading-7 text-[#6f6258]">{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <section className="border-t border-white/10 px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#ff77c9]">
-                Demo evidence
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#161008]">
-                Sample evidence packs
+              <div className="ui-chip">
+                <Braces size={13} />
+                Demo corpus
+              </div>
+              <h2 className="mt-4 text-3xl font-semibold text-[#f4f0e8]">
+                Evidence packs ready to inspect.
               </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f6258]">
-                Built-in demo objects use illustrative references. Local uploads create mock
-                references in this browser only.
-              </p>
             </div>
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#470b64] transition hover:text-[#ff77c9]"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#9fe878] transition hover:text-[#de8aff]"
             >
-              View evidence index
+              Full index
               <ArrowRight size={15} />
             </Link>
           </div>
@@ -257,30 +216,6 @@ export default function HomePage() {
             {demoPacks.map((pack) => (
               <EvidencePackCard key={pack.id} pack={pack} />
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-[#161008]/10 px-4 py-14">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid gap-6 md:grid-cols-[0.8fr_1.2fr] md:items-center">
-            <div>
-              <div className="shelby-hex inline-flex h-12 w-12 items-center justify-center bg-[#eee2ff] text-[#470b64]">
-                <Braces size={20} />
-              </div>
-              <h2 className="mt-4 text-xl font-semibold text-[#161008]">Developer quickstart</h2>
-              <p className="mt-2 text-sm leading-6 text-[#6f6258]">
-                Run the M1B local demo with no env vars. Real Shelby upload remains blocked until
-                the M2 SDK/wallet design is approved.
-              </p>
-            </div>
-            <pre className="shelby-cut overflow-x-auto bg-[#161008] p-5 text-sm leading-7 text-[#dfffcc]">
-              <code>{`git clone https://github.com/a941249849/Shelby-AI-Evidence-Vault
-cd Shelby-AI-Evidence-Vault
-npm install
-npm run dev
-# Open http://localhost:3000`}</code>
-            </pre>
           </div>
         </div>
       </section>

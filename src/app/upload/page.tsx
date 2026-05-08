@@ -57,7 +57,7 @@ interface UploadedResult {
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const fieldClass =
-  'w-full shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 px-3 py-2.5 text-sm text-[#161008] shadow-sm outline-none transition focus:border-[#de8aff] focus:ring-2 focus:ring-[#de8aff]/15';
+  'w-full shelby-cut border border-white/10 bg-white/[0.055] px-3 py-2.5 text-sm text-[#f4f0e8] outline-none transition placeholder:text-[#6f716d] focus:border-[#de8aff]/60 focus:ring-2 focus:ring-[#de8aff]/15';
 
 async function computeSHA256(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
@@ -83,13 +83,12 @@ function ModeIndicator({
 
   if (!isTestnet) {
     return (
-      <div className="mb-8 flex gap-3 rounded-lg border border-[#de8aff]/20 bg-[#eee2ff] px-4 py-3 text-sm text-[#470b64]">
+      <div className="mb-8 flex gap-3 border border-[#de8aff]/28 bg-[#de8aff]/10 px-4 py-3 text-sm text-[#e7b6ff]">
         <ShieldCheck className="mt-0.5 h-4 w-4 flex-none" />
         <div>
           <p className="font-semibold">Local demo upload active</p>
           <p className="mt-1 leading-6">
-            Files are saved to browser localStorage with deterministic mock Shelby references. No
-            wallet signing, no network calls, and no real Shelby upload.
+            Files receive deterministic mock Shelby references and are persisted for inspection.
           </p>
         </div>
       </div>
@@ -98,7 +97,7 @@ function ModeIndicator({
 
   if (!walletConnected) {
     return (
-      <div className="mb-8 flex gap-3 rounded-lg border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      <div className="mb-8 flex gap-3 border border-[#fd8565]/42 bg-[#fd8565]/12 px-4 py-3 text-sm text-[#ffc2ad]">
         <Wallet className="mt-0.5 h-4 w-4 flex-none" />
         <div>
           <p className="font-semibold">Wallet required for testnet upload</p>
@@ -115,7 +114,7 @@ function ModeIndicator({
   // Wallet connected but on the wrong network
   if (walletNetwork !== null && walletNetwork !== Network.TESTNET) {
     return (
-      <div className="mb-8 flex gap-3 rounded-lg border border-red-300/60 bg-red-50 px-4 py-3 text-sm text-red-900">
+      <div className="mb-8 flex gap-3 border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
         <WifiOff className="mt-0.5 h-4 w-4 flex-none" />
         <div>
           <p className="font-semibold">Wrong network — switch to Aptos Testnet</p>
@@ -131,7 +130,7 @@ function ModeIndicator({
   }
 
   return (
-    <div className="mb-8 flex gap-3 rounded-lg border border-emerald-300/60 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+    <div className="mb-8 flex gap-3 border border-[#9fe878]/35 bg-[#9fe878]/10 px-4 py-3 text-sm text-[#9fe878]">
       <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none" />
       <div>
         <p className="font-semibold">Wallet connected — Shelby testnet upload ready</p>
@@ -168,17 +167,17 @@ function WalletConnector({
 }) {
   if (walletConnected) {
     return (
-      <div className="mb-6 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
+      <div className="shelby-surface mb-6 shelby-cut p-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="grid h-8 w-8 flex-none place-items-center shelby-cut bg-[#4f192a] text-[#9fe878]">
+            <div className="grid h-8 w-8 flex-none place-items-center border border-[#9fe878]/30 bg-[#9fe878]/10 text-[#9fe878]">
               <Wallet className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6f6258]">
+              <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">
                 {walletName ?? 'Wallet'} connected
               </p>
-              <p className="truncate font-mono text-xs text-[#161008]">
+              <p className="truncate font-mono text-xs text-[#f4f0e8]">
                 {walletAddress ?? 'unknown'}
               </p>
             </div>
@@ -186,7 +185,7 @@ function WalletConnector({
           <button
             type="button"
             onClick={disconnect}
-            className="flex-none shelby-cut border border-[#161008]/12 px-3 py-1.5 text-xs font-semibold text-[#6f6258] transition hover:border-red-300/60 hover:text-red-700"
+            className="flex-none shelby-cut border border-white/12 px-3 py-1.5 text-xs font-semibold text-[#9d9a92] transition hover:border-red-400/60 hover:text-red-200"
           >
             Disconnect
           </button>
@@ -196,12 +195,12 @@ function WalletConnector({
   }
 
   return (
-    <div className="mb-6 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f6258]">
+    <div className="shelby-surface mb-6 shelby-cut p-4">
+      <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#6f716d]">
         Connect Aptos wallet
       </p>
       {wallets.length === 0 && notDetectedWallets.length === 0 && (
-        <p className="text-sm text-[#6f6258]">
+        <p className="text-sm text-[#9d9a92]">
           No Aptos wallets detected. Install{' '}
           <a
             href="https://petra.app"
@@ -221,7 +220,7 @@ function WalletConnector({
               key={w.name}
               type="button"
               onClick={() => connect(w.name)}
-              className="flex items-center gap-3 shelby-cut border border-[#161008]/12 bg-[#fcfaf8] px-3 py-2.5 text-sm font-semibold text-[#161008] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+              className="flex items-center gap-3 shelby-cut border border-white/10 bg-white/[0.045] px-3 py-2.5 text-sm font-semibold text-[#f4f0e8] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
             >
               {w.icon && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -234,7 +233,7 @@ function WalletConnector({
       )}
       {notDetectedWallets.length > 0 && (
         <div className="mt-3">
-          <p className="mb-2 text-xs text-[#6f6258]">Not installed:</p>
+          <p className="mb-2 text-xs text-[#9d9a92]">Not installed:</p>
           <div className="grid gap-1.5">
             {notDetectedWallets.map((w) => (
               <a
@@ -242,7 +241,7 @@ function WalletConnector({
                 href={w.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-xs text-[#6f6258] underline hover:text-[#de8aff]"
+                className="flex items-center gap-2 text-xs text-[#9d9a92] underline hover:text-[#de8aff]"
               >
                 {w.name}
               </a>
@@ -269,18 +268,14 @@ function StepLabel({
     <div className="mb-5 flex items-center gap-3">
       <span
         className={`grid h-8 w-8 place-items-center rounded-lg text-xs font-semibold ${
-          inverse ? 'bg-[#fcfaf8] text-[#4f192a]' : 'bg-[#4f192a] text-[#fcfaf8]'
+          inverse ? 'bg-[#f4f0e8] text-[#111217]' : 'bg-[#9fe878]/10 text-[#9fe878] border border-[#9fe878]/30'
         }`}
       >
         {number}
       </span>
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 text-[#de8aff]" />
-        <h2
-          className={`text-sm font-semibold uppercase tracking-[0.18em] ${
-            inverse ? 'text-[#fcfaf8]' : 'text-[#161008]'
-          }`}
-        >
+        <h2 className={`text-sm font-semibold uppercase ${inverse ? 'text-[#f4f0e8]' : 'text-[#f4f0e8]'}`}>
           {title}
         </h2>
       </div>
@@ -559,19 +554,19 @@ function UploadPageContent() {
   if (uploadResult) {
     const isTestnet = uploadResult.mode === 'testnet';
     return (
-      <div className="ledger-line min-h-[calc(100vh-4rem)] bg-[#fcfaf8] px-4 py-10 sm:px-6 lg:px-8">
+      <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-8 shadow-sm">
-            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-[#dfffcc] text-[#21351a]">
+          <div className="shelby-surface shelby-cut p-8">
+            <div className="mb-6 flex h-12 w-12 items-center justify-center border border-[#9fe878]/35 bg-[#9fe878]/10 text-[#9fe878]">
               <CheckCircle2 className="h-6 w-6" />
             </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff77c9]">
+            <p className="font-mono text-xs font-semibold uppercase text-[#ff77c9]">
               {isTestnet ? 'Shelby testnet evidence pack sealed' : 'Local evidence pack sealed'}
             </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#4f192a]">
+            <h1 className="mt-3 text-3xl font-semibold text-[#f4f0e8]">
               {uploadResult.packTitle}
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#9d9a92]">
               {uploadResult.blobIds.length} blob
               {uploadResult.blobIds.length !== 1 ? 's' : ''}{' '}
               {isTestnet
@@ -579,21 +574,21 @@ function UploadPageContent() {
                 : 'saved locally with mock Shelby references. No wallet signing, no network upload, and no real Shelby registration.'}
             </p>
 
-            <div className="mt-8 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+            <div className="mt-8 shelby-cut border border-white/10 bg-white/[0.045] p-4">
+              <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#6f716d]">
                 Read receipt
               </p>
               <Link
                 href={`/read-receipt/${uploadResult.receiptId}`}
-                className="group flex items-center justify-between rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-3 py-2 text-xs font-medium text-[#161008] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+                className="group flex items-center justify-between border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-[#f4f0e8] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
               >
                 <span className="truncate font-mono">/read-receipt/{uploadResult.receiptId}</span>
                 <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </Link>
             </div>
 
-            <div className="mt-4 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+            <div className="mt-4 shelby-cut border border-white/10 bg-white/[0.045] p-4">
+              <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#6f716d]">
                 Blob detail pages
               </p>
               <div className="grid gap-2">
@@ -601,7 +596,7 @@ function UploadPageContent() {
                   <Link
                     key={blobId}
                     href={`/blob/${blobId}`}
-                    className="group flex items-center justify-between rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-3 py-2 text-xs font-medium text-[#161008] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+                    className="group flex items-center justify-between border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-[#f4f0e8] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
                   >
                     <span className="truncate font-mono">/blob/{blobId}</span>
                     <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -613,14 +608,14 @@ function UploadPageContent() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-2 shelby-cut bg-[#4f192a] px-4 py-2.5 text-sm font-semibold text-[#fcfaf8] transition hover:bg-[#322312]"
+                className="ui-button shelby-cut-sm"
               >
                 View evidence index
                 <ChevronRight className="h-4 w-4" />
               </Link>
               <button
                 onClick={() => setUploadResult(null)}
-                className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 px-4 py-2.5 text-sm font-semibold text-[#161008] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+                className="ui-button ui-button-secondary shelby-cut-sm"
               >
                 Upload another pack
               </button>
@@ -651,34 +646,34 @@ function UploadPageContent() {
       : 'Save locally';
 
   return (
-    <div className="ledger-line min-h-[calc(100vh-4rem)] bg-[#fcfaf8] px-4 py-10 sm:px-6 lg:px-8">
+    <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#161008]/15 bg-[#fcfaf8] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f6258]">
+            <div className="ui-chip mb-4">
               <FileUp className="h-3.5 w-3.5 text-[#de8aff]" />
               Evidence intake
             </div>
-            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-[#4f192a]">
+            <h1 className="max-w-3xl text-4xl font-semibold text-[#f4f0e8]">
               Package files into a verifiable AI evidence pack.
             </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-[#6f6258]">
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-[#9d9a92]">
               {isTestnet
                 ? 'Connect your Aptos wallet to register files on Shelby testnet. Real account/blobName identity and explorer links are stored in each BlobRecord.'
                 : 'Metadata, file hashes, and mock Shelby references are created locally. Set SHELBY_MODE=testnet with a connected wallet for real testnet upload.'}
             </p>
           </div>
-          <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
+          <div className="shelby-surface shelby-cut p-4">
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#4f192a] text-[#9fe878]">
+              <div className="grid h-10 w-10 place-items-center border border-[#9fe878]/30 bg-[#9fe878]/10 text-[#9fe878]">
                 <HardDrive className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+                <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">
                   Storage boundary
                 </p>
-                <p className="text-sm font-semibold text-[#161008]">
-                  {isTestnet ? 'Shelby testnet + localStorage' : 'Browser localStorage only'}
+                <p className="text-sm font-semibold text-[#f4f0e8]">
+                  {isTestnet ? 'Shelby testnet + SQLite' : 'Mock mode + SQLite'}
                 </p>
               </div>
             </div>
@@ -705,19 +700,19 @@ function UploadPageContent() {
         )}
 
         {uploadError && (
-          <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <div className="mb-6 flex items-start gap-3 border border-red-400/35 bg-red-500/10 px-4 py-3 text-sm text-red-100">
             <AlertTriangle className="mt-0.5 h-4 w-4 flex-none" />
             <span>{uploadError}</span>
           </div>
         )}
 
         <form className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]" onSubmit={handleSubmit}>
-          <section className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-sm">
+          <section className="shelby-surface shelby-cut p-5">
             <StepLabel number="01" title="Pack metadata" icon={FileText} />
 
             <div className="grid gap-5">
               <div>
-                <label htmlFor="title" className="mb-1.5 block text-sm font-semibold text-[#161008]">
+                <label htmlFor="title" className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]">
                   Pack title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -735,7 +730,7 @@ function UploadPageContent() {
                 <div>
                   <label
                     htmlFor="category"
-                    className="mb-1.5 block text-sm font-semibold text-[#161008]"
+                    className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]"
                   >
                     Category
                   </label>
@@ -756,7 +751,7 @@ function UploadPageContent() {
                 <div>
                   <label
                     htmlFor="sourceType"
-                    className="mb-1.5 block text-sm font-semibold text-[#161008]"
+                    className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]"
                   >
                     Source type
                   </label>
@@ -776,8 +771,8 @@ function UploadPageContent() {
               </div>
 
               <div>
-                <label htmlFor="tags" className="mb-1.5 block text-sm font-semibold text-[#161008]">
-                  Tags <span className="font-normal text-[#6f6258]">(comma-separated)</span>
+                <label htmlFor="tags" className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]">
+                  Tags <span className="font-normal text-[#9d9a92]">(comma-separated)</span>
                 </label>
                 <input
                   id="tags"
@@ -793,7 +788,7 @@ function UploadPageContent() {
               <div>
                 <label
                   htmlFor="description"
-                  className="mb-1.5 block text-sm font-semibold text-[#161008]"
+                  className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]"
                 >
                   Description
                 </label>
@@ -811,13 +806,13 @@ function UploadPageContent() {
           </section>
 
           <aside className="space-y-6">
-            <section className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-sm">
+            <section className="shelby-surface shelby-cut p-5">
               <StepLabel number="02" title="Files and hashes" icon={Hash} />
               <div
                 className={`cursor-pointer shelby-cut border border-dashed px-5 py-8 text-center transition ${
                   dragging
                     ? 'border-[#de8aff] bg-[#eee2ff]'
-                    : 'border-[#ffc2ad] bg-[#fcfaf8] hover:border-[#de8aff]/50'
+                    : 'border-white/14 bg-white/[0.045] hover:border-[#de8aff]/50'
                 }`}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -827,11 +822,11 @@ function UploadPageContent() {
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <div className="mx-auto mb-4 grid h-12 w-12 place-items-center shelby-cut bg-[#4f192a] text-[#9fe878]">
+                <div className="mx-auto mb-4 grid h-12 w-12 place-items-center border border-[#9fe878]/30 bg-[#9fe878]/10 text-[#9fe878]">
                   <UploadCloud className="h-6 w-6" />
                 </div>
-                <p className="text-sm font-semibold text-[#161008]">Drop files here or browse</p>
-                <p className="mt-1 text-xs leading-5 text-[#6f6258]">
+                <p className="text-sm font-semibold text-[#f4f0e8]">Drop files here or browse</p>
+                <p className="mt-1 text-xs leading-5 text-[#9d9a92]">
                   Max {formatBytes(MAX_FILE_SIZE)} per file. SHA-256 is computed in-browser before
                   save.
                 </p>
@@ -849,14 +844,14 @@ function UploadPageContent() {
                   {files.map((entry, idx) => (
                     <li
                       key={`${entry.file.name}-${idx}`}
-                      className="flex items-start gap-3 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 px-3 py-3 text-sm"
+                      className="flex items-start gap-3 shelby-cut border border-white/10 bg-white/[0.045] px-3 py-3 text-sm"
                     >
                       <FileText className="mt-0.5 h-4 w-4 flex-none text-[#de8aff]" />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate font-semibold text-[#161008]">
+                        <span className="block truncate font-semibold text-[#f4f0e8]">
                           {entry.file.name}
                         </span>
-                        <span className="text-xs text-[#6f6258]">{formatBytes(entry.file.size)}</span>
+                        <span className="text-xs text-[#9d9a92]">{formatBytes(entry.file.size)}</span>
                         {entry.hashStatus === 'computing' && (
                           <span className="mt-1 flex items-center gap-1.5 text-xs text-[#de8aff]">
                             <Loader2 className="h-3 w-3 animate-spin" />
@@ -864,7 +859,7 @@ function UploadPageContent() {
                           </span>
                         )}
                         {entry.hashStatus === 'done' && entry.hash && (
-                          <span className="mt-1 block truncate font-mono text-xs text-[#6f6258]">
+                          <span className="mt-1 block truncate font-mono text-xs text-[#9d9a92]">
                             {entry.hash}
                           </span>
                         )}
@@ -875,7 +870,7 @@ function UploadPageContent() {
                       <button
                         type="button"
                         onClick={() => removeFile(idx)}
-                        className="grid h-8 w-8 flex-none place-items-center rounded-md text-[#6f6258] transition hover:bg-red-50 hover:text-red-600"
+                        className="grid h-8 w-8 flex-none place-items-center text-[#9d9a92] transition hover:bg-red-500/10 hover:text-red-200"
                         aria-label="Remove file"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -886,22 +881,22 @@ function UploadPageContent() {
               )}
             </section>
 
-            <section className="shelby-cut border border-[#161008]/12 bg-[#4f192a] p-5 text-[#fcfaf8] shadow-sm">
+            <section className="shelby-cut border border-[#9fe878]/25 bg-[#101813] p-5 text-[#f4f0e8] shadow-sm">
               <StepLabel
                 number="03"
                 title={isTestnet ? 'Testnet upload' : 'Local save'}
                 icon={isTestnet ? Wallet : ShieldCheck}
                 inverse
               />
-              <p className="text-sm leading-6 text-[#BFC7D8]">
+              <p className="text-sm leading-6 text-[#9d9a92]">
                 {isTestnet
-                  ? 'Files are registered on Shelby testnet via your connected wallet and metadata is saved to localStorage.'
-                  : 'The saved object is a local demonstration artifact with a deterministic mock Shelby reference.'}
+                  ? 'Files are registered on Shelby testnet via your connected wallet and persisted for inspection.'
+                  : 'The saved object receives a deterministic mock Shelby reference and SQLite persistence.'}
               </p>
               <button
                 type="submit"
                 disabled={uploading || files.length === 0 || testnetRequiresWallet}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#fcfaf8] px-4 py-3 text-sm font-semibold text-[#4f192a] transition hover:bg-[#fcfaf8] disabled:cursor-not-allowed disabled:opacity-55"
+                className="ui-button shelby-cut-sm mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {submitLabel}
@@ -936,4 +931,3 @@ export default function UploadPage() {
     </UploadProviders>
   );
 }
-
