@@ -12,7 +12,7 @@ export const dictionaries: Record<Language, Record<string, string>> = {
     'nav.solution': 'Solution',
     'nav.developers': 'Developers',
     'nav.docs': 'Docs',
-    'nav.ecosystem': 'Experiment',
+    'nav.ecosystem': 'Principle',
     'nav.launch': 'Open app',
     'nav.ready': 'Shelby testnet-ready',
     'nav.index': 'Index',
@@ -94,6 +94,19 @@ export const dictionaries: Record<Language, Record<string, string>> = {
     'home.experiment.testnet.body': 'Connect wallet-backed upload when the experiment moves from mock refs to real Blob records.',
     'home.experiment.receipt.title': 'Receipt review',
     'home.experiment.receipt.body': 'Use receipts and explorer references to verify which evidence an agent answer consumed.',
+    'home.principle.eyebrow': 'Operating principle',
+    'home.principle.title': 'From evidence intake to verifiable read path.',
+    'home.principle.body':
+      'The local sandbox lowers the testing threshold, but the product path is Shelby-shaped from the start: every upload is packaged, mapped to Blob identity, and resolved through receipts.',
+    'home.principle.pack.title': 'Package evidence',
+    'home.principle.pack.body':
+      'Files, datasets, and agent outputs become Evidence Packs with manifest fields, hashes, source type, and inspectable metadata.',
+    'home.principle.blob.title': 'Map to Shelby',
+    'home.principle.blob.body':
+      'Each pack keeps Shelby-ready Blob fields so sandbox records can move toward real testnet identity and explorer references.',
+    'home.principle.receipt.title': 'Verify reads',
+    'home.principle.receipt.body':
+      'Read Receipts connect an agent answer back to the exact pack, blob reference, timestamp, and verification state.',
     'home.corpus.eyebrow': 'Demo corpus',
     'home.corpus.title': 'Evidence packs ready to inspect.',
     'home.corpus.full': 'Full index',
@@ -302,7 +315,7 @@ export const dictionaries: Record<Language, Record<string, string>> = {
     'nav.solution': '解决方案',
     'nav.developers': '开发者',
     'nav.docs': '文档',
-    'nav.ecosystem': '实验路径',
+    'nav.ecosystem': '操作原理',
     'nav.launch': '进入实验台',
     'nav.ready': 'Shelby testnet-ready',
     'nav.index': '索引',
@@ -376,6 +389,19 @@ export const dictionaries: Record<Language, Record<string, string>> = {
     'home.experiment.testnet.body': '接入钱包后，从 mock ref 迁移到真实 BlobRecord 与 testnet 上传。',
     'home.experiment.receipt.title': '回执验证',
     'home.experiment.receipt.body': '通过 Read Receipt 与 Explorer 引用核验 Agent 回答实际读取的证据。',
+    'home.principle.eyebrow': '操作原理',
+    'home.principle.title': '从证据接入到可验证读取路径。',
+    'home.principle.body':
+      '本地沙盒用于降低社区测试门槛，但产品路径从一开始就按 Shelby 形态组织：先封装证据，再映射 Blob 身份，最后通过 Read Receipt 解析读取链路。',
+    'home.principle.pack.title': '封装证据',
+    'home.principle.pack.body':
+      '文件、数据集与 Agent 输出被整理为 Evidence Pack，保留 manifest 字段、哈希、来源类型与可检查元数据。',
+    'home.principle.blob.title': '映射 Shelby',
+    'home.principle.blob.body':
+      '每个证据包保留 Shelby-ready Blob 字段，让沙盒记录可以迁移到真实测试网身份与 Explorer 引用。',
+    'home.principle.receipt.title': '验证读取',
+    'home.principle.receipt.body':
+      'Read Receipt 将 Agent 回答重新连接到具体证据包、Blob 引用、时间戳与验证状态。',
     'home.corpus.eyebrow': 'Demo 语料',
     'home.corpus.title': '可立即检查的证据包。',
     'home.corpus.full': '完整索引',

@@ -198,11 +198,14 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="shelby-home-bg relative min-h-screen overflow-hidden bg-[#fcfaf8] text-[#322312]">
-      <div className="shelby-brand-frame shelby-brand-frame-right" />
-      <div className="shelby-brand-frame shelby-brand-frame-left" />
+    <div className="relative min-h-screen overflow-hidden bg-[#fcfaf8] text-[#322312]">
+      <div className="shelby-ribbon shelby-ribbon-top-brown" />
+      <div className="shelby-ribbon shelby-ribbon-top-pink" />
+      <div className="shelby-ribbon shelby-ribbon-right-brown" />
+      <div className="shelby-ribbon shelby-ribbon-right-pink" />
+      <div className="shelby-ribbon shelby-ribbon-left-pink" />
 
-      <section className="relative px-4 pb-10 pt-14 sm:px-6 lg:px-8 lg:pb-12 lg:pt-20">
+      <section className="relative px-4 pb-10 pt-20 sm:px-6 lg:px-8 lg:pb-12 lg:pt-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
           <div className="relative z-10 min-w-0">
             <p className="font-mono text-sm font-semibold uppercase text-[#ff77c9]">
@@ -291,31 +294,47 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="experiment" className="relative px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl rounded-lg border border-[#322312]/14 bg-[#fcfaf8]/90 p-6 shadow-[0_16px_46px_rgba(50,35,18,0.06)]">
-          <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
+      <section id="experiment" className="relative px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl rounded-lg border border-[#322312]/14 bg-[#fcfaf8]/92 p-6 shadow-[0_16px_46px_rgba(50,35,18,0.06)]">
+          <div className="grid gap-8 lg:grid-cols-[0.58fr_1.42fr] lg:items-end">
             <div>
               <p className="font-mono text-xs font-semibold uppercase text-[#ff77c9]">
-                {t('home.experiment.eyebrow')}
+                {t('home.principle.eyebrow')}
               </p>
               <h2 className="mt-4 text-3xl font-bold leading-tight text-[#322312]">
-                {t('home.experiment.title')}
+                {t('home.principle.title')}
               </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#454039]">
-                {t('home.experiment.body')}
-              </p>
+              <p className="mt-4 text-sm leading-7 text-[#454039]">{t('home.principle.body')}</p>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {[
-                ['01', t('home.experiment.sandbox.title'), t('home.experiment.sandbox.body')],
-                ['02', t('home.experiment.testnet.title'), t('home.experiment.testnet.body')],
-                ['03', t('home.experiment.receipt.title'), t('home.experiment.receipt.body')],
-              ].map(([index, title, body]) => (
-                <div key={index} className="rounded-lg border border-[#322312]/10 bg-[#f7f1e9]/70 p-4">
-                  <p className="font-mono text-xs font-semibold text-[#ff77c9]">{index}</p>
-                  <h3 className="mt-3 text-base font-semibold text-[#322312]">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-[#454039]">{body}</p>
-                </div>
+                [
+                  '01',
+                  t('home.principle.pack.title'),
+                  t('home.principle.pack.body'),
+                  'pack_hash + manifest',
+                ],
+                [
+                  '02',
+                  t('home.principle.blob.title'),
+                  t('home.principle.blob.body'),
+                  'shelby_ref + network',
+                ],
+                [
+                  '03',
+                  t('home.principle.receipt.title'),
+                  t('home.principle.receipt.body'),
+                  'receipt_id + status',
+                ],
+              ].map(([index, title, body, meta]) => (
+                <article key={index} className="rounded-lg border border-[#322312]/10 bg-[#f7f1e9]/72 p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-mono text-xs font-semibold text-[#ff77c9]">{index}</p>
+                    <p className="truncate font-mono text-[0.62rem] uppercase text-[#454039]">{meta}</p>
+                  </div>
+                  <h3 className="mt-5 text-lg font-semibold text-[#322312]">{title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-[#454039]">{body}</p>
+                </article>
               ))}
             </div>
           </div>
