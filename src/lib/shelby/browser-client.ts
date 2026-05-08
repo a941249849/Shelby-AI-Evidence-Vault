@@ -91,7 +91,17 @@ export function buildExplorerUrl(
   blobName: string
 ): string {
   const networkLabel = network === Network.SHELBYNET ? 'shelbynet' : 'testnet';
-  return `https://explorer.shelby.xyz/${networkLabel}/account/${accountAddress}/blob/${encodeURIComponent(blobName)}`;
+  return `https://explorer.shelby.xyz/${networkLabel}/account/${accountAddress}/blob/${encodeBlobNamePath(blobName)}`;
+}
+
+/**
+ * Encodes a Shelby blob name for use in a URL path.
+ * Blob names may contain slash separators (e.g. "evidence/{packId}/{hash}-{file}").
+ * Each path segment is percent-encoded individually while preserving the
+ * slashes — matching the Shelby SDK's encodeURIComponentKeepSlashes behaviour.
+ */
+export function encodeBlobNamePath(blobName: string): string {
+  return blobName.split('/').map(encodeURIComponent).join('/');
 }
 
 /**
@@ -104,7 +114,7 @@ export function buildRetrievalUrl(
   blobName: string
 ): string {
   const base = rpcBaseUrl.replace(/\/$/, '');
-  return `${base}/v1/blobs/${accountAddress}/${encodeURIComponent(blobName)}`;
+  return `${base}/v1/blobs/${accountAddress}/${encodeBlobNamePath(blobName)}`;
 }
 
 /**
