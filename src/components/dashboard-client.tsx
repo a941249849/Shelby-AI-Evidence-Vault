@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Activity, Database, FilePlus2, HardDrive, Layers3, ShieldCheck } from 'lucide-react';
+import {
+  Activity,
+  Database,
+  FilePlus2,
+  Fingerprint,
+  HardDrive,
+  Layers3,
+  ReceiptText,
+  ShieldCheck,
+} from 'lucide-react';
 import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import EvidencePackCard from '@/components/evidence-pack-card';
@@ -66,6 +75,11 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
   const persistedBlobCount = dedupedPersisted.reduce((sum, p) => sum + p.blobCount, 0);
   const totalBlobs = localBlobs.length + persistedBlobCount + demoBlobs.length;
   const activePacks = allPacks.filter((p) => p.status === 'active').length;
+  const topologyItems = [
+    { step: '01', label: 'Evidence packs', value: `${allPacks.length} indexed`, icon: Database },
+    { step: '02', label: 'Blob records', value: `${totalBlobs} tracked`, icon: Fingerprint },
+    { step: '03', label: 'Read receipts', value: 'demo + local', icon: ReceiptText },
+  ];
 
   return (
     <main className="kinetic-grid min-h-[calc(100vh-64px)] px-4 py-10 text-[#2d211c] sm:px-6 lg:px-8">
@@ -104,11 +118,47 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           </aside>
         </div>
 
-        <div className="mb-8 grid rounded-[24px] border border-[#2d211c]/10 bg-[#fff8ea]/65 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Packs indexed" value={allPacks.length} tone="text-[#2d211c]" />
-          <Metric label="Active packs" value={activePacks} tone="text-[#157a4c]" />
-          <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#6a3ea1]" />
-          <Metric label="User packs" value={allUserPacks.length} tone="text-[#a33f2d]" />
+        <div className="mb-8 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+          <section className="shelby-cut relative overflow-hidden border border-[#2d211c]/10 bg-[#2d211c] p-5 text-[#fff8ea]">
+            <div className="hex-field absolute inset-0 opacity-10" />
+            <div className="relative grid gap-5 sm:grid-cols-[0.85fr_1.15fr] sm:items-end">
+              <div>
+                <div className="ui-chip border-white/15 bg-white/10 text-[#fff8ea]">
+                  <Layers3 size={13} />
+                  Index topology
+                </div>
+                <h2 className="mt-5 max-w-sm text-3xl font-semibold leading-[1.04]">
+                  Packs, blobs, receipts, one audit plane.
+                </h2>
+              </div>
+              <div className="grid gap-3">
+                {topologyItems.map(({ step, label, value, icon: StepIcon }) => {
+                  return (
+                    <div
+                      key={label}
+                      className="grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 border-b border-white/10 pb-3 last:border-b-0"
+                    >
+                      <span className="font-mono text-xs font-semibold text-[#f0c846]">
+                        {step}
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold">{label}</p>
+                        <p className="text-xs text-[#d8cdbd]">{value}</p>
+                      </div>
+                      <StepIcon className="h-4 w-4 text-[#dff2c8]" />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          <div className="grid rounded-[24px] border border-[#2d211c]/10 bg-[#fff8ea]/65 sm:grid-cols-2">
+            <Metric label="Packs indexed" value={allPacks.length} tone="text-[#2d211c]" />
+            <Metric label="Active packs" value={activePacks} tone="text-[#157a4c]" />
+            <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#6a3ea1]" />
+            <Metric label="User packs" value={allUserPacks.length} tone="text-[#a33f2d]" />
+          </div>
         </div>
 
         {allUserPacks.length > 0 && (

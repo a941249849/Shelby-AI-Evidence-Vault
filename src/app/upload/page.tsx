@@ -644,6 +644,29 @@ function UploadPageContent() {
           ? 'Wrong network — switch wallet'
           : 'Connect wallet to upload'
       : 'Save locally';
+  const intakeSteps = [
+    {
+      step: '01',
+      title: 'Describe',
+      body: 'Name the pack, category, source, and tags.',
+      icon: FileText,
+      tone: 'duotone-lilac',
+    },
+    {
+      step: '02',
+      title: 'Hash',
+      body: 'Drop files and compute SHA-256 in the browser.',
+      icon: Hash,
+      tone: 'duotone-green',
+    },
+    {
+      step: '03',
+      title: 'Seal',
+      body: isTestnet ? 'Register on Shelby testnet.' : 'Persist locally with SQLite.',
+      icon: ShieldCheck,
+      tone: 'duotone-coral',
+    },
+  ];
 
   return (
     <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
@@ -706,7 +729,31 @@ function UploadPageContent() {
           </div>
         )}
 
-        <form className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]" onSubmit={handleSubmit}>
+        <section className="mb-6 grid gap-3 lg:grid-cols-[1.3fr_0.9fr_1.1fr]">
+          {intakeSteps.map(({ step, title, body, icon: StepIcon, tone }) => {
+            return (
+              <div key={step} className={`shelby-cut p-4 ${tone}`}>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-mono text-xs font-semibold uppercase text-[#6f6258]">
+                      Step {step}
+                    </p>
+                    <h2 className="mt-3 text-lg font-semibold text-[#2d211c]">{title}</h2>
+                    <p className="mt-1 text-sm leading-6 text-[#5f554d]">{body}</p>
+                  </div>
+                  <div className="grid h-10 w-10 flex-none place-items-center rounded-full border border-[#2d211c]/12 bg-[#fff8ea]/72 text-[#2d211c]">
+                    <StepIcon className="h-4 w-4" />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </section>
+
+        <form
+          className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start"
+          onSubmit={handleSubmit}
+        >
           <section className="shelby-surface shelby-cut p-5">
             <StepLabel number="01" title="Pack metadata" icon={FileText} />
 
@@ -805,7 +852,7 @@ function UploadPageContent() {
             </div>
           </section>
 
-          <aside className="space-y-6">
+          <aside className="space-y-6 lg:mt-10">
             <section className="shelby-surface shelby-cut p-5">
               <StepLabel number="02" title="Files and hashes" icon={Hash} />
               <div

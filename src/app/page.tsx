@@ -140,9 +140,12 @@ function ProductPanel() {
 export default function HomePage() {
   return (
     <div className="kinetic-grid min-h-screen text-[#2d211c]">
-      <section className="px-4 pb-14 pt-10 sm:px-6 lg:px-8 lg:pb-18">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.86fr_1.14fr] lg:items-center">
-          <div className="py-4">
+      <section className="relative overflow-hidden px-4 pb-14 pt-10 sm:px-6 lg:px-8 lg:pb-16">
+        <div className="pointer-events-none absolute left-[43%] top-8 hidden h-28 w-28 rotate-[18deg] rounded-full border border-[#2d211c]/10 bg-[#dff2c8]/70 lg:block" />
+        <div className="pointer-events-none absolute right-[7%] top-24 hidden h-24 w-40 -rotate-[10deg] bg-[#ffe0cf]/75 lg:block shelby-cut" />
+        <div className="pointer-events-none absolute bottom-8 left-[36%] hidden h-20 w-32 rotate-[9deg] bg-[#efe2ff]/70 lg:block shelby-cut-sm" />
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+          <div className="relative z-10 py-4">
             <div className="mb-8 flex items-center gap-4">
               <div className="shelby-mark h-16 w-16">
                 <span />
@@ -165,7 +168,20 @@ export default function HomePage() {
               identity, and proving which evidence an answer used.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-7 grid max-w-xl grid-cols-3 gap-2">
+              {['Pack source', 'Bind blob', 'Resolve receipt'].map((item, index) => (
+                <div
+                  key={item}
+                  className={`shelby-cut-sm border border-[#2d211c]/10 bg-[#fff8ea]/70 px-3 py-2 text-xs font-semibold text-[#5f554d] shadow-sm ${
+                    index === 1 ? 'translate-y-3' : index === 2 ? '-translate-y-1' : ''
+                  }`}
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <Link href="/dashboard" className="ui-button shelby-cut-sm">
                 Open evidence index
                 <ArrowRight size={16} />
@@ -184,30 +200,65 @@ export default function HomePage() {
             </div>
           </div>
 
-          <ProductPanel />
+          <div className="relative z-10 lg:translate-y-8">
+            <ProductPanel />
+          </div>
         </div>
       </section>
 
       <section className="border-y border-[#2d211c]/10 bg-[#fff8ea]/55 px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">
-          <FeatureTile
-            icon={Database}
-            title="Structured packs"
-            body="Source material is packaged with category, tags, hashes, and persistence state."
-            className="duotone-green"
-          />
-          <FeatureTile
-            icon={Fingerprint}
-            title="Blob identity"
-            body="Demo, mock, and testnet records stay visually distinct without hiding protocol truth."
-            className="duotone-lilac"
-          />
-          <FeatureTile
-            icon={CheckCircle2}
-            title="Receipt proof"
-            body="Each receipt becomes a compact trace from answer back to evidence and storage."
-            className="duotone-coral"
-          />
+        <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-12 lg:items-stretch">
+          <div className="shelby-cut relative overflow-hidden border border-[#2d211c]/12 bg-[#2d211c] p-6 text-[#fff8ea] lg:col-span-7">
+            <div className="hex-field absolute inset-0 opacity-10" />
+            <div className="relative">
+              <div className="ui-chip border-white/15 bg-white/10 text-[#fff8ea]">
+                <Database size={13} />
+                Evidence graph
+              </div>
+              <h2 className="mt-8 max-w-xl text-4xl font-semibold leading-[1.02]">
+                A product surface with proof moving through it.
+              </h2>
+              <p className="mt-4 max-w-lg text-sm leading-7 text-[#d8cdbd]">
+                The interface should feel like a living evidence system: packs enter, blob identity
+                locks, and receipts resolve into a readable audit trail.
+              </p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {[
+                  ['Pack', 'typed metadata', 'bg-[#dff2c8] text-[#157a4c]'],
+                  ['Blob', 'hash + account', 'bg-[#efe2ff] text-[#6a3ea1]'],
+                  ['Receipt', 'answer lineage', 'bg-[#ffe0cf] text-[#a33f2d]'],
+                ].map(([label, value, tone]) => (
+                  <div key={label} className={`shelby-cut-sm p-4 ${tone}`}>
+                    <p className="font-mono text-xs font-semibold uppercase">{label}</p>
+                    <p className="mt-4 text-sm font-semibold">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-5 lg:col-span-5 lg:grid-rows-[1fr_1fr]">
+            <FeatureTile
+              icon={Fingerprint}
+              title="Blob identity"
+              body="Demo, mock, and testnet records stay visually distinct without hiding protocol truth."
+              className="duotone-lilac lg:translate-y-6"
+            />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <FeatureTile
+                icon={Database}
+                title="Structured packs"
+                body="Source material is packaged with category, tags, hashes, and persistence state."
+                className="duotone-green"
+              />
+              <FeatureTile
+                icon={CheckCircle2}
+                title="Receipt proof"
+                body="Each receipt becomes a compact trace from answer back to storage."
+                className="duotone-coral sm:-translate-y-6"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
