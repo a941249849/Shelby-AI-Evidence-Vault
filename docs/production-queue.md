@@ -32,8 +32,9 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - C3 smoke harness is merged: `scripts/shelby-smoke.mjs`, `src/lib/shelby/status-map.ts`, `docs/c3-smoke-test-guide.md`.
 - M4 read receipt binding is merged: `ReadReceiptClient`, localStorage receipt persistence, BlobRecord identity surface.
 - M5 public ecosystem package is merged in PR #14: README rewrite, demo script update, architecture update, ecosystem submission pack.
-- C7 SQLite backend persistence is the current stage: `lib/server/db.ts`, `lib/server/evidence-store.ts`, `app/actions/persist.ts`.
-- UI redesign remains paused — Task X2 is deferred until backend state is stable.
+- C7 SQLite backend persistence is complete: `lib/server/db.ts`, `lib/server/evidence-store.ts`, `app/actions/persist.ts`.
+- UI redesign remains paused after the Shelby brand pass — Codex owns any future UI work.
+- C8 agent-run evidence-pack integration example is the current Copilot stage: GitHub issue #19.
 
 ## Stage Gate
 
@@ -370,7 +371,7 @@ Owner: Copilot
 
 Size: Large
 
-Status: **Complete** — implemented in this PR.
+Status: **Complete**.
 
 When to start:
 
@@ -418,6 +419,60 @@ Acceptance:
 - `npm run lint` passes.
 - `npm run build` passes.
 
+### Task C8: Agent run evidence-pack integration example
+
+Owner: Copilot
+
+Size: Large
+
+Status: **Dispatched** — GitHub issue #19.
+
+When to start:
+
+After C7 merges and UI work is paused.
+
+Goal:
+
+Add a deterministic agent-run integration example that demonstrates the product's core story:
+
+```
+source evidence -> agent run output -> EvidencePack -> BlobRecord -> ReadReceipt
+```
+
+This should make the app feel like an AI evidence vault rather than only a file uploader, while staying fully local and reproducible by default.
+
+Scope:
+
+- Add a deterministic sample agent-run generator or script that creates an agent-output artifact from public/static input.
+- Represent the generated artifact as an EvidencePack with category/source fields aligned to the existing domain model.
+- Create BlobRecord objects with SHA-256 hashes and Shelby-shaped refs using the existing mock/default path.
+- Create a ReadReceipt that binds the agent-run output to referenced evidence and resolves on `/read-receipt/[id]`.
+- Persist generated records through the existing C7 SQLite persistence layer.
+- Add a clear command or minimal app trigger only if needed for the demo.
+- Update demo, architecture, and production-queue documentation.
+
+Hard boundaries:
+
+- No UI redesign or theme overhaul.
+- No calls to real OpenAI/LLM APIs.
+- No new AI agent framework dependency unless strongly justified.
+- No private keys, seed phrases, server signer, or wallet payment UX.
+- No marketplace/trading/token features.
+- Do not change Shelby testnet upload protocol behavior.
+- Do not remove existing mock upload, testnet wallet path, C7 persistence, or read receipt behavior.
+- Do not commit runtime DB files or generated local outputs.
+
+Acceptance:
+
+- Running the C8 example locally creates one agent-run EvidencePack, associated BlobRecord objects, and one ReadReceipt.
+- The created ReadReceipt resolves on `/read-receipt/[id]` and shows referenced blob identity, hashes, source, and receipt mode/status.
+- Dashboard shows the generated agent-run pack after refresh.
+- Existing upload flow still works in mock mode with zero env vars.
+- Existing demo receipts such as `/read-receipt/rr-001` still work.
+- SQLite persistence remains non-fatal; app degrades gracefully if DB writes fail.
+- `npm run lint` passes.
+- `npm run build` passes.
+
 ## Codex Task Queue
 
 ### Task X1: M1B merge-readiness review
@@ -450,12 +505,15 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-C7 SQLite persistence is the current stage (this PR).
+C7 SQLite persistence is complete. UI work is paused. C8 is the current stage.
 
-After C7 merges, the next task options include:
+Current next action:
 
-- **X2 (Codex):** UI redesign pass — now that protocol boundaries are stable through C7.
+- **C8:** Agent run integration example — a scripted/deterministic agent run that produces an evidence pack and read receipt. Dispatched in GitHub issue #19.
+
+Later task options include:
+
 - **C6:** Search and filter on the dashboard (operator-requested feature).
-- **C8:** Agent run integration example — a scripted agent that produces an evidence pack and read receipt.
+- **X2:** UI refinement pass after C8 lands, owned by Codex.
 
 Do not dispatch small patch tasks to Copilot. Next Copilot task should be a large bounded implementation with clear acceptance criteria.
