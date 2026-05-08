@@ -59,7 +59,9 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
   const allPacks = [...allUserPacks, ...demoPacks];
 
   const localBlobs = localPacks.flatMap((p) => getLocalBlobsByPackId(p.id));
-  const totalBlobs = localBlobs.length + demoBlobs.length;
+  // Count blobs from SQLite-only packs (not in localStorage) using their stored blobCount.
+  const persistedBlobCount = dedupedPersisted.reduce((sum, p) => sum + p.blobCount, 0);
+  const totalBlobs = localBlobs.length + persistedBlobCount + demoBlobs.length;
   const activePacks = allPacks.filter((p) => p.status === 'active').length;
 
   return (

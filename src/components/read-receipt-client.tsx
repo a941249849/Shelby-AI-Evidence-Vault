@@ -22,7 +22,7 @@ import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import { formatDateTime } from '@/lib/utils';
 import { getLocalReadReceiptById, getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getReadReceiptById, getBlobById, getEvidencePackById } from '@/lib/evidence/service';
-import { getPersistedReceiptAction, getPersistedBlobAction } from '@/app/actions/persist';
+import { getPersistedReceiptAction, getPersistedBlobAction, getPersistedPackAction } from '@/app/actions/persist';
 
 interface ReadReceiptClientProps {
   id: string;
@@ -298,9 +298,14 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
           if (b) resolvedBlobs.push(b);
         }
 
-        const resolvedPacks: EvidencePack[] = persistedReceipt.evidencePackIds
-          .map((pid) => getLocalPackById(pid) ?? getEvidencePackById(pid))
-          .filter(Boolean) as EvidencePack[];
+        const resolvedPacks: EvidencePack[] = [];
+        for (const pid of persistedReceipt.evidencePackIds) {
+          const p =
+            getLocalPackById(pid) ??
+            getEvidencePackById(pid) ??
+            (await getPersistedPackAction(pid).catch(() => null));
+          if (p) resolvedPacks.push(p);
+        }
 
         setResolved({
           receipt: persistedReceipt,

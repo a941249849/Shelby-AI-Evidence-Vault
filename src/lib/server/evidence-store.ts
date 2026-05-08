@@ -98,3 +98,35 @@ export function getReceipts(): ReadReceipt[] {
     .all() as { payload: string }[];
   return rows.map((r) => JSON.parse(r.payload) as ReadReceipt);
 }
+
+// ---------------------------------------------------------------------------
+// Atomic upload write — pack + blobs + receipt in a single transaction
+// ---------------------------------------------------------------------------
+
+/**
+ * Inserts a complete upload result (pack, its blobs, and read receipt) within
+ * a single SQLite transaction so no partial record set can be left behind if
+ * one insert fails.
+ */
+export function insertUploadTransaction(
+  pack: EvidencePack,
+  blobs: BlobRecord[],
+  receipt: ReadReceipt
+): void {
+  const db = getDb();
+  db.transaction(() => {
+    db.prepare(
+      `INSERT OR REPLACE INTO evidence_packs (id, created_at, payload) VALUES (?, ?, ?)`
+    ).run(pack.id, pack.createdAt, JSON.stringify(pack));
+
+    for (const blob of blobs) {
+      db.prepare(
+        `INSERT OR REPLACE INTO blob_records (id, evidence_pack_id, created_at, payload) VALUES (?, ?, ?, ?)`
+      ).run(blob.id, blob.evidencePackId, blob.createdAt, JSON.stringify(blob));
+    }
+
+    db.prepare(
+      `INSERT OR REPLACE INTO read_receipts (id, created_at, payload) VALUES (?, ?, ?)`
+    ).run(receipt.id, receipt.timestamp, JSON.stringify(receipt));
+  })();
+}

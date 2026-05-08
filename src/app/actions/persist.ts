@@ -13,10 +13,9 @@
  */
 
 import {
-  insertPack,
-  insertBlob,
-  insertReceipt,
+  insertUploadTransaction,
   getPacks,
+  getPackById as dbGetPackById,
   getBlobById as dbGetBlobById,
   getBlobsByPackId as dbGetBlobsByPackId,
   getReceiptById as dbGetReceiptById,
@@ -31,8 +30,8 @@ import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 
 /**
  * Persist a completed upload atomically: one EvidencePack, its BlobRecord(s),
- * and the generated ReadReceipt.  Called from the upload page after a
- * successful mock or testnet upload.
+ * and the generated ReadReceipt — all in a single SQLite transaction.
+ * Called from the upload page after a successful mock or testnet upload.
  */
 export async function persistUploadAction(
   pack: EvidencePack,
@@ -40,11 +39,7 @@ export async function persistUploadAction(
   receipt: ReadReceipt
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    insertPack(pack);
-    for (const blob of blobs) {
-      insertBlob(blob);
-    }
-    insertReceipt(receipt);
+    insertUploadTransaction(pack, blobs, receipt);
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown persistence error';
@@ -65,6 +60,18 @@ export async function getPersistedPacksAction(): Promise<EvidencePack[]> {
     return getPacks();
   } catch {
     return [];
+  }
+}
+
+/**
+ * Looks up a single EvidencePack by ID in SQLite.
+ * Returns null if not found — demo data is NOT included.
+ */
+export async function getPersistedPackAction(id: string): Promise<EvidencePack | null> {
+  try {
+    return dbGetPackById(id) ?? null;
+  } catch {
+    return null;
   }
 }
 
