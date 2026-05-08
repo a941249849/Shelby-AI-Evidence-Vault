@@ -114,7 +114,8 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
           setBlob(null);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('[BlobDetailClient] getPersistedBlobAction failed', err);
         setBlob(null);
       });
   }, [id]);

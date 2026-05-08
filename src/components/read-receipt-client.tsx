@@ -291,7 +291,10 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
           const b =
             getLocalBlobById(bid) ??
             getBlobById(bid) ??
-            (await getPersistedBlobAction(bid).catch(() => null));
+            (await getPersistedBlobAction(bid).catch((err) => {
+              console.error('[ReadReceiptClient] getPersistedBlobAction failed for', bid, err);
+              return null;
+            }));
           if (b) resolvedBlobs.push(b);
         }
 
@@ -305,7 +308,8 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
           packs: resolvedPacks,
         });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('[ReadReceiptClient] getPersistedReceiptAction failed', err);
         setResolved(null);
       });
   }, [id]);

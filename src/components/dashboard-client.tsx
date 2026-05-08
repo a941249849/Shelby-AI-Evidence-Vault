@@ -35,8 +35,9 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
       .then((packs) => {
         setPersistedPacks(packs);
       })
-      .catch(() => {
+      .catch((err) => {
         // SQLite unavailable — silently degrade to localStorage only
+        console.error('[DashboardClient] getPersistedPacksAction failed', err);
       });
   }, []);
 
