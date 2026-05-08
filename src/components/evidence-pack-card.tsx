@@ -1,8 +1,11 @@
+'use client';
+
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ArrowUpRight, Boxes, CalendarDays, Database, FileText, Workflow } from 'lucide-react';
 import type { EvidencePack } from '@/lib/evidence/types';
 import { formatDate } from '@/lib/utils';
+import { useI18n } from '@/components/language-provider';
 
 interface EvidencePackCardProps {
   pack: EvidencePack;
@@ -10,28 +13,28 @@ interface EvidencePackCardProps {
 
 const categoryStyles: Record<
   EvidencePack['category'],
-  { label: string; color: string; rail: string; icon: ReactNode }
+  { labelKey: string; color: string; rail: string; icon: ReactNode }
 > = {
   dataset: {
-    label: 'Dataset',
+    labelKey: 'card.category.dataset',
     color: 'border-[#157a4c]/25 bg-[#dff2c8] text-[#157a4c]',
     rail: 'bg-[#157a4c]',
     icon: <Database size={14} />,
   },
   'agent-run': {
-    label: 'Agent run',
+    labelKey: 'card.category.agent-run',
     color: 'border-[#d94f83]/25 bg-[#ffd8e6] text-[#9f315f]',
     rail: 'bg-[#d94f83]',
     icon: <Workflow size={14} />,
   },
   document: {
-    label: 'Document',
+    labelKey: 'card.category.document',
     color: 'border-[#6a3ea1]/25 bg-[#efe2ff] text-[#6a3ea1]',
     rail: 'bg-[#6a3ea1]',
     icon: <FileText size={14} />,
   },
   manifest: {
-    label: 'Manifest',
+    labelKey: 'card.category.manifest',
     color: 'border-[#ef6f4d]/25 bg-[#ffe0cf] text-[#a33f2d]',
     rail: 'bg-[#ef6f4d]',
     icon: <Boxes size={14} />,
@@ -39,6 +42,7 @@ const categoryStyles: Record<
 };
 
 export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
+  const { t } = useI18n();
   const category = categoryStyles[pack.category];
   const isLocal = pack.dataSource === 'local';
 
@@ -52,7 +56,7 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
             className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-xs font-semibold uppercase ${category.color}`}
           >
             {category.icon}
-            {category.label}
+            {t(category.labelKey)}
           </span>
           <span
             className={`border px-2 py-1 font-mono text-xs font-semibold uppercase ${
@@ -61,7 +65,7 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
                 : 'border-[#2d211c]/12 bg-[#f4efe2] text-[#6f6258]'
             }`}
           >
-            {isLocal ? 'Local' : 'Demo'}
+            {isLocal ? t('card.local') : t('card.demo')}
           </span>
         </div>
 
@@ -74,15 +78,15 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
 
         <dl className="mt-5 grid grid-cols-3 gap-3 border-y border-[#2d211c]/10 py-3 text-xs">
           <div>
-            <dt className="font-mono uppercase text-[#978978]">Blobs</dt>
+            <dt className="font-mono uppercase text-[#978978]">{t('card.blobs')}</dt>
             <dd className="mt-1 font-semibold text-[#2d211c]">{pack.blobCount}</dd>
           </div>
           <div>
-            <dt className="font-mono uppercase text-[#978978]">Source</dt>
+            <dt className="font-mono uppercase text-[#978978]">{t('card.source')}</dt>
             <dd className="mt-1 truncate font-semibold text-[#2d211c]">{pack.sourceType}</dd>
           </div>
           <div>
-            <dt className="font-mono uppercase text-[#978978]">Created</dt>
+            <dt className="font-mono uppercase text-[#978978]">{t('card.created')}</dt>
             <dd className="mt-1 flex items-center gap-1 font-semibold text-[#2d211c]">
               <CalendarDays size={12} />
               {formatDate(pack.createdAt)}
@@ -105,7 +109,7 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
           href={`/dashboard?pack=${pack.id}`}
           className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#157a4c] transition group-hover:text-[#6a3ea1]"
         >
-          Inspect evidence
+          {t('card.inspect')}
           <ArrowUpRight size={15} />
         </Link>
       </div>

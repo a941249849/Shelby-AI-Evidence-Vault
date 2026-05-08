@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -12,6 +14,8 @@ import {
 } from 'lucide-react';
 import { evidencePacks } from '@/lib/demo-data';
 import EvidencePackCard from '@/components/evidence-pack-card';
+import { useI18n } from '@/components/language-provider';
+import ShelbyLogo from '@/components/shelby-logo';
 
 const demoPacks = evidencePacks.slice(0, 3);
 
@@ -72,6 +76,8 @@ function FeatureTile({
 }
 
 function ProductPanel() {
+  const { t } = useI18n();
+
   return (
     <div className="shelby-cut relative overflow-hidden border border-[#2d211c]/12 bg-[#fff8ea] p-4 shadow-[0_30px_90px_rgba(80,48,24,0.18)]">
       <div className="hex-field absolute inset-0 opacity-30" />
@@ -80,7 +86,7 @@ function ProductPanel() {
           <div className="mb-6 flex items-center justify-between gap-4">
             <div className="ui-chip border-white/15 bg-white/10 text-[#fff8ea]">
               <Network size={13} />
-              Live proof path
+              {t('home.panel.eyebrow')}
             </div>
             <div className="grid h-10 w-10 place-items-center rounded-full bg-[#dff2c8] text-[#157a4c]">
               <ShieldCheck size={19} />
@@ -89,22 +95,22 @@ function ProductPanel() {
           <div className="space-y-4">
             <ProofStep
               index="01"
-              title="Pack"
-              body="Gather source material into an evidence pack with typed metadata."
+              title={t('home.step.pack.title')}
+              body={t('home.step.pack.body')}
               tone="border-[#f0c846]/45 bg-[#f0c846]/16 text-[#f0c846]"
               dark
             />
             <ProofStep
               index="02"
-              title="Bind"
-              body="Hash files and bind them to Shelby-ready blob identity."
+              title={t('home.step.bind.title')}
+              body={t('home.step.bind.body')}
               tone="border-[#ef6f4d]/45 bg-[#ef6f4d]/16 text-[#ffb49e]"
               dark
             />
             <ProofStep
               index="03"
-              title="Resolve"
-              body="Receipts reconnect an answer to packs, blobs, hashes, and runtime state."
+              title={t('home.step.resolve.title')}
+              body={t('home.step.resolve.body')}
               tone="border-[#9fe878]/45 bg-[#9fe878]/16 text-[#b9f39d]"
               dark
             />
@@ -114,18 +120,22 @@ function ProductPanel() {
         <aside className="grid gap-4">
           <div className="shelby-cut duotone-green p-5">
             <p className="font-mono text-xs font-semibold uppercase text-[#157a4c]">
-              Runtime store
+              {t('home.panel.runtime')}
             </p>
             <p className="mt-5 text-5xl font-semibold text-[#2d211c]">SQLite</p>
-            <p className="mt-2 text-sm text-[#4d433c]">Uploads survive browser resets.</p>
+            <p className="mt-2 text-sm text-[#4d433c]">{t('home.panel.sqliteBody')}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="shelby-cut duotone-lilac p-4">
-              <p className="font-mono text-xs font-semibold uppercase text-[#6a3ea1]">Packs</p>
+              <p className="font-mono text-xs font-semibold uppercase text-[#6a3ea1]">
+                {t('home.panel.packs')}
+              </p>
               <p className="mt-3 text-3xl font-semibold text-[#2d211c]">{evidencePacks.length}</p>
             </div>
             <div className="shelby-cut duotone-coral p-4">
-              <p className="font-mono text-xs font-semibold uppercase text-[#a33f2d]">Blobs</p>
+              <p className="font-mono text-xs font-semibold uppercase text-[#a33f2d]">
+                {t('home.panel.blobs')}
+              </p>
               <p className="mt-3 text-3xl font-semibold text-[#2d211c]">
                 {evidencePacks.reduce((sum, pack) => sum + pack.blobCount, 0)}
               </p>
@@ -138,6 +148,14 @@ function ProductPanel() {
 }
 
 export default function HomePage() {
+  const { t } = useI18n();
+  const graphItems = [
+    ['home.graph.pack', 'home.graph.packValue', 'bg-[#dff2c8] text-[#157a4c]'],
+    ['home.graph.blob', 'home.graph.blobValue', 'bg-[#efe2ff] text-[#6a3ea1]'],
+    ['home.graph.receipt', 'home.graph.receiptValue', 'bg-[#ffe0cf] text-[#a33f2d]'],
+  ];
+  const heroChips = ['home.chip.pack', 'home.chip.bind', 'home.chip.receipt'];
+
   return (
     <div className="kinetic-grid min-h-screen text-[#2d211c]">
       <section className="relative overflow-hidden px-4 pb-14 pt-10 sm:px-6 lg:px-8 lg:pb-16">
@@ -147,54 +165,47 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
           <div className="relative z-10 py-4">
             <div className="mb-8 flex items-center gap-4">
-              <div className="shelby-mark h-16 w-16">
-                <span />
-              </div>
+              <ShelbyLogo className="h-20 w-20 flex-none" />
               <div>
                 <p className="font-mono text-xs font-semibold uppercase text-[#157a4c]">
-                  Built to hold. Made to move.
+                  {t('home.eyebrow')}
                 </p>
-                <p className="mt-1 text-sm text-[#6f6258]">
-                  Evidence packs, Shelby blobs, read receipts
-                </p>
+                <p className="mt-1 text-sm text-[#6f6258]">{t('home.subtitle')}</p>
               </div>
             </div>
 
             <h1 className="max-w-4xl text-5xl font-semibold leading-[0.94] text-[#2d211c] sm:text-6xl lg:text-7xl">
-              Verifiable memory for AI agents.
+              {t('home.title')}
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-8 text-[#5f554d]">
-              A warmer Shelby-shaped product surface for packaging source files, resolving blob
-              identity, and proving which evidence an answer used.
-            </p>
+            <p className="mt-6 max-w-xl text-base leading-8 text-[#5f554d]">{t('home.body')}</p>
 
             <div className="mt-7 grid max-w-xl grid-cols-3 gap-2">
-              {['Pack source', 'Bind blob', 'Resolve receipt'].map((item, index) => (
+              {heroChips.map((item, index) => (
                 <div
                   key={item}
                   className={`shelby-cut-sm border border-[#2d211c]/10 bg-[#fff8ea]/70 px-3 py-2 text-xs font-semibold text-[#5f554d] shadow-sm ${
                     index === 1 ? 'translate-y-3' : index === 2 ? '-translate-y-1' : ''
                   }`}
                 >
-                  {item}
+                  {t(item)}
                 </div>
               ))}
             </div>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <Link href="/dashboard" className="ui-button shelby-cut-sm">
-                Open evidence index
+                {t('home.cta.index')}
                 <ArrowRight size={16} />
               </Link>
               <Link href="/upload" className="ui-button ui-button-secondary shelby-cut-sm">
-                Upload evidence
+                {t('home.cta.upload')}
                 <UploadCloud size={16} />
               </Link>
               <Link
                 href="/read-receipt/rr-001"
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold text-[#157a4c] transition hover:text-[#6a3ea1]"
               >
-                Inspect receipt
+                {t('home.cta.receipt')}
                 <ReceiptText size={16} />
               </Link>
             </div>
@@ -213,24 +224,17 @@ export default function HomePage() {
             <div className="relative">
               <div className="ui-chip border-white/15 bg-white/10 text-[#fff8ea]">
                 <Database size={13} />
-                Evidence graph
+                {t('home.graph.eyebrow')}
               </div>
               <h2 className="mt-8 max-w-xl text-4xl font-semibold leading-[1.02]">
-                A product surface with proof moving through it.
+                {t('home.graph.title')}
               </h2>
-              <p className="mt-4 max-w-lg text-sm leading-7 text-[#d8cdbd]">
-                The interface should feel like a living evidence system: packs enter, blob identity
-                locks, and receipts resolve into a readable audit trail.
-              </p>
+              <p className="mt-4 max-w-lg text-sm leading-7 text-[#d8cdbd]">{t('home.graph.body')}</p>
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                {[
-                  ['Pack', 'typed metadata', 'bg-[#dff2c8] text-[#157a4c]'],
-                  ['Blob', 'hash + account', 'bg-[#efe2ff] text-[#6a3ea1]'],
-                  ['Receipt', 'answer lineage', 'bg-[#ffe0cf] text-[#a33f2d]'],
-                ].map(([label, value, tone]) => (
+                {graphItems.map(([label, value, tone]) => (
                   <div key={label} className={`shelby-cut-sm p-4 ${tone}`}>
-                    <p className="font-mono text-xs font-semibold uppercase">{label}</p>
-                    <p className="mt-4 text-sm font-semibold">{value}</p>
+                    <p className="font-mono text-xs font-semibold uppercase">{t(label)}</p>
+                    <p className="mt-4 text-sm font-semibold">{t(value)}</p>
                   </div>
                 ))}
               </div>
@@ -240,21 +244,21 @@ export default function HomePage() {
           <div className="grid gap-5 lg:col-span-5 lg:grid-rows-[1fr_1fr]">
             <FeatureTile
               icon={Fingerprint}
-              title="Blob identity"
-              body="Demo, mock, and testnet records stay visually distinct without hiding protocol truth."
+              title={t('home.feature.blob.title')}
+              body={t('home.feature.blob.body')}
               className="duotone-lilac lg:translate-y-6"
             />
             <div className="grid gap-5 sm:grid-cols-2">
               <FeatureTile
                 icon={Database}
-                title="Structured packs"
-                body="Source material is packaged with category, tags, hashes, and persistence state."
+                title={t('home.feature.packs.title')}
+                body={t('home.feature.packs.body')}
                 className="duotone-green"
               />
               <FeatureTile
                 icon={CheckCircle2}
-                title="Receipt proof"
-                body="Each receipt becomes a compact trace from answer back to storage."
+                title={t('home.feature.receipt.title')}
+                body={t('home.feature.receipt.body')}
                 className="duotone-coral sm:-translate-y-6"
               />
             </div>
@@ -268,17 +272,17 @@ export default function HomePage() {
             <div>
               <div className="ui-chip">
                 <Braces size={13} />
-                Demo corpus
+                {t('home.corpus.eyebrow')}
               </div>
               <h2 className="mt-4 text-3xl font-semibold text-[#2d211c]">
-                Evidence packs ready to inspect.
+                {t('home.corpus.title')}
               </h2>
             </div>
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-2 text-sm font-semibold text-[#157a4c] transition hover:text-[#6a3ea1]"
             >
-              Full index
+              {t('home.corpus.full')}
               <ArrowRight size={15} />
             </Link>
           </div>

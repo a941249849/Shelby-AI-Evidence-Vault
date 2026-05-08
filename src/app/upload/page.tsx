@@ -28,6 +28,7 @@ import { useShelbyUpload } from '@/lib/shelby/use-shelby-upload';
 import UploadProviders from './providers';
 import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
+import { useI18n } from '@/components/language-provider';
 
 type Category = 'dataset' | 'agent-run' | 'document' | 'manifest';
 type SourceType = 'web-scrape' | 'api-export' | 'agent-output' | 'manual-upload';
@@ -71,11 +72,13 @@ function ModeIndicator({
   walletConnected,
   walletAddress,
   walletNetwork,
+  t,
 }: {
   mode: 'mock' | 'testnet' | null;
   walletConnected: boolean;
   walletAddress: string | null;
   walletNetwork: Network | null;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }) {
   if (mode === null) return null;
 
@@ -86,10 +89,8 @@ function ModeIndicator({
       <div className="mb-8 flex gap-3 border border-[#6a3ea1]/28 bg-[#efe2ff] px-4 py-3 text-sm text-[#6a3ea1]">
         <ShieldCheck className="mt-0.5 h-4 w-4 flex-none" />
         <div>
-          <p className="font-semibold">Local demo upload active</p>
-          <p className="mt-1 leading-6">
-            Files receive deterministic mock Shelby references and are persisted for inspection.
-          </p>
+          <p className="font-semibold">{t('upload.localActive')}</p>
+          <p className="mt-1 leading-6">{t('upload.localActiveBody')}</p>
         </div>
       </div>
     );
@@ -100,12 +101,8 @@ function ModeIndicator({
       <div className="mb-8 flex gap-3 border border-[#ef6f4d]/42 bg-[#ffe0cf] px-4 py-3 text-sm text-[#a33f2d]">
         <Wallet className="mt-0.5 h-4 w-4 flex-none" />
         <div>
-          <p className="font-semibold">Wallet required for testnet upload</p>
-          <p className="mt-1 leading-6">
-            Connect your Aptos wallet to upload blobs to Shelby testnet. The wallet will sign the
-            on-chain registration transaction. Requires testnet APT for gas and ShelbyUSD for
-            storage.
-          </p>
+          <p className="font-semibold">{t('upload.walletRequired')}</p>
+          <p className="mt-1 leading-6">{t('upload.walletRequiredBody')}</p>
         </div>
       </div>
     );
@@ -117,12 +114,9 @@ function ModeIndicator({
       <div className="mb-8 flex gap-3 border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
         <WifiOff className="mt-0.5 h-4 w-4 flex-none" />
         <div>
-          <p className="font-semibold">Wrong network — switch to Aptos Testnet</p>
+          <p className="font-semibold">{t('upload.wrongNetwork')}</p>
           <p className="mt-1 leading-6">
-            Your wallet is connected to{' '}
-            <span className="font-mono font-semibold">{walletNetwork}</span>. Shelby testnet
-            upload requires <span className="font-semibold">Aptos Testnet</span>. Switch your
-            wallet network and reconnect.
+            {t('upload.wrongNetworkBody', { network: walletNetwork })}
           </p>
         </div>
       </div>
@@ -133,11 +127,9 @@ function ModeIndicator({
     <div className="mb-8 flex gap-3 border border-[#157a4c]/35 bg-[#dff2c8] px-4 py-3 text-sm text-[#157a4c]">
       <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none" />
       <div>
-        <p className="font-semibold">Wallet connected — Shelby testnet upload ready</p>
+        <p className="font-semibold">{t('upload.walletReady')}</p>
         <p className="mt-1 leading-6">
-          Uploading as{' '}
-          <span className="font-mono text-xs">{walletAddress ?? 'unknown'}</span>. Each file will
-          be registered on-chain and uploaded to Shelby testnet RPC.
+          {t('upload.walletReadyBody', { address: walletAddress ?? 'unknown' })}
         </p>
       </div>
     </div>
@@ -156,6 +148,7 @@ function WalletConnector({
   walletName,
   connect,
   disconnect,
+  t,
 }: {
   wallets: ReadonlyArray<AdapterWallet>;
   notDetectedWallets: ReadonlyArray<AdapterNotDetectedWallet>;
@@ -164,6 +157,7 @@ function WalletConnector({
   walletName: string | null;
   connect: (name: string) => void;
   disconnect: () => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }) {
   if (walletConnected) {
     return (
@@ -175,7 +169,7 @@ function WalletConnector({
             </div>
             <div className="min-w-0">
               <p className="font-mono text-xs font-semibold uppercase text-[#978978]">
-                {walletName ?? 'Wallet'} connected
+                {t('upload.connected', { name: walletName ?? 'Wallet' })}
               </p>
               <p className="truncate font-mono text-xs text-[#2d211c]">
                 {walletAddress ?? 'unknown'}
@@ -187,7 +181,7 @@ function WalletConnector({
             onClick={disconnect}
             className="flex-none shelby-cut border border-[#2d211c]/12 px-3 py-1.5 text-xs font-semibold text-[#6f6258] transition hover:border-red-400/60 hover:text-red-200"
           >
-            Disconnect
+            {t('upload.disconnect')}
           </button>
         </div>
       </div>
@@ -197,21 +191,10 @@ function WalletConnector({
   return (
     <div className="shelby-surface mb-6 shelby-cut p-4">
       <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#978978]">
-        Connect Aptos wallet
+        {t('upload.connectWallet')}
       </p>
       {wallets.length === 0 && notDetectedWallets.length === 0 && (
-        <p className="text-sm text-[#6f6258]">
-          No Aptos wallets detected. Install{' '}
-          <a
-            href="https://petra.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-[#6a3ea1]"
-          >
-            Petra
-          </a>{' '}
-          or another Aptos wallet extension and refresh the page.
-        </p>
+        <p className="text-sm text-[#6f6258]">{t('upload.noWallet')}</p>
       )}
       {wallets.length > 0 && (
         <div className="grid gap-2">
@@ -233,7 +216,7 @@ function WalletConnector({
       )}
       {notDetectedWallets.length > 0 && (
         <div className="mt-3">
-          <p className="mb-2 text-xs text-[#6f6258]">Not installed:</p>
+          <p className="mb-2 text-xs text-[#6f6258]">{t('upload.notInstalled')}</p>
           <div className="grid gap-1.5">
             {notDetectedWallets.map((w) => (
               <a
@@ -284,6 +267,7 @@ function StepLabel({
 }
 
 function UploadPageContent() {
+  const { t } = useI18n();
   const [form, setForm] = useState<FormState>({
     title: '',
     category: 'dataset',
@@ -316,7 +300,7 @@ function UploadPageContent() {
     const oversized = incoming.filter((f) => f.size > MAX_FILE_SIZE);
     if (oversized.length > 0) {
       setUploadError(
-        `${oversized.length} file(s) skipped: files must be <= ${formatBytes(MAX_FILE_SIZE)}.`
+        t('upload.fileSkipped', { count: oversized.length, size: formatBytes(MAX_FILE_SIZE) })
       );
     }
 
@@ -352,7 +336,7 @@ function UploadPageContent() {
           });
         });
     });
-  }, []);
+  }, [t]);
 
   function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
     const chosen = Array.from(e.target.files ?? []);
@@ -376,22 +360,22 @@ function UploadPageContent() {
     setUploadError(null);
 
     if (!form.title.trim()) {
-      setUploadError('Pack title is required.');
+      setUploadError(t('upload.packRequired'));
       return;
     }
     if (files.length === 0) {
-      setUploadError('Please select at least one file.');
+      setUploadError(t('upload.fileRequired'));
       return;
     }
     const notReady = files.some((f) => f.hashStatus !== 'done');
     if (notReady) {
-      setUploadError('Please wait for SHA-256 computation to complete.');
+      setUploadError(t('upload.hashPending'));
       return;
     }
 
     if (mode === 'testnet' && !shelbyUpload.walletConnected) {
       setUploadError(
-        'Wallet not connected. Please connect your Aptos wallet to upload to Shelby testnet.'
+        t('upload.walletNotConnected')
       );
       return;
     }
@@ -402,7 +386,7 @@ function UploadPageContent() {
       shelbyUpload.walletNetwork !== Network.TESTNET
     ) {
       setUploadError(
-        `Wrong network: wallet is on "${shelbyUpload.walletNetwork}". Switch to Aptos Testnet and reconnect.`
+        t('upload.wrongNetworkError', { network: shelbyUpload.walletNetwork })
       );
       return;
     }
@@ -545,7 +529,7 @@ function UploadPageContent() {
         description: '',
       });
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'Upload failed.');
+      setUploadError(err instanceof Error ? err.message : t('upload.failed'));
     } finally {
       setUploading(false);
     }
@@ -561,7 +545,7 @@ function UploadPageContent() {
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <p className="font-mono text-xs font-semibold uppercase text-[#ff77c9]">
-              {isTestnet ? 'Shelby testnet evidence pack sealed' : 'Local evidence pack sealed'}
+              {isTestnet ? t('upload.success.testnet') : t('upload.success.local')}
             </p>
             <h1 className="mt-3 text-3xl font-semibold text-[#2d211c]">
               {uploadResult.packTitle}
@@ -569,14 +553,12 @@ function UploadPageContent() {
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
               {uploadResult.blobIds.length} blob
               {uploadResult.blobIds.length !== 1 ? 's' : ''}{' '}
-              {isTestnet
-                ? 'registered on Shelby testnet and saved locally with real account/blob metadata.'
-                : 'saved locally with mock Shelby references. No wallet signing, no network upload, and no real Shelby registration.'}
+              {isTestnet ? t('upload.success.testnetBody', { count: uploadResult.blobIds.length }) : t('upload.success.localBody', { count: uploadResult.blobIds.length })}
             </p>
 
             <div className="mt-8 shelby-cut border border-[#2d211c]/10 bg-[#fff8ea] p-4">
               <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#978978]">
-                Read receipt
+                {t('upload.readReceipt')}
               </p>
               <Link
                 href={`/read-receipt/${uploadResult.receiptId}`}
@@ -589,7 +571,7 @@ function UploadPageContent() {
 
             <div className="mt-4 shelby-cut border border-[#2d211c]/10 bg-[#fff8ea] p-4">
               <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#978978]">
-                Blob detail pages
+                {t('upload.blobPages')}
               </p>
               <div className="grid gap-2">
                 {uploadResult.blobIds.map((blobId) => (
@@ -610,14 +592,14 @@ function UploadPageContent() {
                 href="/dashboard"
                 className="ui-button shelby-cut-sm"
               >
-                View evidence index
+                {t('upload.viewIndex')}
                 <ChevronRight className="h-4 w-4" />
               </Link>
               <button
                 onClick={() => setUploadResult(null)}
                 className="ui-button ui-button-secondary shelby-cut-sm"
               >
-                Upload another pack
+                {t('upload.another')}
               </button>
             </div>
           </div>
@@ -635,34 +617,34 @@ function UploadPageContent() {
   const testnetRequiresWallet = isTestnet && (!shelbyUpload.walletConnected || wrongNetwork);
   const submitLabel = uploading
     ? isTestnet
-      ? 'Uploading to testnet'
-      : 'Saving locally'
+      ? t('upload.submit.uploading')
+      : t('upload.submit.saving')
     : isTestnet
       ? shelbyUpload.walletConnected && !wrongNetwork
-        ? 'Upload to Shelby testnet'
+        ? t('upload.submit.testnet')
         : wrongNetwork
-          ? 'Wrong network — switch wallet'
-          : 'Connect wallet to upload'
-      : 'Save locally';
+          ? t('upload.submit.wrongNetwork')
+          : t('upload.submit.connect')
+      : t('upload.submit.local');
   const intakeSteps = [
     {
       step: '01',
-      title: 'Describe',
-      body: 'Name the pack, category, source, and tags.',
+      title: t('upload.describe'),
+      body: t('upload.describeBody'),
       icon: FileText,
       tone: 'duotone-lilac',
     },
     {
       step: '02',
-      title: 'Hash',
-      body: 'Drop files and compute SHA-256 in the browser.',
+      title: t('upload.hash'),
+      body: t('upload.hashBody'),
       icon: Hash,
       tone: 'duotone-green',
     },
     {
       step: '03',
-      title: 'Seal',
-      body: isTestnet ? 'Register on Shelby testnet.' : 'Persist locally with SQLite.',
+      title: t('upload.seal'),
+      body: isTestnet ? t('upload.sealTestnet') : t('upload.sealMock'),
       icon: ShieldCheck,
       tone: 'duotone-coral',
     },
@@ -675,15 +657,15 @@ function UploadPageContent() {
           <div>
             <div className="ui-chip mb-4">
               <FileUp className="h-3.5 w-3.5 text-[#6a3ea1]" />
-              Evidence intake
+              {t('upload.eyebrow')}
             </div>
             <h1 className="max-w-3xl text-4xl font-semibold text-[#2d211c]">
-              Package files into a verifiable AI evidence pack.
+              {t('upload.title')}
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-[#6f6258]">
               {isTestnet
-                ? 'Connect your Aptos wallet to register files on Shelby testnet. Real account/blobName identity and explorer links are stored in each BlobRecord.'
-                : 'Metadata, file hashes, and mock Shelby references are created locally. Set SHELBY_MODE=testnet with a connected wallet for real testnet upload.'}
+                ? t('upload.body.testnet')
+                : t('upload.body.mock')}
             </p>
           </div>
           <div className="shelby-surface shelby-cut p-4">
@@ -693,10 +675,10 @@ function UploadPageContent() {
               </div>
               <div>
                 <p className="font-mono text-xs font-semibold uppercase text-[#978978]">
-                  Storage boundary
+                  {t('upload.storage')}
                 </p>
                 <p className="text-sm font-semibold text-[#2d211c]">
-                  {isTestnet ? 'Shelby testnet + SQLite' : 'Mock mode + SQLite'}
+                  {isTestnet ? t('upload.mode.testnetSqlite') : t('upload.mode.mockSqlite')}
                 </p>
               </div>
             </div>
@@ -708,6 +690,7 @@ function UploadPageContent() {
           walletConnected={shelbyUpload.walletConnected}
           walletAddress={shelbyUpload.walletAddress}
           walletNetwork={shelbyUpload.walletNetwork}
+          t={t}
         />
 
         {isTestnet && (
@@ -719,6 +702,7 @@ function UploadPageContent() {
             walletName={shelbyUpload.walletName}
             connect={shelbyUpload.connect}
             disconnect={shelbyUpload.disconnect}
+            t={t}
           />
         )}
 
@@ -736,9 +720,11 @@ function UploadPageContent() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="font-mono text-xs font-semibold uppercase text-[#6f6258]">
-                      Step {step}
+                      {t('upload.step', { step })}
                     </p>
-                    <h2 className="mt-3 text-lg font-semibold text-[#2d211c]">{title}</h2>
+                    <h2 className="mt-3 text-lg font-semibold text-[#2d211c]">
+                      {title}
+                    </h2>
                     <p className="mt-1 text-sm leading-6 text-[#5f554d]">{body}</p>
                   </div>
                   <div className="grid h-10 w-10 flex-none place-items-center rounded-full border border-[#2d211c]/12 bg-[#fff8ea]/72 text-[#2d211c]">
@@ -755,12 +741,12 @@ function UploadPageContent() {
           onSubmit={handleSubmit}
         >
           <section className="shelby-surface shelby-cut p-5">
-            <StepLabel number="01" title="Pack metadata" icon={FileText} />
+            <StepLabel number="01" title={t('upload.packMetadata')} icon={FileText} />
 
             <div className="grid gap-5">
               <div>
                 <label htmlFor="title" className="mb-1.5 block text-sm font-semibold text-[#2d211c]">
-                  Pack title <span className="text-red-500">*</span>
+                  {t('upload.packTitle')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="title"
@@ -768,7 +754,7 @@ function UploadPageContent() {
                   type="text"
                   value={form.title}
                   onChange={handleFormChange}
-                  placeholder="Common Crawl Sample - Web Text 2024-Q1"
+                  placeholder={t('upload.placeholder.title')}
                   className={fieldClass}
                 />
               </div>
@@ -779,7 +765,7 @@ function UploadPageContent() {
                     htmlFor="category"
                     className="mb-1.5 block text-sm font-semibold text-[#2d211c]"
                   >
-                    Category
+                    {t('upload.category')}
                   </label>
                   <select
                     id="category"
@@ -788,10 +774,10 @@ function UploadPageContent() {
                     onChange={handleFormChange}
                     className={fieldClass}
                   >
-                    <option value="dataset">Dataset</option>
-                    <option value="agent-run">Agent Run</option>
-                    <option value="document">Document</option>
-                    <option value="manifest">Manifest</option>
+                    <option value="dataset">{t('upload.category.dataset')}</option>
+                    <option value="agent-run">{t('upload.category.agent-run')}</option>
+                    <option value="document">{t('upload.category.document')}</option>
+                    <option value="manifest">{t('upload.category.manifest')}</option>
                   </select>
                 </div>
 
@@ -800,7 +786,7 @@ function UploadPageContent() {
                     htmlFor="sourceType"
                     className="mb-1.5 block text-sm font-semibold text-[#2d211c]"
                   >
-                    Source type
+                    {t('upload.sourceType')}
                   </label>
                   <select
                     id="sourceType"
@@ -809,17 +795,17 @@ function UploadPageContent() {
                     onChange={handleFormChange}
                     className={fieldClass}
                   >
-                    <option value="web-scrape">Web Scrape</option>
-                    <option value="api-export">API Export</option>
-                    <option value="agent-output">Agent Output</option>
-                    <option value="manual-upload">Manual Upload</option>
+                    <option value="web-scrape">{t('upload.source.web-scrape')}</option>
+                    <option value="api-export">{t('upload.source.api-export')}</option>
+                    <option value="agent-output">{t('upload.source.agent-output')}</option>
+                    <option value="manual-upload">{t('upload.source.manual-upload')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label htmlFor="tags" className="mb-1.5 block text-sm font-semibold text-[#2d211c]">
-                  Tags <span className="font-normal text-[#6f6258]">(comma-separated)</span>
+                  {t('upload.tags')} <span className="font-normal text-[#6f6258]">({t('upload.commaSeparated')})</span>
                 </label>
                 <input
                   id="tags"
@@ -827,7 +813,7 @@ function UploadPageContent() {
                   type="text"
                   value={form.tags}
                   onChange={handleFormChange}
-                  placeholder="nlp, training-data, 2024"
+                  placeholder={t('upload.placeholder.tags')}
                   className={fieldClass}
                 />
               </div>
@@ -837,7 +823,7 @@ function UploadPageContent() {
                   htmlFor="description"
                   className="mb-1.5 block text-sm font-semibold text-[#2d211c]"
                 >
-                  Description
+                  {t('upload.description')}
                 </label>
                 <textarea
                   id="description"
@@ -845,7 +831,7 @@ function UploadPageContent() {
                   rows={7}
                   value={form.description}
                   onChange={handleFormChange}
-                  placeholder="Describe the source, capture method, and intended evidence value."
+                  placeholder={t('upload.placeholder.description')}
                   className={`${fieldClass} resize-none`}
                 />
               </div>
@@ -854,7 +840,7 @@ function UploadPageContent() {
 
           <aside className="space-y-6 lg:mt-10">
             <section className="shelby-surface shelby-cut p-5">
-              <StepLabel number="02" title="Files and hashes" icon={Hash} />
+              <StepLabel number="02" title={t('upload.filesHashes')} icon={Hash} />
               <div
                 className={`cursor-pointer shelby-cut border border-dashed px-5 py-8 text-center transition ${
                   dragging
@@ -872,10 +858,9 @@ function UploadPageContent() {
                 <div className="mx-auto mb-4 grid h-12 w-12 place-items-center border border-[#157a4c]/30 bg-[#dff2c8] text-[#157a4c]">
                   <UploadCloud className="h-6 w-6" />
                 </div>
-                <p className="text-sm font-semibold text-[#2d211c]">Drop files here or browse</p>
+                <p className="text-sm font-semibold text-[#2d211c]">{t('upload.drop')}</p>
                 <p className="mt-1 text-xs leading-5 text-[#6f6258]">
-                  Max {formatBytes(MAX_FILE_SIZE)} per file. SHA-256 is computed in-browser before
-                  save.
+                  {t('upload.maxFile', { size: formatBytes(MAX_FILE_SIZE) })}
                 </p>
               </div>
               <input
@@ -902,7 +887,7 @@ function UploadPageContent() {
                         {entry.hashStatus === 'computing' && (
                           <span className="mt-1 flex items-center gap-1.5 text-xs text-[#6a3ea1]">
                             <Loader2 className="h-3 w-3 animate-spin" />
-                            Computing SHA-256
+                            {t('upload.computing')}
                           </span>
                         )}
                         {entry.hashStatus === 'done' && entry.hash && (
@@ -911,14 +896,14 @@ function UploadPageContent() {
                           </span>
                         )}
                         {entry.hashStatus === 'error' && (
-                          <span className="mt-1 block text-xs text-red-600">Hash error</span>
+                          <span className="mt-1 block text-xs text-red-600">{t('upload.hashError')}</span>
                         )}
                       </span>
                       <button
                         type="button"
                         onClick={() => removeFile(idx)}
                         className="grid h-8 w-8 flex-none place-items-center text-[#6f6258] transition hover:bg-red-500/10 hover:text-red-200"
-                        aria-label="Remove file"
+                        aria-label={t('upload.removeFile')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -931,14 +916,14 @@ function UploadPageContent() {
             <section className="shelby-cut border border-[#157a4c]/25 bg-[#fff8ea] p-5 text-[#2d211c] shadow-sm">
               <StepLabel
                 number="03"
-                title={isTestnet ? 'Testnet upload' : 'Local save'}
+                title={isTestnet ? t('upload.testnetUpload') : t('upload.localSave')}
                 icon={isTestnet ? Wallet : ShieldCheck}
                 inverse
               />
               <p className="text-sm leading-6 text-[#6f6258]">
                 {isTestnet
-                  ? 'Files are registered on Shelby testnet via your connected wallet and persisted for inspection.'
-                  : 'The saved object receives a deterministic mock Shelby reference and SQLite persistence.'}
+                  ? t('upload.sealTestnet')
+                  : t('upload.sealMock')}
               </p>
               <button
                 type="submit"
@@ -950,17 +935,17 @@ function UploadPageContent() {
               </button>
               {testnetRequiresWallet && !wrongNetwork && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
-                  Connect an Aptos wallet to enable testnet upload.
+                  {t('upload.connectHint')}
                 </p>
               )}
               {wrongNetwork && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
-                  Switch your wallet to Aptos Testnet to enable upload.
+                  {t('upload.networkHint')}
                 </p>
               )}
               {!isTestnet && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
-                  Set SHELBY_MODE=testnet and connect a wallet for real Shelby testnet upload.
+                  {t('upload.mockHint')}
                 </p>
               )}
             </section>

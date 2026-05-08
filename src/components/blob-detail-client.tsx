@@ -20,19 +20,26 @@ import { formatBytes, formatDateTime } from '@/lib/utils';
 import { getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getBlobById, getEvidencePackById } from '@/lib/evidence/service';
 import { getPersistedBlobAction, getPersistedPackAction } from '@/app/actions/persist';
+import { useI18n } from '@/components/language-provider';
 
 interface BlobDetailClientProps {
   id: string;
 }
 
-function DataSourceBadge({ blob }: { blob: BlobRecord }) {
+function DataSourceBadge({
+  blob,
+  t,
+}: {
+  blob: BlobRecord;
+  t: (key: string, values?: Record<string, string | number>) => string;
+}) {
   const isTestnet = blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet';
 
   if (isTestnet) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-[#157a4c]/40 bg-[#dff2c8] px-3 py-1 text-xs font-semibold text-[#157a4c]">
         <ShieldCheck className="h-3.5 w-3.5" />
-        Shelby testnet upload
+        {t('blob.testnet')}
       </span>
     );
   }
@@ -41,7 +48,7 @@ function DataSourceBadge({ blob }: { blob: BlobRecord }) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-[#6a3ea1]/30 bg-[#efe2ff] px-3 py-1 text-xs font-semibold text-[#6a3ea1]">
         <ShieldCheck className="h-3.5 w-3.5" />
-        Local demo upload
+        {t('blob.local')}
       </span>
     );
   }
@@ -49,7 +56,7 @@ function DataSourceBadge({ blob }: { blob: BlobRecord }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-[#2d211c]/10 bg-[#fff8ea] px-3 py-1 text-xs font-semibold text-[#6f6258]">
       <Database className="h-3.5 w-3.5" />
-      Demo data
+      {t('blob.demo')}
     </span>
   );
 }
@@ -83,6 +90,7 @@ function MonoBlock({ children }: { children: React.ReactNode }) {
 }
 
 export default function BlobDetailClient({ id }: BlobDetailClientProps) {
+  const { t } = useI18n();
   const [blob, setBlob] = useState<BlobRecord | null | undefined>(undefined);
   const [pack, setPack] = useState<EvidencePack | undefined>(undefined);
 
@@ -136,17 +144,16 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
           <div className="mx-auto mb-5 grid h-12 w-12 place-items-center shelby-cut bg-[#2d211c] text-[#157a4c]">
             <Fingerprint className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-semibold  text-[#2d211c]">Blob not found</h1>
+          <h1 className="text-2xl font-semibold  text-[#2d211c]">{t('blob.notFound')}</h1>
           <p className="mt-3 text-sm leading-6 text-[#6f6258]">
-            No blob with ID <code className="rounded bg-[#fff8ea] px-1 font-mono">{id}</code>{' '}
-            exists in demo data or local uploads.
+            {t('blob.notFoundBody', { id })}
           </p>
           <Link
             href="/dashboard"
             className="mt-6 inline-flex items-center gap-2 shelby-cut bg-[#2d211c] px-4 py-2.5 text-sm font-semibold text-[#fff8ea] transition hover:bg-[#157a4c]"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to index
+            {t('blob.back')}
           </Link>
         </div>
       </div>
@@ -155,10 +162,10 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
 
   const isTestnetBlob = blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet';
   const referenceLabel = isTestnetBlob
-    ? 'Shelby Testnet Reference'
+    ? t('blob.testnetReference')
     : blob.dataSource === 'local'
-      ? 'Mock Reference'
-      : 'Demo Reference';
+      ? t('blob.mockReference')
+      : t('blob.demoReference');
 
   return (
     <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
@@ -170,7 +177,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
               className="inline-flex items-center gap-1 rounded-full border border-[#2d211c]/10 bg-[#fff8ea] px-3 py-1 transition hover:border-[#6a3ea1]/35 hover:text-[#6a3ea1]"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Dashboard
+              {t('blob.dashboard')}
             </Link>
             {pack && (
               <Link
@@ -184,18 +191,17 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
 
           <div className="grid gap-6 lg:grid-cols-[1fr_340px] lg:items-end">
             <div>
-              <DataSourceBadge blob={blob} />
+              <DataSourceBadge blob={blob} t={t} />
               <h1 className="mt-4 max-w-4xl text-4xl font-semibold  text-[#2d211c]">
-                Blob provenance inspector
+                {t('blob.title')}
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
-                Inspect the local proof surface for one stored evidence object: identity,
-                reference, hash, file metadata, and pack membership.
+                {t('blob.body')}
               </p>
             </div>
             <div className="shelby-cut shelby-surface p-4 shadow-sm">
               <p className="text-xs font-semibold uppercase  text-[#6f6258]">
-                Blob ID
+                {t('blob.id')}
               </p>
               <p className="mt-2 truncate font-mono text-sm font-semibold text-[#2d211c]">
                 {blob.id}
@@ -212,7 +218,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase  text-[#6f6258]">
-                  Reference boundary
+                  {t('blob.referenceBoundary')}
                 </p>
                 <h2 className="text-lg font-semibold text-[#2d211c]">{referenceLabel}</h2>
               </div>
@@ -221,33 +227,33 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
             <MonoBlock>{blob.shelbyRef}</MonoBlock>
             <p className="mt-3 text-xs leading-5 text-[#6f6258]">
               {blob.dataSource === 'local'
-                ? 'Local demo reference. Testnet records additionally carry account namespace, blob name, network, and explorer metadata.'
+                ? t('blob.localReferenceBody')
                 : isTestnetBlob
-                  ? 'Shelby testnet reference with account namespace, blob name, network, and explorer metadata when available.'
-                  : 'Illustrative demo reference. Real Shelby blob identity is represented by account namespace plus blob name when using testnet mode.'}
+                  ? t('blob.testnetReferenceBody')
+                  : t('blob.demoReferenceBody')}
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <Fact icon={Hash} label="SHA-256 hash">
+              <Fact icon={Hash} label={t('blob.sha')}>
                 <MonoBlock>{blob.hash}</MonoBlock>
               </Fact>
-              <Fact icon={FileText} label="Source">
+              <Fact icon={FileText} label={t('blob.source')}>
                 <span className="break-all">{blob.source}</span>
               </Fact>
             </div>
           </section>
 
           <aside className="space-y-4">
-            <Fact icon={HardDrive} label="Size">
+            <Fact icon={HardDrive} label={t('blob.size')}>
               {formatBytes(blob.size)}
             </Fact>
-            <Fact icon={FileText} label="MIME type">
+            <Fact icon={FileText} label={t('blob.mime')}>
               <code className="font-mono text-sm">{blob.mimeType}</code>
             </Fact>
-            <Fact icon={CalendarClock} label="Created">
+            <Fact icon={CalendarClock} label={t('blob.created')}>
               {formatDateTime(blob.createdAt)}
             </Fact>
-            <Fact icon={Link2} label="Evidence pack">
+            <Fact icon={Link2} label={t('blob.pack')}>
               {pack ? (
                 <Link
                   href={`/dashboard?pack=${pack.id}`}
@@ -256,7 +262,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
                   {pack.title}
                 </Link>
               ) : (
-                <span className="text-[#6f6258]">Unknown pack</span>
+                <span className="text-[#6f6258]">{t('blob.unknownPack')}</span>
               )}
             </Fact>
           </aside>
@@ -265,7 +271,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
         <section className="mt-6 shelby-cut shelby-surface p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase  text-[#6f6258]">
             <Tag className="h-4 w-4 text-[#6a3ea1]" />
-            Tags and adapter metadata
+            {t('blob.tags')}
           </div>
           <div className="flex flex-wrap gap-2">
             {blob.tags.map((tag) => (
@@ -278,17 +284,17 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
             ))}
             {blob.uploadMode && (
               <span className="rounded-md border border-[#6a3ea1]/30 bg-[#efe2ff] px-2.5 py-1 text-xs font-semibold text-[#6a3ea1]">
-                mode: {blob.uploadMode}
+                {t('blob.mode')}: {blob.uploadMode}
               </span>
             )}
             {blob.network && (
               <span className="rounded-md border border-[#157a4c]/35 bg-[#dff2c8] px-2.5 py-1 text-xs font-semibold text-[#157a4c]">
-                network: {blob.network}
+                {t('blob.network')}: {blob.network}
               </span>
             )}
             {blob.blobName && (
               <span className="rounded-md border border-[#2d211c]/10 bg-[#fff8ea] px-2.5 py-1 font-mono text-xs text-[#2d211c]">
-                blobName: {blob.blobName}
+                {t('blob.blobName')}: {blob.blobName}
               </span>
             )}
           </div>

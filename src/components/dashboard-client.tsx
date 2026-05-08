@@ -17,6 +17,7 @@ import type { BlobRecord } from '@/lib/demo-data/blobs';
 import EvidencePackCard from '@/components/evidence-pack-card';
 import { getLocalPacks, getLocalBlobsByPackId, resetLocalData } from '@/lib/store/local-store';
 import { getPersistedPacksAction } from '@/app/actions/persist';
+import { useI18n } from '@/components/language-provider';
 
 interface DashboardClientProps {
   demoPacks: EvidencePack[];
@@ -41,6 +42,7 @@ function Metric({
 }
 
 export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClientProps) {
+  const { t } = useI18n();
   const [localPacks, setLocalPacks] = useState<EvidencePack[]>([]);
   const [persistedPacks, setPersistedPacks] = useState<EvidencePack[]>([]);
   const [resetConfirm, setResetConfirm] = useState(false);
@@ -76,9 +78,24 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
   const totalBlobs = localBlobs.length + persistedBlobCount + demoBlobs.length;
   const activePacks = allPacks.filter((p) => p.status === 'active').length;
   const topologyItems = [
-    { step: '01', label: 'Evidence packs', value: `${allPacks.length} indexed`, icon: Database },
-    { step: '02', label: 'Blob records', value: `${totalBlobs} tracked`, icon: Fingerprint },
-    { step: '03', label: 'Read receipts', value: 'demo + local', icon: ReceiptText },
+    {
+      step: '01',
+      label: t('dashboard.topology.packs'),
+      value: t('dashboard.indexed', { count: allPacks.length }),
+      icon: Database,
+    },
+    {
+      step: '02',
+      label: t('dashboard.topology.blobs'),
+      value: t('dashboard.tracked', { count: totalBlobs }),
+      icon: Fingerprint,
+    },
+    {
+      step: '03',
+      label: t('dashboard.topology.receipts'),
+      value: t('dashboard.demoLocal'),
+      icon: ReceiptText,
+    },
   ];
 
   return (
@@ -88,14 +105,13 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           <section className="shelby-surface shelby-cut p-6">
             <div className="ui-chip">
               <ShieldCheck size={13} />
-              Evidence index
+              {t('dashboard.eyebrow')}
             </div>
             <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1] text-[#2d211c] sm:text-5xl">
-              Inspectable storage state for AI evidence.
+              {t('dashboard.title')}
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[#6f6258]">
-              Demo corpus, browser-local records, and SQLite-persisted uploads resolve through one
-              evidence index.
+              {t('dashboard.body')}
             </p>
           </section>
 
@@ -103,9 +119,11 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase text-[#978978]">
-                  Runtime boundary
+                  {t('dashboard.runtime')}
                 </p>
-                <p className="mt-2 text-lg font-semibold text-[#2d211c]">Local + SQLite</p>
+                <p className="mt-2 text-lg font-semibold text-[#2d211c]">
+                  {t('dashboard.localSqlite')}
+                </p>
               </div>
               <div className="grid h-11 w-11 place-items-center rounded-full border border-[#157a4c]/25 bg-[#dff2c8] text-[#157a4c]">
                 <HardDrive size={19} />
@@ -113,7 +131,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             </div>
             <Link href="/upload" className="ui-button shelby-cut-sm w-full">
               <FilePlus2 size={16} />
-              New evidence pack
+              {t('dashboard.newPack')}
             </Link>
           </aside>
         </div>
@@ -125,10 +143,10 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               <div>
                 <div className="ui-chip border-white/15 bg-white/10 text-[#fff8ea]">
                   <Layers3 size={13} />
-                  Index topology
+                  {t('dashboard.topology')}
                 </div>
                 <h2 className="mt-5 max-w-sm text-3xl font-semibold leading-[1.04]">
-                  Packs, blobs, receipts, one audit plane.
+                  {t('dashboard.topologyTitle')}
                 </h2>
               </div>
               <div className="grid gap-3">
@@ -154,10 +172,10 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           </section>
 
           <div className="grid rounded-[24px] border border-[#2d211c]/10 bg-[#fff8ea]/65 sm:grid-cols-2">
-            <Metric label="Packs indexed" value={allPacks.length} tone="text-[#2d211c]" />
-            <Metric label="Active packs" value={activePacks} tone="text-[#157a4c]" />
-            <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#6a3ea1]" />
-            <Metric label="User packs" value={allUserPacks.length} tone="text-[#a33f2d]" />
+            <Metric label={t('dashboard.metric.packs')} value={allPacks.length} tone="text-[#2d211c]" />
+            <Metric label={t('dashboard.metric.active')} value={activePacks} tone="text-[#157a4c]" />
+            <Metric label={t('dashboard.metric.blobs')} value={totalBlobs} tone="text-[#6a3ea1]" />
+            <Metric label={t('dashboard.metric.user')} value={allUserPacks.length} tone="text-[#a33f2d]" />
           </div>
         </div>
 
@@ -167,15 +185,17 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               <div>
                 <div className="ui-chip">
                   <Activity size={13} />
-                  User-created records
+                  {t('dashboard.userRecords')}
                 </div>
-                <h2 className="mt-3 text-xl font-semibold text-[#2d211c]">Local workspace</h2>
+                <h2 className="mt-3 text-xl font-semibold text-[#2d211c]">
+                  {t('dashboard.localWorkspace')}
+                </h2>
               </div>
               <button
                 onClick={handleReset}
                 className="shelby-cut-sm border border-[#2d211c]/12 bg-[#fff8ea] px-3 py-2 text-xs font-semibold text-[#6f6258] transition hover:border-[#ef6f4d]/45 hover:text-[#a33f2d]"
               >
-                {resetConfirm ? 'Click again to reset browser cache' : 'Reset browser cache'}
+                {resetConfirm ? t('dashboard.resetConfirm') : t('dashboard.reset')}
               </button>
             </div>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -191,13 +211,15 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             <div>
               <div className="ui-chip">
                 <Database size={13} />
-                Built-in corpus
+                {t('dashboard.builtin')}
               </div>
-              <h2 className="mt-3 text-xl font-semibold text-[#2d211c]">Demo evidence</h2>
+              <h2 className="mt-3 text-xl font-semibold text-[#2d211c]">
+                {t('dashboard.demoEvidence')}
+              </h2>
             </div>
             <div className="hidden items-center gap-2 font-mono text-xs font-semibold uppercase text-[#978978] sm:flex">
               <Layers3 size={14} />
-              {demoPacks.length} packs
+              {t('dashboard.packCount', { count: demoPacks.length })}
             </div>
           </div>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
