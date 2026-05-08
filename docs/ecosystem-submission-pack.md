@@ -7,7 +7,7 @@ Milestone: M5 — Public Ecosystem Package
 
 ## English Positioning
 
-**Shelby AI Evidence Vault** is a verifiable evidence storage and read-receipt demo for AI agents, built on Shelby testnet. It demonstrates how AI pipelines can store datasets, agent run outputs, and documents with cryptographic provenance — and produce auditable receipts that trace every query back to the evidence that informed it.
+**Shelby AI Evidence Vault** is a verifiable evidence storage and read-receipt demo for AI agents, with a browser-wallet Shelby testnet upload path. It demonstrates how AI pipelines can store datasets, agent run outputs, and documents with cryptographic provenance — and produce auditable receipts that trace every query back to the evidence that informed it.
 
 It ships as a complete, runnable open-source demo. Local mock mode works with zero configuration. A browser-wallet Shelby testnet upload path is available for operators with funded wallets. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet.
 
@@ -51,7 +51,7 @@ It ships as a complete, runnable open-source demo. Local mock mode works with ze
 
 ## 30-Second Elevator Pitch
 
-AI agents make decisions based on data — but how do you prove which data they used, and that it hasn't been tampered with? Shelby AI Evidence Vault gives every dataset and agent output a cryptographic identity on Shelby testnet, and produces auditable read receipts that trace every answer back to its evidence. Local mock mode works in under a minute with no setup. Operators with a funded Aptos testnet wallet can upload real blobs today.
+AI agents make decisions based on data — but how do you prove which data they used, and that it hasn't been tampered with? Shelby AI Evidence Vault gives every dataset and agent output a cryptographic identity on Shelby testnet, and produces auditable read receipts that trace every answer back to its evidence. Local mock mode works in under a minute with no setup. A browser-wallet Shelby testnet upload path is available for operators with a funded Aptos testnet wallet — real testnet upload requires operator prerequisites and manual verification.
 
 ---
 

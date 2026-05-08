@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
-**A verifiable evidence storage and read-receipt demo for AI agents, built on Shelby testnet. Local mock works out of the box — browser-wallet Shelby testnet upload is available for operators with funded wallets.**
+**A verifiable evidence storage and read-receipt demo for AI agents, with a browser-wallet Shelby testnet upload path. Local mock works out of the box — no wallet, no API keys required. Real testnet upload requires operator prerequisites and manual verification.**
 
 ---
 
@@ -16,7 +16,7 @@ Shelby AI Evidence Vault is a public demo showing how AI pipelines can store dat
 - **Evidence packs** — structured groups of related blobs with metadata, tags, provenance, and status
 - **Read receipts** — auditable records of agent activity: what was uploaded, what evidence was consulted, and what was answered; bound to real `BlobRecord` identity in M4
 - **Working local upload flow** — SHA-256 computed in-browser, evidence packs and receipts persisted to `localStorage`, no wallet or API keys required
-- **Browser-wallet Shelby testnet path** — operators with a funded Aptos testnet wallet and Shelby storage credits can upload real blobs to testnet behind a `SHELBY_MODE=testnet` gate
+- **Browser-wallet Shelby testnet path** — a testnet upload path is available behind a `SHELBY_MODE=testnet` gate using `@shelby-protocol/react`; requires operator prerequisites (funded Aptos testnet wallet, Shelby storage credits) and manual verification — no automated CI upload
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 
 ---

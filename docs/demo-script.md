@@ -229,4 +229,3 @@ npm run build  # Must pass
 ```
 
 The smoke harness is opt-in and disabled unless `SHELBY_SMOKE=true` is explicitly set.
-
