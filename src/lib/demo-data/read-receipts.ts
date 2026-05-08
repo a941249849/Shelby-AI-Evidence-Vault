@@ -7,6 +7,14 @@ export interface ReadReceipt {
   evidencePackIds: string[];
   timestamp: string;
   agentVersion: string;
+  /**
+   * Identifies the origin of the receipt.
+   * Undefined means built-in demo data (backward compatible).
+   * 'demo'            — built-in illustrative data.
+   * 'local'           — created after a browser-local mock upload.
+   * 'shelby-testnet'  — created after a real Shelby testnet upload.
+   */
+  receiptMode?: 'demo' | 'local' | 'shelby-testnet';
 }
 
 export const readReceipts: ReadReceipt[] = [

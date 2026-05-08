@@ -1,21 +1,24 @@
 /**
- * Browser-side localStorage persistence for user-uploaded evidence packs
- * and blob records.
+ * Browser-side localStorage persistence for user-uploaded evidence packs,
+ * blob records, and read receipts.
  *
  * Demo data is NOT stored here — it remains in src/lib/demo-data/ and is
  * always present. This store only holds records created through the upload
  * page during the current browser session (survives page refresh).
  *
- * Data is serialised as JSON under two keys:
- *   shelby_vault_packs  — EvidencePack[]
- *   shelby_vault_blobs  — BlobRecord[]
+ * Data is serialised as JSON under three keys:
+ *   shelby_vault_packs    — EvidencePack[]
+ *   shelby_vault_blobs    — BlobRecord[]
+ *   shelby_vault_receipts — ReadReceipt[]
  */
 
 import type { EvidencePack } from '../demo-data/evidence-packs';
 import type { BlobRecord } from '../demo-data/blobs';
+import type { ReadReceipt } from '../demo-data/read-receipts';
 
 const PACKS_KEY = 'shelby_vault_packs';
 const BLOBS_KEY = 'shelby_vault_blobs';
+const RECEIPTS_KEY = 'shelby_vault_receipts';
 
 function safeRead<T>(key: string): T[] {
   try {
@@ -83,7 +86,26 @@ export function resetLocalData(): void {
   try {
     localStorage.removeItem(PACKS_KEY);
     localStorage.removeItem(BLOBS_KEY);
+    localStorage.removeItem(RECEIPTS_KEY);
   } catch {
     // ignore
   }
+}
+
+// ---------------------------------------------------------------------------
+// Read receipts
+// ---------------------------------------------------------------------------
+
+export function getLocalReadReceipts(): ReadReceipt[] {
+  return safeRead<ReadReceipt>(RECEIPTS_KEY);
+}
+
+export function addLocalReadReceipt(receipt: ReadReceipt): void {
+  const receipts = getLocalReadReceipts();
+  receipts.unshift(receipt); // newest first
+  safeWrite(RECEIPTS_KEY, receipts);
+}
+
+export function getLocalReadReceiptById(id: string): ReadReceipt | undefined {
+  return getLocalReadReceipts().find((r) => r.id === id);
 }
