@@ -17,6 +17,8 @@ The official docs confirm four architectural facts that matter for the next phas
 
 Important correction: Issue #5 listed `0xc63d6a5e...b3ddbf5` as a preliminary contract account to verify. The current official `Networks` page lists the Shelby Smart Contract account for `shelbynet` as `0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8bb4988e6a`. Treat the old `0xc63...` value as stale/unverified and do not hardcode either value in M1B code.
 
+Strategy correction after the devnet/testnet transition: the product strategy remains correct, but M2 real integration should prioritize Shelby **testnet** as the main target when possible. `shelbynet` should be treated as legacy/developer-prototype context, useful for architecture clues and explorer inspection, not as the default assumption for production-shaped integration.
+
 ## Documentation Map
 
 | Area | Official page reviewed | URL | Finding |
@@ -28,7 +30,7 @@ Important correction: Issue #5 listed `0xc63d6a5e...b3ddbf5` as a preliminary co
 | Protocol | Storage Providers | https://docs.shelby.xyz/protocol/architecture/storage-providers | Describes storage provider nodes and the Cavalier reference implementation. |
 | Protocol | Smart Contracts | https://docs.shelby.xyz/protocol/architecture/smart-contracts | Confirms metadata registration, write payment, acknowledgements, micropayments, participation, and audits are on-chain coordinated. |
 | Protocol | Token Economics | https://docs.shelby.xyz/protocol/architecture/token-economics | Confirms user payments for storage/read operations and native token role for staking/rewards/governance. |
-| Protocol | Networks | https://docs.shelby.xyz/protocol/architecture/networks | Confirms `shelbynet`, component URLs, weekly-wipe prototype network warning, and current smart-contract account. |
+| Protocol | Networks | https://docs.shelby.xyz/protocol/architecture/networks | Confirms official `testnet` component URLs and the older `shelbynet` developer-prototype section. |
 | SDK | TypeScript Getting Started | https://docs.shelby.xyz/sdks/typescript | Confirms `@shelby-protocol/sdk` and `@aptos-labs/ts-sdk`; Node and browser entry points. |
 | SDK | Node Overview | https://docs.shelby.xyz/sdks/typescript/node | Confirms `@shelby-protocol/sdk/node` and `ShelbyNodeClient`. |
 | SDK | Browser Overview | https://docs.shelby.xyz/sdks/typescript/browser | Confirms `@shelby-protocol/sdk/browser` and `ShelbyClient`. |
@@ -131,6 +133,12 @@ M1B correctly keeps these separate in `.env.example`, `config.ts`, and docs.
 Official `Networks` page currently lists:
 
 ```txt
+Network: testnet
+Indexer: https://api.testnet.aptoslabs.com/v1/graphql
+Shelby RPC: https://api.testnet.shelby.xyz/shelby
+Aptos Full Node: https://api.testnet.aptoslabs.com/v1
+Shelby Smart Contract: 0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8bb4988e6a
+
 Network: shelbynet
 Indexer: https://api.shelbynet.shelby.xyz/v1/graphql
 Shelby RPC: https://api.shelbynet.shelby.xyz/shelby
@@ -138,13 +146,14 @@ Aptos Full Node: https://api.shelbynet.shelby.xyz/v1
 Shelby Smart Contract: 0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8bb4988e6a
 ```
 
-The page also says `shelbynet` is a developer prototype network that may be wiped roughly weekly or faster. It is isolated from Aptos mainnet, testnet, and devnet.
+The page still says `shelbynet` is a developer prototype network that may be wiped roughly weekly or faster. It is isolated from Aptos mainnet, testnet, and devnet. The same page now also exposes a separate `testnet` section. If Shelby team guidance says the March testnet topology is close to mainnet topology, then M2/M3 should use testnet as the production-shaped integration target and keep shelbynet as historical/prototype context.
 
 Shelby Explorer at `https://explorer.shelby.xyz/shelbynet` is beta, has a "Connect Wallet" entry, and displays live stats such as total blobs, total storage used, blob events, slices, placement groups, and storage providers. At review time it showed 16 storage providers and live blob/event tables with blob states like Registered, Complete, Pending, and Ready.
 
 Implementation impact:
 
-- Never point Shelby code at generic Aptos testnet endpoints for shelbynet work.
+- Never mix `shelbynet` and `testnet` endpoint families in one runtime config.
+- For real integration work, prefer the official testnet tuple: Aptos Labs testnet fullnode/indexer plus Shelby testnet RPC.
 - Do not hardcode the smart contract account in M1B. Even the current official account may change with weekly wipes or docs updates.
 - Explorer links should be generated from the selected network and stored account/blob metadata in M2+.
 
@@ -451,8 +460,9 @@ Blocked:
 
 Deliverables:
 
+- Select `testnet` as the default real-integration target unless current official SDK/docs explicitly require `shelbynet`.
 - Decide browser wallet vs server signer.
-- Confirm current SDK network constant/config for shelbynet.
+- Confirm current SDK network constant/config for the selected network.
 - Confirm current smart contract account from docs/explorer at implementation time.
 - Confirm API key type and placement.
 - Design expiration UI.
