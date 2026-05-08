@@ -1,8 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fcfaf8;
+  --foreground: #161008;
+  --shelby-ink: #161008;
+  --shelby-plum: #4f192a;
+  --shelby-violet-dark: #470b64;
+  --shelby-green-dark: #21351a;
+  --paper: #fcfaf8;
+  --paper-2: #ffdcd9;
+  --slate-text: #161008;
+  --muted: #6f6258;
+  --violet: #de8aff;
+  --violet-soft: #eee2ff;
+  --green: #9fe878;
+  --green-soft: #dfffcc;
+  --pink: #ff77c9;
+  --pink-soft: #ffdfef;
+  --coral: #fd8565;
+  --coral-soft: #ffdcd9;
 }
 
 @theme inline {
@@ -12,17 +28,11 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  text-rendering: geometricPrecision;
 }
 
 code,
@@ -38,4 +48,56 @@ samp {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+::selection {
+  background: rgba(222, 138, 255, 0.34);
+  color: var(--shelby-ink);
+}
+
+.paper-surface {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(252, 250, 248, 0.92)),
+    var(--paper);
+  border: 1px solid rgba(22, 16, 8, 0.14);
+}
+
+.ledger-line {
+  background-image:
+    linear-gradient(rgba(22, 16, 8, 0.055) 1px, transparent 1px),
+    linear-gradient(60deg, rgba(222, 138, 255, 0.09) 1px, transparent 1px);
+  background-size: 100% 36px, 72px 72px;
+}
+
+.proof-glow {
+  box-shadow:
+    0 0 0 1px rgba(159, 232, 120, 0.28),
+    0 18px 60px rgba(222, 138, 255, 0.12);
+}
+
+.ink-panel {
+  background:
+    linear-gradient(60deg, rgba(252, 250, 248, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 12% 18%, rgba(222, 138, 255, 0.25), transparent 30%),
+    radial-gradient(circle at 82% 20%, rgba(159, 232, 120, 0.18), transparent 28%),
+    linear-gradient(135deg, #4f192a 0%, #470b64 52%, #21351a 100%);
+  background-size: 64px 64px, auto, auto, auto;
+}
+
+.shelby-hex {
+  clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0 50%);
+}
+
+.shelby-cut {
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+}
+
+.shelby-cut-sm {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+}
+
+input,
+select,
+textarea {
+  color: var(--slate-text);
 }
