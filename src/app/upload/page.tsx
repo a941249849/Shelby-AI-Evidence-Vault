@@ -21,10 +21,11 @@ import { Network } from '@aptos-labs/ts-sdk';
 import type { AdapterWallet, AdapterNotDetectedWallet } from '@aptos-labs/wallet-adapter-react';
 import { shelbyUploadAction, getShelbyModeAction } from '@/app/actions/upload';
 import { parseTags, buildEvidencePack, buildBlobRecord } from '@/lib/validation';
-import { addLocalPack, addLocalBlob } from '@/lib/store/local-store';
+import { addLocalPack, addLocalBlob, addLocalReadReceipt } from '@/lib/store/local-store';
 import { formatBytes } from '@/lib/utils';
 import { useShelbyUpload } from '@/lib/shelby/use-shelby-upload';
 import UploadProviders from './providers';
+import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 
 type Category = 'dataset' | 'agent-run' | 'document' | 'manifest';
 type SourceType = 'web-scrape' | 'api-export' | 'agent-output' | 'manual-upload';
@@ -48,6 +49,7 @@ interface UploadedResult {
   packTitle: string;
   blobIds: string[];
   mode: 'mock' | 'testnet';
+  receiptId: string;
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -510,7 +512,21 @@ function UploadPageContent() {
       }
 
       addLocalPack(pack);
-      setUploadResult({ packId: pack.id, packTitle: pack.title, blobIds, mode: mode ?? 'mock' });
+
+      const receipt: ReadReceipt = {
+        id: `local-rr-${crypto.randomUUID()}`,
+        runId: `upload-${pack.id}`,
+        query: `Evidence pack "${pack.title}" uploaded via ${mode === 'testnet' ? 'Shelby testnet' : 'local mock'} upload.`,
+        answerSummary: `${blobIds.length} blob${blobIds.length !== 1 ? 's' : ''} sealed into evidence pack "${pack.title}". Each blob hash was computed in-browser before storage. Pack ID: ${pack.id}.`,
+        referencedBlobIds: blobIds,
+        evidencePackIds: [pack.id],
+        timestamp: new Date().toISOString(),
+        agentVersion: 'shelby-vault/upload',
+        receiptMode: mode === 'testnet' ? 'shelby-testnet' : 'local',
+      };
+      addLocalReadReceipt(receipt);
+
+      setUploadResult({ packId: pack.id, packTitle: pack.title, blobIds, mode: mode ?? 'mock', receiptId: receipt.id });
       setFiles([]);
       setForm({
         title: '',
@@ -550,6 +566,19 @@ function UploadPageContent() {
             </p>
 
             <div className="mt-8 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+                Read receipt
+              </p>
+              <Link
+                href={`/read-receipt/${uploadResult.receiptId}`}
+                className="group flex items-center justify-between rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-3 py-2 text-xs font-medium text-[#161008] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+              >
+                <span className="truncate font-mono">/read-receipt/{uploadResult.receiptId}</span>
+                <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+
+            <div className="mt-4 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4">
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
                 Blob detail pages
               </p>

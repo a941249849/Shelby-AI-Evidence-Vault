@@ -270,6 +270,58 @@ Deliverables:
 
 PR note: A real Shelby testnet smoke upload was **not** run. The CI environment has no funded Aptos testnet wallet and no Shelby testnet API access. The manual browser upload path is documented in `docs/c3-smoke-test-guide.md`. All opt-in gates, fail-closed behavior, and machine-readable output were verified locally.
 
+### Task C4: M4 bind read receipts to real/local Shelby BlobRecord identity
+
+Owner: Copilot
+
+Size: Large
+
+Status: **Complete** — implemented in this PR.
+
+When to start:
+
+After C3 lands.
+
+Goal:
+
+Make read receipts bind to actual BlobRecord identity, not just raw demo blob IDs. A receipt should resolve referenced blobs/packs from built-in demo data and browser-local uploads, then expose evidence lineage and Shelby identity fields.
+
+Scope:
+
+- Extend `ReadReceipt` model with optional `receiptMode` field.
+- Add browser-local read receipt persistence (`getLocalReadReceipts`, `addLocalReadReceipt`, `getLocalReadReceiptById`) and update `resetLocalData` to clear receipts.
+- Create a read receipt automatically after successful upload (mock or testnet), and show a link to it on the upload success screen.
+- Convert the read receipt page into a client-aware component (similar to `BlobDetailClient`) so local receipts survive refresh.
+- Improve receipt blob display: show hash, source, shelbyRef, identity fields (accountAddress, blobName, network, storageStatus, explorerUrl, retrievalUrl) and data source badge per blob.
+- Add `docs/m4-read-receipt-binding.md` with model and verification path.
+
+Hard boundaries:
+
+- No UI redesign or theme overhaul.
+- No production database.
+- No real LLM/API calls.
+- No private key or server signer.
+
+Acceptance:
+
+- Demo read receipt `/read-receipt/rr-001` still works.
+- Uploading in mock mode creates a local read receipt and shows a link to it.
+- The local receipt page survives refresh and resolves its local pack/blob data from localStorage.
+- `resetLocalData` clears local packs, blobs, and receipts.
+- Mock mode remains default and works with zero env vars.
+- `npm run lint` passes.
+- `npm run build` passes.
+
+Deliverables:
+
+- `src/lib/demo-data/read-receipts.ts` — `ReadReceipt.receiptMode` field added
+- `src/lib/store/local-store.ts` — read receipt persistence helpers + `resetLocalData` update
+- `src/app/upload/page.tsx` — receipt created on upload success, receipt link shown
+- `src/components/read-receipt-client.tsx` — new client component with full blob identity display
+- `src/app/read-receipt/[id]/page.tsx` — thin server wrapper delegating to client component
+- `docs/production-queue.md` — C4 task documented
+- `docs/m4-read-receipt-binding.md` — model and verification guide
+
 ## Codex Task Queue
 
 ### Task X1: M1B merge-readiness review
