@@ -91,6 +91,24 @@ export interface BuildBlobInput {
   uploadMode: 'mock' | 'testnet';
   /** Network context: populated for local uploads. */
   network?: 'mock' | 'testnet';
+  /** Shelby account address (real testnet uploads). */
+  accountAddress?: string;
+  /** Shelby blob name key (real testnet uploads). */
+  blobName?: string;
+  /** Aptos transaction hash (real testnet uploads, if available). */
+  transactionHash?: string;
+  /** Commitment merkle root (real testnet uploads, if available). */
+  commitmentRoot?: string;
+  /** Blob expiration in microseconds (real testnet uploads). */
+  expirationMicros?: string;
+  /** Storage status from Shelby RPC (real testnet uploads). */
+  storageStatus?: string;
+  /** Explorer URL for the blob (real testnet uploads). */
+  explorerUrl?: string;
+  /** RPC retrieval URL for the blob (real testnet uploads). */
+  retrievalUrl?: string;
+  /** Data source label: 'local' for mock, 'shelby-testnet' for real uploads. */
+  dataSource?: 'local' | 'shelby-testnet';
 }
 
 /**
@@ -113,9 +131,16 @@ export function buildBlobRecord(input: BuildBlobInput): BlobRecord {
     createdAt: new Date().toISOString(),
     size: input.size,
     mimeType: input.mimeType || 'application/octet-stream',
-    dataSource: 'local',
+    dataSource: input.dataSource ?? 'local',
     uploadMode: input.uploadMode,
-    blobName: input.fileName,
+    blobName: input.blobName ?? input.fileName,
     network: input.network ?? (input.uploadMode === 'mock' ? 'mock' : undefined),
+    accountAddress: input.accountAddress,
+    transactionHash: input.transactionHash,
+    commitmentRoot: input.commitmentRoot,
+    expirationMicros: input.expirationMicros,
+    storageStatus: input.storageStatus,
+    explorerUrl: input.explorerUrl,
+    retrievalUrl: input.retrievalUrl,
   };
 }

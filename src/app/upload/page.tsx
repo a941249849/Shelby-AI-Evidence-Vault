@@ -14,11 +14,14 @@ import {
   ShieldCheck,
   Trash2,
   UploadCloud,
+  Wallet,
 } from 'lucide-react';
 import { shelbyUploadAction, getShelbyModeAction } from '@/app/actions/upload';
 import { parseTags, buildEvidencePack, buildBlobRecord } from '@/lib/validation';
 import { addLocalPack, addLocalBlob } from '@/lib/store/local-store';
 import { formatBytes } from '@/lib/utils';
+import { useShelbyUpload } from '@/lib/shelby/use-shelby-upload';
+import UploadProviders from './providers';
 
 type Category = 'dataset' | 'agent-run' | 'document' | 'manifest';
 type SourceType = 'web-scrape' | 'api-export' | 'agent-output' | 'manual-upload';
@@ -41,6 +44,7 @@ interface UploadedResult {
   packId: string;
   packTitle: string;
   blobIds: string[];
+  mode: 'mock' | 'testnet';
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -55,29 +59,59 @@ async function computeSHA256(file: File): Promise<string> {
   return 'sha256:' + hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-function ModeIndicator({ mode }: { mode: 'mock' | 'testnet' | null }) {
+function ModeIndicator({
+  mode,
+  walletConnected,
+  walletAddress,
+}: {
+  mode: 'mock' | 'testnet' | null;
+  walletConnected: boolean;
+  walletAddress: string | null;
+}) {
   if (mode === null) return null;
 
   const isTestnet = mode === 'testnet';
-  const Icon = isTestnet ? AlertTriangle : ShieldCheck;
+
+  if (!isTestnet) {
+    return (
+      <div className="mb-8 flex gap-3 rounded-lg border border-[#de8aff]/20 bg-[#eee2ff] px-4 py-3 text-sm text-[#470b64]">
+        <ShieldCheck className="mt-0.5 h-4 w-4 flex-none" />
+        <div>
+          <p className="font-semibold">Local demo upload active</p>
+          <p className="mt-1 leading-6">
+            Files are saved to browser localStorage with deterministic mock Shelby references. No
+            wallet signing, no network calls, and no real Shelby upload.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!walletConnected) {
+    return (
+      <div className="mb-8 flex gap-3 rounded-lg border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <Wallet className="mt-0.5 h-4 w-4 flex-none" />
+        <div>
+          <p className="font-semibold">Wallet required for testnet upload</p>
+          <p className="mt-1 leading-6">
+            Connect your Aptos wallet to upload blobs to Shelby testnet. The wallet will sign the
+            on-chain registration transaction. Requires testnet APT for gas and ShelbyUSD for
+            storage.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={`mb-8 flex gap-3 rounded-lg border px-4 py-3 text-sm ${
-        isTestnet
-          ? 'border-[#fd8565]/45 bg-[#ffdcd9] text-[#4f192a]'
-          : 'border-[#de8aff]/20 bg-[#eee2ff] text-[#470b64]'
-      }`}
-    >
-      <Icon className="mt-0.5 h-4 w-4 flex-none" />
+    <div className="mb-8 flex gap-3 rounded-lg border border-emerald-300/60 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+      <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none" />
       <div>
-        <p className="font-semibold">
-          {isTestnet ? 'Real Shelby upload blocked until M2' : 'Local demo upload active'}
-        </p>
+        <p className="font-semibold">Wallet connected — Shelby testnet upload ready</p>
         <p className="mt-1 leading-6">
-          {isTestnet
-            ? 'Official integration still requires commitment generation, on-chain registration, RPC upload, signer/wallet design, API key handling, network selection, and funding. Set SHELBY_MODE=mock for local demo mode.'
-            : 'Files are saved to browser localStorage with deterministic mock Shelby references. M1B performs no wallet signing, no network calls, and no real Shelby upload.'}
+          Uploading as{' '}
+          <span className="font-mono text-xs">{walletAddress ?? 'unknown'}</span>. Each file will
+          be registered on-chain and uploaded to Shelby testnet RPC.
         </p>
       </div>
     </div>
@@ -118,7 +152,7 @@ function StepLabel({
   );
 }
 
-export default function UploadPage() {
+function UploadPageContent() {
   const [form, setForm] = useState<FormState>({
     title: '',
     category: 'dataset',
@@ -133,6 +167,8 @@ export default function UploadPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [mode, setMode] = useState<'mock' | 'testnet' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const shelbyUpload = useShelbyUpload();
 
   useEffect(() => {
     getShelbyModeAction().then(setMode).catch(() => setMode('mock'));
@@ -222,6 +258,13 @@ export default function UploadPage() {
       return;
     }
 
+    if (mode === 'testnet' && !shelbyUpload.walletConnected) {
+      setUploadError(
+        'Wallet not connected. Please connect your Aptos wallet to upload to Shelby testnet.'
+      );
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -241,54 +284,90 @@ export default function UploadPage() {
         const hash = entry.hash!;
         const mimeType = entry.file.type || 'application/octet-stream';
 
-        let content: string | undefined;
-        try {
+        if (mode === 'testnet') {
+          // ── Testnet path: browser wallet upload via @shelby-protocol/react ──
           const buffer = await entry.file.arrayBuffer();
-          const bytes = new Uint8Array(buffer);
-          const chunkSize = 0x8000;
-          let binary = '';
-          for (let i = 0; i < bytes.length; i += chunkSize) {
-            binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-          }
-          content = btoa(binary);
-        } catch {
-          content = undefined;
-        }
+          const blobData = new Uint8Array(buffer);
 
-        const actionResult = await shelbyUploadAction(
-          hash,
-          entry.file.size,
-          {
+          const testnetResult = await shelbyUpload.uploadBlob({
             packId: pack.id,
             fileName: entry.file.name,
+            blobData,
+            hash,
+          });
+
+          const blob = buildBlobRecord({
+            evidencePackId: pack.id,
+            hash,
+            shelbyRef: testnetResult.shelbyRef,
+            fileName: entry.file.name,
+            size: entry.file.size,
             mimeType,
-          },
-          content
-        );
+            tags,
+            uploadMode: 'testnet',
+            network: 'testnet',
+            dataSource: 'shelby-testnet',
+            accountAddress: testnetResult.accountAddress,
+            blobName: testnetResult.blobName,
+            expirationMicros: testnetResult.expirationMicros,
+            storageStatus: testnetResult.storageStatus,
+            explorerUrl: testnetResult.explorerUrl,
+            retrievalUrl: testnetResult.retrievalUrl,
+          });
 
-        if (!actionResult.success) {
-          throw new Error(actionResult.error);
+          addLocalBlob(blob);
+          blobIds.push(blob.id);
+        } else {
+          // ── Mock path: server action with deterministic local reference ──
+          let content: string | undefined;
+          try {
+            const buffer = await entry.file.arrayBuffer();
+            const bytes = new Uint8Array(buffer);
+            const chunkSize = 0x8000;
+            let binary = '';
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+              binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+            }
+            content = btoa(binary);
+          } catch {
+            content = undefined;
+          }
+
+          const actionResult = await shelbyUploadAction(
+            hash,
+            entry.file.size,
+            {
+              packId: pack.id,
+              fileName: entry.file.name,
+              mimeType,
+            },
+            content
+          );
+
+          if (!actionResult.success) {
+            throw new Error(actionResult.error);
+          }
+
+          const blob = buildBlobRecord({
+            evidencePackId: pack.id,
+            hash,
+            shelbyRef: actionResult.result.shelbyRef,
+            mockRef: actionResult.result.mockRef,
+            fileName: entry.file.name,
+            size: entry.file.size,
+            mimeType,
+            tags,
+            uploadMode: actionResult.mode,
+            network: actionResult.result.network,
+          });
+
+          addLocalBlob(blob);
+          blobIds.push(blob.id);
         }
-
-        const blob = buildBlobRecord({
-          evidencePackId: pack.id,
-          hash,
-          shelbyRef: actionResult.result.shelbyRef,
-          mockRef: actionResult.result.mockRef,
-          fileName: entry.file.name,
-          size: entry.file.size,
-          mimeType,
-          tags,
-          uploadMode: actionResult.mode,
-          network: actionResult.result.network,
-        });
-
-        addLocalBlob(blob);
-        blobIds.push(blob.id);
       }
 
       addLocalPack(pack);
-      setUploadResult({ packId: pack.id, packTitle: pack.title, blobIds });
+      setUploadResult({ packId: pack.id, packTitle: pack.title, blobIds, mode: mode ?? 'mock' });
       setFiles([]);
       setForm({
         title: '',
@@ -305,6 +384,7 @@ export default function UploadPage() {
   }
 
   if (uploadResult) {
+    const isTestnet = uploadResult.mode === 'testnet';
     return (
       <div className="ledger-line min-h-[calc(100vh-4rem)] bg-[#fcfaf8] px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
@@ -313,16 +393,17 @@ export default function UploadPage() {
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff77c9]">
-              Local evidence pack sealed
+              {isTestnet ? 'Shelby testnet evidence pack sealed' : 'Local evidence pack sealed'}
             </p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#4f192a]">
               {uploadResult.packTitle}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
               {uploadResult.blobIds.length} blob
-              {uploadResult.blobIds.length !== 1 ? 's' : ''} saved locally with mock Shelby
-              references. M1B performs no wallet signing, no network upload, and no real Shelby
-              registration.
+              {uploadResult.blobIds.length !== 1 ? 's' : ''}{' '}
+              {isTestnet
+                ? 'registered on Shelby testnet and saved locally with real account/blob metadata.'
+                : 'saved locally with mock Shelby references. No wallet signing, no network upload, and no real Shelby registration.'}
             </p>
 
             <div className="mt-8 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4">
@@ -364,6 +445,17 @@ export default function UploadPage() {
     );
   }
 
+  const isTestnet = mode === 'testnet';
+  const submitLabel = uploading
+    ? isTestnet
+      ? 'Uploading to testnet'
+      : 'Saving locally'
+    : isTestnet
+      ? shelbyUpload.walletConnected
+        ? 'Upload to Shelby testnet'
+        : 'Connect wallet to upload'
+      : 'Save locally';
+
   return (
     <div className="ledger-line min-h-[calc(100vh-4rem)] bg-[#fcfaf8] px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -377,8 +469,9 @@ export default function UploadPage() {
               Package files into a verifiable AI evidence pack.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-[#6f6258]">
-              Metadata, file hashes, and mock Shelby references are created locally for M1B. Real
-              Shelby identity, storage, and wallet flow remain explicitly blocked until M2.
+              {isTestnet
+                ? 'Connect your Aptos wallet to register files on Shelby testnet. Real account/blobName identity and explorer links are stored in each BlobRecord.'
+                : 'Metadata, file hashes, and mock Shelby references are created locally. Set SHELBY_MODE=testnet with a connected wallet for real testnet upload.'}
             </p>
           </div>
           <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
@@ -390,13 +483,19 @@ export default function UploadPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
                   Storage boundary
                 </p>
-                <p className="text-sm font-semibold text-[#161008]">Browser localStorage only</p>
+                <p className="text-sm font-semibold text-[#161008]">
+                  {isTestnet ? 'Shelby testnet + localStorage' : 'Browser localStorage only'}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <ModeIndicator mode={mode} />
+        <ModeIndicator
+          mode={mode}
+          walletConnected={shelbyUpload.walletConnected}
+          walletAddress={shelbyUpload.walletAddress}
+        />
 
         {uploadError && (
           <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -581,23 +680,35 @@ export default function UploadPage() {
             </section>
 
             <section className="shelby-cut border border-[#161008]/12 bg-[#4f192a] p-5 text-[#fcfaf8] shadow-sm">
-              <StepLabel number="03" title="Local save" icon={ShieldCheck} inverse />
+              <StepLabel
+                number="03"
+                title={isTestnet ? 'Testnet upload' : 'Local save'}
+                icon={isTestnet ? Wallet : ShieldCheck}
+                inverse
+              />
               <p className="text-sm leading-6 text-[#BFC7D8]">
-                The saved object is an M1B local demonstration artifact. It is intentionally not a
-                production Shelby storage record.
+                {isTestnet
+                  ? 'Files are registered on Shelby testnet via your connected wallet and metadata is saved to localStorage.'
+                  : 'The saved object is a local demonstration artifact with a deterministic mock Shelby reference.'}
               </p>
               <button
                 type="submit"
-                disabled={uploading || files.length === 0}
+                disabled={uploading || files.length === 0 || (isTestnet && !shelbyUpload.walletConnected)}
                 className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#fcfaf8] px-4 py-3 text-sm font-semibold text-[#4f192a] transition hover:bg-[#fcfaf8] disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
-                {uploading ? 'Saving locally' : 'Save locally'}
+                {submitLabel}
               </button>
-              <p className="mt-3 text-xs leading-5 text-[#8793AA]">
-                Wallet, on-chain registration, RPC upload, and real Shelby references are M2+
-                concerns.
-              </p>
+              {isTestnet && !shelbyUpload.walletConnected && (
+                <p className="mt-3 text-xs leading-5 text-[#8793AA]">
+                  Connect an Aptos wallet to enable testnet upload.
+                </p>
+              )}
+              {!isTestnet && (
+                <p className="mt-3 text-xs leading-5 text-[#8793AA]">
+                  Set SHELBY_MODE=testnet and connect a wallet for real Shelby testnet upload.
+                </p>
+              )}
             </section>
           </aside>
         </form>
@@ -605,3 +716,12 @@ export default function UploadPage() {
     </div>
   );
 }
+
+export default function UploadPage() {
+  return (
+    <UploadProviders>
+      <UploadPageContent />
+    </UploadProviders>
+  );
+}
+

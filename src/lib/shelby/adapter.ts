@@ -29,10 +29,26 @@ export interface ShelbyUploadResult {
   shelbyRef: string;
   /** Deterministic mock reference for local mock uploads. Same as shelbyRef in mock mode. */
   mockRef?: string;
-  /** Network context: 'mock' for local demo, 'testnet' for real uploads (M2+). */
+  /** Network context: 'mock' for local demo, 'testnet' for real uploads. */
   network?: 'mock' | 'testnet';
   hash: string;
   timestamp: string;
+  /** Shelby blob name (account namespace key). Populated for real testnet uploads. */
+  blobName?: string;
+  /** Aptos account address that owns this blob. Populated for real testnet uploads. */
+  accountAddress?: string;
+  /** Aptos transaction hash from on-chain commitment registration. */
+  transactionHash?: string;
+  /** Commitment merkle root from the Shelby commitment generation step. */
+  commitmentRoot?: string;
+  /** Blob expiration in microseconds as set at upload time. */
+  expirationMicros?: string;
+  /** Storage status from the Shelby RPC after putBlob. */
+  storageStatus?: string;
+  /** Explorer URL for the blob on the Shelby network explorer. */
+  explorerUrl?: string;
+  /** RPC retrieval URL for the blob. */
+  retrievalUrl?: string;
 }
 
 export interface ShelbyAdapter {
