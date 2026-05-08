@@ -20,12 +20,64 @@ import { formatBytes, formatDateTime } from '@/lib/utils';
 import { getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getBlobById, getEvidencePackById } from '@/lib/evidence/service';
 import { getPersistedBlobAction, getPersistedPackAction } from '@/app/actions/persist';
+import { useLanguage } from '@/components/language-state';
 
 interface BlobDetailClientProps {
   id: string;
 }
 
+const blobCopy = {
+  zh: {
+    notFound: 'Blob 未找到',
+    notFoundBody: 'Demo 数据或本地上传中不存在这个 Blob ID。',
+    back: '返回索引',
+    dashboard: '索引',
+    title: 'Blob 来源证明检查器',
+    subtitle: '检查一个已存储证据对象的身份证明、引用、哈希、文件元数据与证据包归属。',
+    blobId: 'Blob ID',
+    refBoundary: '引用边界',
+    mockRef: 'Mock 引用',
+    demoRef: 'Demo 引用',
+    localHint: '本地 Demo 引用。测试网记录还会包含账号命名空间、blobName、网络与 explorer 元数据。',
+    demoHint: '示例 Demo 引用。使用测试网模式时，真实 Shelby Blob 身份由账号命名空间与 blobName 表示。',
+    hash: 'SHA-256 哈希',
+    source: '来源',
+    size: '大小',
+    mime: 'MIME 类型',
+    created: '创建时间',
+    pack: '证据包',
+    tags: '标签与适配器元数据',
+    unknown: '未知证据包',
+  },
+  en: {
+    notFound: 'Blob not found',
+    notFoundBody: 'No blob with this ID exists in demo data or local uploads.',
+    back: 'Back to index',
+    dashboard: 'Dashboard',
+    title: 'Blob provenance inspector',
+    subtitle:
+      'Inspect the local proof surface for one stored evidence object: identity, reference, hash, file metadata, and pack membership.',
+    blobId: 'Blob ID',
+    refBoundary: 'Reference boundary',
+    mockRef: 'Mock Reference',
+    demoRef: 'Demo Reference',
+    localHint:
+      'Local demo reference. Testnet records additionally carry account namespace, blob name, network, and explorer metadata.',
+    demoHint:
+      'Illustrative demo reference. Real Shelby blob identity is represented by account namespace plus blob name when using testnet mode.',
+    hash: 'SHA-256 hash',
+    source: 'Source',
+    size: 'Size',
+    mime: 'MIME type',
+    created: 'Created',
+    pack: 'Evidence pack',
+    tags: 'Tags and adapter metadata',
+    unknown: 'Unknown pack',
+  },
+};
+
 function DataSourceBadge({ blob }: { blob: BlobRecord }) {
+  const { language } = useLanguage();
   if (blob.dataSource === 'local') {
     const isTestnet = blob.uploadMode === 'testnet';
     return (
@@ -37,7 +89,11 @@ function DataSourceBadge({ blob }: { blob: BlobRecord }) {
         }`}
       >
         <ShieldCheck className="h-3.5 w-3.5" />
-        {isTestnet ? 'Shelby testnet upload' : 'Local demo upload'}
+        {isTestnet
+          ? 'Shelby testnet upload'
+          : language === 'zh'
+            ? '本地 Demo 上传'
+            : 'Local demo upload'}
       </span>
     );
   }
@@ -45,7 +101,7 @@ function DataSourceBadge({ blob }: { blob: BlobRecord }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#9d9a92]">
       <Database className="h-3.5 w-3.5" />
-      Demo data
+      {language === 'zh' ? 'Demo 数据' : 'Demo data'}
     </span>
   );
 }
@@ -79,6 +135,8 @@ function MonoBlock({ children }: { children: React.ReactNode }) {
 }
 
 export default function BlobDetailClient({ id }: BlobDetailClientProps) {
+  const { language } = useLanguage();
+  const t = blobCopy[language];
   const [blob, setBlob] = useState<BlobRecord | null | undefined>(undefined);
   const [pack, setPack] = useState<EvidencePack | undefined>(undefined);
 
@@ -132,24 +190,24 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
           <div className="mx-auto mb-5 grid h-12 w-12 place-items-center shelby-cut bg-[#111217] text-[#9fe878]">
             <Fingerprint className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-semibold  text-[#f4f0e8]">Blob not found</h1>
+          <h1 className="text-2xl font-semibold  text-[#f4f0e8]">{t.notFound}</h1>
           <p className="mt-3 text-sm leading-6 text-[#9d9a92]">
-            No blob with ID <code className="rounded bg-white/[0.04] px-1 font-mono">{id}</code>{' '}
-            exists in demo data or local uploads.
+            {t.notFoundBody}{' '}
+            <code className="rounded bg-white/[0.04] px-1 font-mono">{id}</code>
           </p>
           <Link
             href="/dashboard"
             className="mt-6 inline-flex items-center gap-2 shelby-cut bg-[#111217] px-4 py-2.5 text-sm font-semibold text-[#f4f0e8] transition hover:bg-[#1c1d25]"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to index
+            {t.back}
           </Link>
         </div>
       </div>
     );
   }
 
-  const referenceLabel = blob.dataSource === 'local' ? 'Mock Reference' : 'Demo Reference';
+  const referenceLabel = blob.dataSource === 'local' ? t.mockRef : t.demoRef;
 
   return (
     <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
@@ -161,7 +219,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
               className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Dashboard
+              {t.dashboard}
             </Link>
             {pack && (
               <Link
@@ -177,16 +235,15 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
             <div>
               <DataSourceBadge blob={blob} />
               <h1 className="mt-4 max-w-4xl text-4xl font-semibold  text-[#f4f0e8]">
-                Blob provenance inspector
+                {t.title}
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#9d9a92]">
-                Inspect the local proof surface for one stored evidence object: identity,
-                reference, hash, file metadata, and pack membership.
+                {t.subtitle}
               </p>
             </div>
             <div className="shelby-cut shelby-surface p-4 shadow-sm">
               <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                Blob ID
+                {t.blobId}
               </p>
               <p className="mt-2 truncate font-mono text-sm font-semibold text-[#f4f0e8]">
                 {blob.id}
@@ -203,7 +260,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                  Reference boundary
+                  {t.refBoundary}
                 </p>
                 <h2 className="text-lg font-semibold text-[#f4f0e8]">{referenceLabel}</h2>
               </div>
@@ -211,32 +268,30 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
 
             <MonoBlock>{blob.shelbyRef}</MonoBlock>
             <p className="mt-3 text-xs leading-5 text-[#9d9a92]">
-              {blob.dataSource === 'local'
-                ? 'Local demo reference. Testnet records additionally carry account namespace, blob name, network, and explorer metadata.'
-                : 'Illustrative demo reference. Real Shelby blob identity is represented by account namespace plus blob name when using testnet mode.'}
+              {blob.dataSource === 'local' ? t.localHint : t.demoHint}
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <Fact icon={Hash} label="SHA-256 hash">
+              <Fact icon={Hash} label={t.hash}>
                 <MonoBlock>{blob.hash}</MonoBlock>
               </Fact>
-              <Fact icon={FileText} label="Source">
+              <Fact icon={FileText} label={t.source}>
                 <span className="break-all">{blob.source}</span>
               </Fact>
             </div>
           </section>
 
           <aside className="space-y-4">
-            <Fact icon={HardDrive} label="Size">
+            <Fact icon={HardDrive} label={t.size}>
               {formatBytes(blob.size)}
             </Fact>
-            <Fact icon={FileText} label="MIME type">
+            <Fact icon={FileText} label={t.mime}>
               <code className="font-mono text-sm">{blob.mimeType}</code>
             </Fact>
-            <Fact icon={CalendarClock} label="Created">
+            <Fact icon={CalendarClock} label={t.created}>
               {formatDateTime(blob.createdAt)}
             </Fact>
-            <Fact icon={Link2} label="Evidence pack">
+            <Fact icon={Link2} label={t.pack}>
               {pack ? (
                 <Link
                   href={`/dashboard?pack=${pack.id}`}
@@ -245,7 +300,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
                   {pack.title}
                 </Link>
               ) : (
-                <span className="text-[#9d9a92]">Unknown pack</span>
+                <span className="text-[#9d9a92]">{t.unknown}</span>
               )}
             </Fact>
           </aside>
@@ -254,7 +309,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
         <section className="mt-6 shelby-cut shelby-surface p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">
             <Tag className="h-4 w-4 text-[#de8aff]" />
-            Tags and adapter metadata
+            {t.tags}
           </div>
           <div className="flex flex-wrap gap-2">
             {blob.tags.map((tag) => (

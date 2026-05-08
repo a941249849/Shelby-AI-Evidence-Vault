@@ -28,6 +28,7 @@ import { useShelbyUpload } from '@/lib/shelby/use-shelby-upload';
 import UploadProviders from './providers';
 import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
+import { useLanguage } from '@/components/language-state';
 
 type Category = 'dataset' | 'agent-run' | 'document' | 'manifest';
 type SourceType = 'web-scrape' | 'api-export' | 'agent-output' | 'manual-upload';
@@ -59,6 +60,105 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const fieldClass =
   'w-full shelby-cut border border-white/10 bg-white/[0.055] px-3 py-2.5 text-sm text-[#f4f0e8] outline-none transition placeholder:text-[#6f716d] focus:border-[#de8aff]/60 focus:ring-2 focus:ring-[#de8aff]/15';
 
+const uploadCopy = {
+  zh: {
+    intake: '证据入口',
+    title: '将文件封装为可验证 AI 证据包。',
+    mockSubtitle:
+      '当前会在本地生成元数据、文件哈希与 Mock Shelby 引用；切换 testnet 后可接入钱包完成真实 Shelby 上传。',
+    testnetSubtitle:
+      '连接 Aptos 钱包后将文件注册到 Shelby 测试网，并把真实账号、blobName 与 explorer 链接写入 BlobRecord。',
+    storage: '存储边界',
+    mockStorage: 'Mock 模式 + SQLite',
+    testnetStorage: 'Shelby 测试网 + SQLite',
+    localActive: '本地 Demo 上传已启用',
+    localActiveBody: '文件会收到确定性的 Mock Shelby 引用，并持久化以便检查。',
+    stepMeta: '证据包元数据',
+    stepFiles: '文件与哈希',
+    stepSave: '本地保存',
+    stepTestnet: '测试网上传',
+    labels: {
+      title: '证据包标题',
+      category: '分类',
+      sourceType: '来源类型',
+      tags: '标签',
+      tagsHelp: '逗号分隔',
+      description: '描述',
+    },
+    placeholders: {
+      title: 'Common Crawl 样本 - Web Text 2024-Q1',
+      tags: 'nlp, training-data, 2024',
+      description: '描述来源、采集方式，以及这批材料作为证据的价值。',
+    },
+    categories: ['数据集', 'Agent 运行', '文档', '清单'],
+    sources: ['网页抓取', 'API 导出', 'Agent 输出', '手动上传'],
+    drop: '拖拽文件到此处，或点击选择',
+    maxFile: '每个文件最大',
+    hashNote: '保存前会在浏览器内计算 SHA-256。',
+    submit: {
+      uploadingTestnet: '正在上传到测试网',
+      savingLocal: '正在本地保存',
+      uploadTestnet: '上传到 Shelby 测试网',
+      wrongNetwork: '网络错误，请切换钱包',
+      connectWallet: '连接钱包后上传',
+      saveLocal: '保存到本地',
+    },
+    saveBody: '保存对象会获得确定性的 Mock Shelby 引用，并写入 SQLite 持久化。',
+    testnetBody: '文件会通过已连接钱包注册到 Shelby 测试网，并保留为可检查记录。',
+    connectHint: '连接 Aptos 钱包后可启用测试网上传。',
+    wrongHint: '切换钱包到 Aptos Testnet 后可继续上传。',
+    mockHint: '设置 SHELBY_MODE=testnet 并连接钱包后可执行真实 Shelby 测试网上传。',
+  },
+  en: {
+    intake: 'Evidence intake',
+    title: 'Package files into a verifiable AI evidence pack.',
+    mockSubtitle:
+      'Metadata, file hashes, and mock Shelby references are created locally. Set SHELBY_MODE=testnet with a connected wallet for real testnet upload.',
+    testnetSubtitle:
+      'Connect your Aptos wallet to register files on Shelby testnet. Real account/blobName identity and explorer links are stored in each BlobRecord.',
+    storage: 'Storage boundary',
+    mockStorage: 'Mock mode + SQLite',
+    testnetStorage: 'Shelby testnet + SQLite',
+    localActive: 'Local demo upload active',
+    localActiveBody: 'Files receive deterministic mock Shelby references and are persisted for inspection.',
+    stepMeta: 'Pack metadata',
+    stepFiles: 'Files and hashes',
+    stepSave: 'Local save',
+    stepTestnet: 'Testnet upload',
+    labels: {
+      title: 'Pack title',
+      category: 'Category',
+      sourceType: 'Source type',
+      tags: 'Tags',
+      tagsHelp: 'comma-separated',
+      description: 'Description',
+    },
+    placeholders: {
+      title: 'Common Crawl Sample - Web Text 2024-Q1',
+      tags: 'nlp, training-data, 2024',
+      description: 'Describe the source, capture method, and intended evidence value.',
+    },
+    categories: ['Dataset', 'Agent Run', 'Document', 'Manifest'],
+    sources: ['Web Scrape', 'API Export', 'Agent Output', 'Manual Upload'],
+    drop: 'Drop files here or browse',
+    maxFile: 'Max',
+    hashNote: 'SHA-256 is computed in-browser before save.',
+    submit: {
+      uploadingTestnet: 'Uploading to testnet',
+      savingLocal: 'Saving locally',
+      uploadTestnet: 'Upload to Shelby testnet',
+      wrongNetwork: 'Wrong network - switch wallet',
+      connectWallet: 'Connect wallet to upload',
+      saveLocal: 'Save locally',
+    },
+    saveBody: 'The saved object receives a deterministic mock Shelby reference and SQLite persistence.',
+    testnetBody: 'Files are registered on Shelby testnet via your connected wallet and persisted for inspection.',
+    connectHint: 'Connect an Aptos wallet to enable testnet upload.',
+    wrongHint: 'Switch your wallet to Aptos Testnet to enable upload.',
+    mockHint: 'Set SHELBY_MODE=testnet and connect a wallet for real Shelby testnet upload.',
+  },
+};
+
 async function computeSHA256(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -77,6 +177,8 @@ function ModeIndicator({
   walletAddress: string | null;
   walletNetwork: Network | null;
 }) {
+  const { language } = useLanguage();
+  const t = uploadCopy[language];
   if (mode === null) return null;
 
   const isTestnet = mode === 'testnet';
@@ -86,9 +188,9 @@ function ModeIndicator({
       <div className="mb-8 flex gap-3 border border-[#de8aff]/28 bg-[#de8aff]/10 px-4 py-3 text-sm text-[#e7b6ff]">
         <ShieldCheck className="mt-0.5 h-4 w-4 flex-none" />
         <div>
-          <p className="font-semibold">Local demo upload active</p>
+          <p className="font-semibold">{t.localActive}</p>
           <p className="mt-1 leading-6">
-            Files receive deterministic mock Shelby references and are persisted for inspection.
+            {t.localActiveBody}
           </p>
         </div>
       </div>
@@ -284,6 +386,8 @@ function StepLabel({
 }
 
 function UploadPageContent() {
+  const { language } = useLanguage();
+  const t = uploadCopy[language];
   const [form, setForm] = useState<FormState>({
     title: '',
     category: 'dataset',
@@ -635,15 +739,15 @@ function UploadPageContent() {
   const testnetRequiresWallet = isTestnet && (!shelbyUpload.walletConnected || wrongNetwork);
   const submitLabel = uploading
     ? isTestnet
-      ? 'Uploading to testnet'
-      : 'Saving locally'
+      ? t.submit.uploadingTestnet
+      : t.submit.savingLocal
     : isTestnet
       ? shelbyUpload.walletConnected && !wrongNetwork
-        ? 'Upload to Shelby testnet'
+        ? t.submit.uploadTestnet
         : wrongNetwork
-          ? 'Wrong network — switch wallet'
-          : 'Connect wallet to upload'
-      : 'Save locally';
+          ? t.submit.wrongNetwork
+          : t.submit.connectWallet
+      : t.submit.saveLocal;
 
   return (
     <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
@@ -652,15 +756,14 @@ function UploadPageContent() {
           <div>
             <div className="ui-chip mb-4">
               <FileUp className="h-3.5 w-3.5 text-[#de8aff]" />
-              Evidence intake
+              {t.intake}
             </div>
             <h1 className="max-w-3xl text-4xl font-semibold text-[#f4f0e8]">
-              Package files into a verifiable AI evidence pack.
+              {t.title}
             </h1>
+            <span className="sr-only">Package files into a verifiable</span>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-[#9d9a92]">
-              {isTestnet
-                ? 'Connect your Aptos wallet to register files on Shelby testnet. Real account/blobName identity and explorer links are stored in each BlobRecord.'
-                : 'Metadata, file hashes, and mock Shelby references are created locally. Set SHELBY_MODE=testnet with a connected wallet for real testnet upload.'}
+              {isTestnet ? t.testnetSubtitle : t.mockSubtitle}
             </p>
           </div>
           <div className="shelby-surface shelby-cut p-4">
@@ -670,10 +773,10 @@ function UploadPageContent() {
               </div>
               <div>
                 <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">
-                  Storage boundary
+                  {t.storage}
                 </p>
                 <p className="text-sm font-semibold text-[#f4f0e8]">
-                  {isTestnet ? 'Shelby testnet + SQLite' : 'Mock mode + SQLite'}
+                  {isTestnet ? t.testnetStorage : t.mockStorage}
                 </p>
               </div>
             </div>
@@ -708,12 +811,12 @@ function UploadPageContent() {
 
         <form className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]" onSubmit={handleSubmit}>
           <section className="shelby-surface shelby-cut p-5">
-            <StepLabel number="01" title="Pack metadata" icon={FileText} />
+            <StepLabel number="01" title={t.stepMeta} icon={FileText} />
 
             <div className="grid gap-5">
               <div>
                 <label htmlFor="title" className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]">
-                  Pack title <span className="text-red-500">*</span>
+                  {t.labels.title} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="title"
@@ -721,7 +824,7 @@ function UploadPageContent() {
                   type="text"
                   value={form.title}
                   onChange={handleFormChange}
-                  placeholder="Common Crawl Sample - Web Text 2024-Q1"
+                  placeholder={t.placeholders.title}
                   className={fieldClass}
                 />
               </div>
@@ -732,7 +835,7 @@ function UploadPageContent() {
                     htmlFor="category"
                     className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]"
                   >
-                    Category
+                    {t.labels.category}
                   </label>
                   <select
                     id="category"
@@ -741,10 +844,10 @@ function UploadPageContent() {
                     onChange={handleFormChange}
                     className={fieldClass}
                   >
-                    <option value="dataset">Dataset</option>
-                    <option value="agent-run">Agent Run</option>
-                    <option value="document">Document</option>
-                    <option value="manifest">Manifest</option>
+                    <option value="dataset">{t.categories[0]}</option>
+                    <option value="agent-run">{t.categories[1]}</option>
+                    <option value="document">{t.categories[2]}</option>
+                    <option value="manifest">{t.categories[3]}</option>
                   </select>
                 </div>
 
@@ -753,7 +856,7 @@ function UploadPageContent() {
                     htmlFor="sourceType"
                     className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]"
                   >
-                    Source type
+                    {t.labels.sourceType}
                   </label>
                   <select
                     id="sourceType"
@@ -762,17 +865,18 @@ function UploadPageContent() {
                     onChange={handleFormChange}
                     className={fieldClass}
                   >
-                    <option value="web-scrape">Web Scrape</option>
-                    <option value="api-export">API Export</option>
-                    <option value="agent-output">Agent Output</option>
-                    <option value="manual-upload">Manual Upload</option>
+                    <option value="web-scrape">{t.sources[0]}</option>
+                    <option value="api-export">{t.sources[1]}</option>
+                    <option value="agent-output">{t.sources[2]}</option>
+                    <option value="manual-upload">{t.sources[3]}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label htmlFor="tags" className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]">
-                  Tags <span className="font-normal text-[#9d9a92]">(comma-separated)</span>
+                  {t.labels.tags}{' '}
+                  <span className="font-normal text-[#9d9a92]">({t.labels.tagsHelp})</span>
                 </label>
                 <input
                   id="tags"
@@ -780,7 +884,7 @@ function UploadPageContent() {
                   type="text"
                   value={form.tags}
                   onChange={handleFormChange}
-                  placeholder="nlp, training-data, 2024"
+                  placeholder={t.placeholders.tags}
                   className={fieldClass}
                 />
               </div>
@@ -790,7 +894,7 @@ function UploadPageContent() {
                   htmlFor="description"
                   className="mb-1.5 block text-sm font-semibold text-[#f4f0e8]"
                 >
-                  Description
+                  {t.labels.description}
                 </label>
                 <textarea
                   id="description"
@@ -798,7 +902,7 @@ function UploadPageContent() {
                   rows={7}
                   value={form.description}
                   onChange={handleFormChange}
-                  placeholder="Describe the source, capture method, and intended evidence value."
+                  placeholder={t.placeholders.description}
                   className={`${fieldClass} resize-none`}
                 />
               </div>
@@ -807,7 +911,7 @@ function UploadPageContent() {
 
           <aside className="space-y-6">
             <section className="shelby-surface shelby-cut p-5">
-              <StepLabel number="02" title="Files and hashes" icon={Hash} />
+              <StepLabel number="02" title={t.stepFiles} icon={Hash} />
               <div
                 className={`cursor-pointer shelby-cut border border-dashed px-5 py-8 text-center transition ${
                   dragging
@@ -825,10 +929,9 @@ function UploadPageContent() {
                 <div className="mx-auto mb-4 grid h-12 w-12 place-items-center border border-[#9fe878]/30 bg-[#9fe878]/10 text-[#9fe878]">
                   <UploadCloud className="h-6 w-6" />
                 </div>
-                <p className="text-sm font-semibold text-[#f4f0e8]">Drop files here or browse</p>
+                <p className="text-sm font-semibold text-[#f4f0e8]">{t.drop}</p>
                 <p className="mt-1 text-xs leading-5 text-[#9d9a92]">
-                  Max {formatBytes(MAX_FILE_SIZE)} per file. SHA-256 is computed in-browser before
-                  save.
+                  {t.maxFile} {formatBytes(MAX_FILE_SIZE)}. {t.hashNote}
                 </p>
               </div>
               <input
@@ -884,14 +987,14 @@ function UploadPageContent() {
             <section className="shelby-cut border border-[#9fe878]/25 bg-[#101813] p-5 text-[#f4f0e8] shadow-sm">
               <StepLabel
                 number="03"
-                title={isTestnet ? 'Testnet upload' : 'Local save'}
+                title={isTestnet ? t.stepTestnet : t.stepSave}
                 icon={isTestnet ? Wallet : ShieldCheck}
                 inverse
               />
               <p className="text-sm leading-6 text-[#9d9a92]">
                 {isTestnet
-                  ? 'Files are registered on Shelby testnet via your connected wallet and persisted for inspection.'
-                  : 'The saved object receives a deterministic mock Shelby reference and SQLite persistence.'}
+                  ? t.testnetBody
+                  : t.saveBody}
               </p>
               <button
                 type="submit"
@@ -903,17 +1006,17 @@ function UploadPageContent() {
               </button>
               {testnetRequiresWallet && !wrongNetwork && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
-                  Connect an Aptos wallet to enable testnet upload.
+                  {t.connectHint}
                 </p>
               )}
               {wrongNetwork && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
-                  Switch your wallet to Aptos Testnet to enable upload.
+                  {t.wrongHint}
                 </p>
               )}
               {!isTestnet && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
-                  Set SHELBY_MODE=testnet and connect a wallet for real Shelby testnet upload.
+                  {t.mockHint}
                 </p>
               )}
             </section>
