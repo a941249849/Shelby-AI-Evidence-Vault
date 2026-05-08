@@ -22,7 +22,7 @@ export interface BlobRecord {
   size: number;
   mimeType: string;
   /** Indicates the origin of this record. Undefined means built-in demo data. */
-  dataSource?: 'demo' | 'local';
+  dataSource?: 'demo' | 'local' | 'shelby-testnet';
   /** The adapter mode used when this blob was registered. */
   uploadMode?: 'mock' | 'testnet';
   /**
@@ -46,6 +46,10 @@ export interface BlobRecord {
   storageStatus?: string;
   /** Commitment root hash from the Shelby commitment generation step (M2+). */
   commitmentRoot?: string;
+  /** Explorer URL for the blob on the Shelby network explorer. */
+  explorerUrl?: string;
+  /** RPC retrieval URL for the blob. */
+  retrievalUrl?: string;
 }
 
 export const blobs: BlobRecord[] = [
