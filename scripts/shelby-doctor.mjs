@@ -120,6 +120,7 @@ const jsonMode = args.includes('--json');
 // ── Read env ───────────────────────────────────────────────────────────────────
 const env = process.env;
 const shelbyMode = env.SHELBY_MODE ?? 'mock';
+const isValidMode = shelbyMode === 'mock' || shelbyMode === 'testnet';
 const isTestnet = shelbyMode === 'testnet';
 
 // ── Build checks ──────────────────────────────────────────────────────────────
@@ -138,10 +139,22 @@ addCheck({
   id: 'mode-detect',
   status: 'INFO',
   message: `SHELBY_MODE = "${shelbyMode}"`,
-  detail: isTestnet
+  detail: !isValidMode
+    ? 'Invalid mode detected — only "mock" and "testnet" are supported.'
+    : isTestnet
     ? 'Testnet mode detected — validating all required testnet env vars.'
     : 'Mock/local mode — real upload is disabled. No credentials needed.',
 });
+
+if (!isValidMode) {
+  addCheck({
+    id: 'shelby-mode-invalid',
+    status: 'FAIL',
+    message: `SHELBY_MODE="${shelbyMode}" is not supported.`,
+    detail: 'A typo here can silently put an operator on the wrong path, so the doctor fails closed.',
+    action: 'Unset SHELBY_MODE for mock/local mode, or set SHELBY_MODE=testnet for real Shelby testnet readiness checks.',
+  });
+}
 
 // ── Section: Public API key guard (any mode) ───────────────────────────────────
 // This is the most critical check. A NEXT_PUBLIC_ API key would be embedded in
@@ -183,7 +196,7 @@ if (!publicKeyFound) {
 
 // ── Section: Mock mode checks ──────────────────────────────────────────────────
 
-if (!isTestnet) {
+if (!isTestnet && isValidMode) {
   addCheck({
     id: 'mock-mode-pass',
     status: 'PASS',

@@ -99,7 +99,7 @@ src/lib/shelby/
   adapter.ts          # ShelbyAdapter interface + payload/result types
   config.ts           # Reads SHELBY_MODE and related env vars (server-side only)
   mock-adapter.ts     # Deterministic mock: derives shelby://mock/blob/ ref from content hash
-  testnet-adapter.ts  # Real testnet adapter (M1B blocked — see implementation notes)
+  testnet-adapter.ts  # Legacy server-side placeholder; browser-wallet path is the real M3 testnet route
   index.ts            # getAdapter() factory + re-exports
 ```
 
@@ -295,22 +295,22 @@ Real uploads to Shelby testnet require:
 - **ShelbyUSD or SHEL tokens**: for Shelby storage operations.
 - Verify the current Shelby/testnet funding path before wiring any funding UI.
 
-### Signing security (M2+ design decision)
+### Signing security
 
 Uploading requires an Aptos account signer on the selected network. This must be handled:
-- Server-side using a funded account whose private key is stored as an env secret (never in source code).
-- Or via a secure wallet/browser signing integration (e.g. `@shelby-protocol/react` for browser flows).
+- Via the existing browser-wallet signing integration (`@shelby-protocol/react` + Aptos wallet adapter).
+- Or, in a future architecture, server-side using a funded account whose private key is stored as an env secret (never in source code).
 
-**Never commit private keys, seed phrases, or mnemonic phrases.** This is a M2+ security design decision outside M1B scope.
+**Never commit private keys, seed phrases, or mnemonic phrases.** Server-side private key custody is intentionally not implemented in this app.
 
 ---
 
-## M1B limitations
+## Current limitations
 
-- Real Shelby testnet upload is not functional — it is a documented placeholder blocked until M2.
+- Real Shelby testnet upload depends on operator-owned wallet, testnet APT, Shelby storage credits, and complete environment configuration.
 - Mock refs (`shelby://mock/blob/{id}`) are local demo identifiers only, not real Shelby blob identities.
 - File size is capped at 5 MB per file for browser performance.
-- Evidence packs persist in `localStorage` only — they are browser-specific and tab-private.
+- Evidence packs persist to local SQLite, with browser localStorage retained as a cache/fallback.
 - No authentication or rate limiting on uploads.
-- No search or filter on the dashboard.
-- No read receipt generation from uploads.
+- Search/filter/sort on the dashboard is client-side only.
+- Read receipts are generated for mock/local uploads and bound to persisted blob identity.
