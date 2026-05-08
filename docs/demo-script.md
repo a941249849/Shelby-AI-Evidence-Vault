@@ -1,6 +1,6 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **M4/M5/C8 evidence vault** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **C12 release-candidate evidence vault** to stakeholders or the community.
 
 > **Current scope:**
 > - Local mock upload works with zero configuration (the default).

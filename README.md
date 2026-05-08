@@ -1,23 +1,24 @@
 # Shelby AI Evidence Vault
 
-![Milestone](https://img.shields.io/badge/milestone-M5%20Public%20Ecosystem%20Package-violet?style=flat-square)
+![Milestone](https://img.shields.io/badge/milestone-C12%20Release%20Candidate-violet?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
-**A verifiable evidence storage and read-receipt demo for AI agents, with a browser-wallet Shelby testnet upload path. Local mock works out of the box — no wallet, no API keys required. Real testnet upload requires operator prerequisites and manual verification.**
+**An AI evidence and read-receipt layer built for Shelby: evidence packs, Shelby Blob identity, and auditable receipts for agent workflows. Local mock is a zero-credential preview path; Shelby testnet is the real protocol proof path.**
 
 ---
 
 ## What is this?
 
-Shelby AI Evidence Vault is a public demo showing how AI pipelines can store datasets, agent run outputs, and documents with verifiable provenance:
+Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenance. It shows how datasets, agent outputs, and documents can become verifiable evidence records instead of loose files:
 
 - **Cryptographic blob references** — every file gets a SHA-256 hash and a Shelby reference (`shelby://mock/blob/{id}` in local mode, `shelby://testnet/{account}/{blobName}` in testnet mode)
 - **Evidence packs** — structured groups of related blobs with metadata, tags, provenance, and status
-- **Read receipts** — auditable records of agent activity: what was uploaded, what evidence was consulted, and what was answered; bound to real `BlobRecord` identity in M4
-- **Working local upload flow** — SHA-256 computed in-browser, evidence packs and receipts persisted to `localStorage`, no wallet or API keys required
+- **Read receipts** — auditable records of agent activity: what was uploaded, what evidence was consulted, and what was answered; bound to real `BlobRecord` identity
+- **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a community preview and development fallback, not the product endpoint
 - **Browser-wallet Shelby testnet path** — a testnet upload path is available behind a `SHELBY_MODE=testnet` gate using `@shelby-protocol/react`; requires operator prerequisites (funded Aptos testnet wallet, Shelby storage credits) and manual verification — no automated CI upload
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
+- **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
 
 ---
 
@@ -25,7 +26,7 @@ Shelby AI Evidence Vault is a public demo showing how AI pipelines can store dat
 
 | Mode | How to activate | What it does |
 |---|---|---|
-| **Local mock (default)** | No env vars needed | SHA-256 in-browser, `shelby://mock/blob/{id}` refs, localStorage persistence, read receipt created automatically |
+| **Local mock (default)** | No env vars needed | Zero-credential preview: SHA-256 in-browser, `shelby://mock/blob/{id}` refs, local persistence, read receipt created automatically |
 | **Testnet browser-wallet** | `SHELBY_MODE=testnet` + `NEXT_PUBLIC_SHELBY_NETWORK=testnet` + funded Aptos wallet | Real Shelby testnet upload via `@shelby-protocol/react` hook + browser wallet signing; requires operator prerequisites |
 | **Smoke harness** | `SHELBY_SMOKE=true` + `SHELBY_RPC_URL` + optional prior-upload address/blobName | Validates config, checks RPC connectivity, and verifies retrieval of a previously uploaded blob |
 
@@ -45,7 +46,7 @@ Shelby AI Evidence Vault is a public demo showing how AI pipelines can store dat
 | Upload adapter | Mock (default) / Shelby testnet browser-wallet path |
 | Shelby SDK | `@shelby-protocol/sdk` + `@shelby-protocol/react` |
 | Wallet adapter | `@aptos-labs/wallet-adapter-react` |
-| Persistence | Browser localStorage (packs, blobs, receipts) |
+| Persistence | Local SQLite (server-side records) + browser localStorage fallback/cache |
 
 ---
 
@@ -59,7 +60,7 @@ npm run dev
 # Open http://localhost:3000
 ```
 
-No environment variables required. Mock mode is the default — uploads work immediately with deterministic SHA-256-derived local mock references (`shelby://mock/blob/{id}`).
+No environment variables required. Mock mode is the default preview path — uploads work immediately with deterministic SHA-256-derived local mock references (`shelby://mock/blob/{id}`). Real Shelby proof uses the testnet browser-wallet mode.
 
 ---
 
@@ -135,8 +136,8 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | Route | Description |
 |---|---|
 | `/` | Landing page — hero, problem/solution, demo objects, quickstart |
-| `/dashboard` | Browse all evidence packs; shows built-in + uploaded local packs |
-| `/upload` | Upload form: SHA-256, file drop, mode indicator, wallet connect (testnet mode) |
+| `/dashboard` | Evidence registry: browse, search, and filter built-in, local, SQLite, and testnet records |
+| `/upload` | Create Evidence Pack: SHA-256, file drop, mode indicator, wallet connect (testnet mode) |
 | `/blob/[id]` | Blob detail: Shelby ref, hash, source, metadata, data-source badge |
 | `/read-receipt/[id]` | Read receipt: run ID, query, answer, resolved blob identity and pack links |
 
@@ -148,16 +149,17 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 src/
 ├── app/                          # Next.js App Router pages
 │   ├── actions/upload.ts         # Server Action: shelbyUploadAction (API key stays server-side)
-│   ├── dashboard/                # Evidence pack browser (server → DashboardClient)
+│   ├── actions/persist.ts        # Server Actions: SQLite persistence for packs/blobs/receipts
+│   ├── dashboard/                # Evidence registry (server → DashboardClient)
 │   ├── upload/
 │   │   ├── page.tsx              # Full upload flow (client component — mock + testnet paths)
 │   │   └── providers.tsx         # QueryClient + AptosWalletAdapterProvider (testnet path)
 │   ├── blob/[id]/                # Blob detail (server → BlobDetailClient)
 │   └── read-receipt/[id]/        # Thin server shell → ReadReceiptClient
 ├── components/                   # Shared UI components
-│   ├── dashboard-client.tsx      # Merges demo + localStorage packs
-│   ├── blob-detail-client.tsx    # Resolves demo + localStorage blobs
-│   └── read-receipt-client.tsx   # Resolves receipts from demo data or localStorage
+│   ├── dashboard-client.tsx      # Merges demo + localStorage + SQLite packs
+│   ├── blob-detail-client.tsx    # Resolves demo + localStorage + SQLite blobs
+│   └── read-receipt-client.tsx   # Resolves receipts from demo/local/SQLite data
 └── lib/
     ├── demo-data/                # Static demo data (5 packs, 6 blobs, 4 receipts)
     ├── evidence/                 # Service layer (reads demo-data)
@@ -172,6 +174,9 @@ src/
     │   └── index.ts              # getAdapter() factory
     ├── store/
     │   └── local-store.ts        # localStorage: packs, blobs, and receipts
+    ├── server/
+    │   ├── db.ts                 # SQLite schema and connection
+    │   └── evidence-store.ts     # Server-side pack/blob/receipt CRUD
     └── validation.ts             # parseTags, isValidSHA256, buildEvidencePack, buildBlobRecord
 ```
 
@@ -200,20 +205,22 @@ Built-in demo data lives in `src/lib/demo-data/`:
 
 ---
 
-## Current features (M4/M5)
+## Current features (C12 release candidate)
 
-- Working local demo upload: SHA-256 in-browser, mock Shelby refs, localStorage persistence
+- Shelby-first evidence model: EvidencePack, BlobRecord identity, and ReadReceipt lineage
+- Working local preview upload: SHA-256 in-browser, mock Shelby refs, local persistence
 - Browser-wallet Shelby testnet upload path via `useShelbyUpload` hook (operator-funded wallets only)
 - Dual-mode adapter: mock (default) / testnet (browser-wallet)
-- Evidence packs, blobs, and read receipts all persisted to browser `localStorage`
+- Evidence packs, blobs, and read receipts persisted to local SQLite, with browser localStorage retained as fallback/cache
 - Read receipt created automatically after upload (mock or testnet); link shown on success screen
-- Read receipt page resolves blob identity from demo data or localStorage (client component)
+- Read receipt page resolves blob identity from demo data, localStorage, or SQLite
 - BlobRecord identity fields surfaced on receipt page: shelbyRef, hash, source, accountAddress, blobName, network, storageStatus, explorerUrl, retrievalUrl
 - Data-source badge on blob/receipt detail (Demo / Local mock / Shelby testnet)
 - Opt-in Node.js smoke harness (`npm run smoke`) for RPC connectivity and retrieval verification
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
 - Dashboard shows built-in demo data + locally uploaded packs; reset button clears all local data
 - Mode indicator and wallet connect UI on upload page
+- C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
 
 ---
 
@@ -250,6 +257,7 @@ CI does not run real uploads. All real-upload paths are operator-dependent and d
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |
+| `docs/release-candidate-checklist.md` | C12 release-candidate verification gate |
 | `docs/c3-smoke-test-guide.md` | Smoke harness setup and manual testnet verification |
 | `docs/m4-read-receipt-binding.md` | Read receipt model and BlobRecord identity binding |
 | `docs/m2-m4-product-architecture-plan.md` | M2–M4 frozen architecture plan |

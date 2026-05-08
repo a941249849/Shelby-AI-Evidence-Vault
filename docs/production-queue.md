@@ -37,8 +37,9 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - C9 community experiment verification is merged: `scripts/verify-community-demo.mjs`, `docs/community-experiment-runbook.md`.
 - C10 evidence index search/filter/sort is merged: `src/components/dashboard-client.tsx`.
 - C11 Shelby testnet readiness doctor is merged: `scripts/shelby-doctor.mjs`, `docs/shelby-testnet-operator-runbook.md`.
-- C12 release-candidate acceptance harness is the current stage: `scripts/verify-release-candidate.mjs`, `docs/release-candidate-checklist.md`.
-- UI redesign remains paused — Task X2 is deferred until backend state is stable.
+- C12 release-candidate acceptance harness is merged: `scripts/verify-release-candidate.mjs`, `docs/release-candidate-checklist.md`.
+- Backend/protocol/product QA gates are stable enough for Codex-owned product closeout.
+- UI and product narrative redesign is now the active Codex stage: Task X2.
 
 ## Stage Gate
 
@@ -455,12 +456,12 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-C12 community release-candidate acceptance harness is the current stage.
+X2 product closeout and UI redesign is the current stage.
 
-After C12 merges, the next task options include:
+After C12, do not continue expanding Copilot production tasks by default. The product should now be tightened around the Shelby-first narrative and final community presentation.
 
-- **X2 (Codex):** UI redesign pass — now that backend/protocol and operator-readiness boundaries are stable through C12.
-- Further community-facing or operator-readiness improvements as prioritized.
+- **X2 (Codex):** Product closeout and UI redesign pass. Reframe the app from a generic upload/demo surface into a Shelby AI evidence layer: Evidence Registry, Shelby Blob Identity, Read Receipt, and testnet proof path.
+- Further Copilot work should be avoided unless a concrete blocker appears in the Shelby testnet proof path.
 
 ### Task C12: Community release candidate acceptance harness and product QA gate
 
