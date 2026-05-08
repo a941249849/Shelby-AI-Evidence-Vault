@@ -23,16 +23,66 @@ import { formatDateTime } from '@/lib/utils';
 import { getLocalReadReceiptById, getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getReadReceiptById, getBlobById, getEvidencePackById } from '@/lib/evidence/service';
 import { getPersistedReceiptAction, getPersistedBlobAction, getPersistedPackAction } from '@/app/actions/persist';
+import { useLanguage } from '@/components/language-state';
 
 interface ReadReceiptClientProps {
   id: string;
 }
+
+const receiptCopy = {
+  zh: {
+    notFound: '读取回执未找到',
+    notFoundBody: 'Demo 数据或本地存储中不存在这个回执 ID。',
+    back: '返回索引',
+    dashboard: '索引',
+    badge: 'AI 读取回执',
+    title: '回答来源与证据使用情况。',
+    subtitle: '一个 Agent 回答的紧凑回执：问题、回答摘要、运行元数据、引用 Blob 与证据包。',
+    receiptId: '回执 ID',
+    query: '问题',
+    userQuestion: '用户问题',
+    answerSummary: '回答摘要',
+    generated: '生成结果',
+    referenced: '引用 Blob',
+    blob: 'Blob',
+    missingBlob: '本地存储中未找到。',
+    runId: '运行 ID',
+    timestamp: '时间戳',
+    agentVersion: 'Agent 版本',
+    mode: '回执模式',
+    packs: '证据包',
+  },
+  en: {
+    notFound: 'Read receipt not found',
+    notFoundBody: 'No read receipt with this ID exists in demo data or local storage.',
+    back: 'Back to index',
+    dashboard: 'Dashboard',
+    badge: 'AI read receipt',
+    title: 'Answer provenance and evidence usage.',
+    subtitle:
+      'A compact receipt for one agent response: prompt, answer summary, run metadata, referenced blobs, and evidence packs.',
+    receiptId: 'Receipt ID',
+    query: 'Query',
+    userQuestion: 'User question',
+    answerSummary: 'Answer summary',
+    generated: 'Generated response',
+    referenced: 'Referenced blobs',
+    blob: 'Blob',
+    missingBlob: 'Not found in local storage.',
+    runId: 'Run ID',
+    timestamp: 'Timestamp',
+    agentVersion: 'Agent version',
+    mode: 'Receipt mode',
+    packs: 'Evidence packs',
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
 
 function ReceiptModeBadge({ mode }: { mode: ReadReceipt['receiptMode'] }) {
+  const { language } = useLanguage();
   if (mode === 'shelby-testnet') {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fd8565]/50 bg-[#ffdcd9] px-3 py-1 text-xs font-semibold text-[#f4f0e8]">
@@ -45,19 +95,20 @@ function ReceiptModeBadge({ mode }: { mode: ReadReceipt['receiptMode'] }) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-[#de8aff]/25 bg-[#eee2ff] px-3 py-1 text-xs font-semibold text-[#470b64]">
         <ShieldCheck className="h-3.5 w-3.5" />
-        Local demo upload
+        {language === 'zh' ? '本地 Demo 上传' : 'Local demo upload'}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#9d9a92]">
       <Database className="h-3.5 w-3.5" />
-      Demo data
+      {language === 'zh' ? 'Demo 数据' : 'Demo data'}
     </span>
   );
 }
 
 function BlobDataSourceBadge({ blob }: { blob: BlobRecord }) {
+  const { language } = useLanguage();
   if (blob.dataSource === 'shelby-testnet') {
     return (
       <span className="inline-flex items-center gap-1 rounded border border-[#fd8565]/50 bg-[#ffdcd9] px-2 py-0.5 text-xs font-semibold text-[#f4f0e8]">
@@ -68,13 +119,13 @@ function BlobDataSourceBadge({ blob }: { blob: BlobRecord }) {
   if (blob.dataSource === 'local') {
     return (
       <span className="inline-flex items-center gap-1 rounded border border-[#de8aff]/25 bg-[#eee2ff] px-2 py-0.5 text-xs font-semibold text-[#470b64]">
-        Local mock
+        {language === 'zh' ? '本地 Mock' : 'Local mock'}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs font-semibold text-[#9d9a92]">
-      Demo
+      {language === 'zh' ? 'Demo' : 'Demo'}
     </span>
   );
 }
@@ -108,6 +159,7 @@ function MonoBlock({ children }: { children: React.ReactNode }) {
 }
 
 function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
+  const { language } = useLanguage();
   return (
     <div className="shelby-cut shelby-surface p-4 shadow-sm">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -126,21 +178,21 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
       <div className="space-y-3">
         <div>
           <p className="mb-1 text-xs font-semibold uppercase  text-[#9d9a92]">
-            Shelby ref
+            {language === 'zh' ? 'Shelby 引用' : 'Shelby ref'}
           </p>
           <MonoBlock>{blob.shelbyRef}</MonoBlock>
         </div>
 
         <div>
           <p className="mb-1 text-xs font-semibold uppercase  text-[#9d9a92]">
-            SHA-256 hash
+            {language === 'zh' ? 'SHA-256 哈希' : 'SHA-256 hash'}
           </p>
           <MonoBlock>{blob.hash}</MonoBlock>
         </div>
 
         <div>
           <p className="mb-1 text-xs font-semibold uppercase  text-[#9d9a92]">
-            Source
+            {language === 'zh' ? '来源' : 'Source'}
           </p>
           <p className="break-all text-xs text-[#f4f0e8]">{blob.source}</p>
         </div>
@@ -151,7 +203,7 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
             {blob.accountAddress && (
               <div>
                 <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                  Account address
+                  {language === 'zh' ? '账户地址' : 'Account address'}
                 </p>
                 <p className="mt-0.5 break-all font-mono text-xs text-[#f4f0e8]">
                   {blob.accountAddress}
@@ -161,7 +213,7 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
             {blob.blobName && (
               <div>
                 <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                  Blob name
+                  {language === 'zh' ? 'Blob 名称' : 'Blob name'}
                 </p>
                 <p className="mt-0.5 break-all font-mono text-xs text-[#f4f0e8]">{blob.blobName}</p>
               </div>
@@ -169,7 +221,7 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
             {blob.network && (
               <div>
                 <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                  Network
+                  {language === 'zh' ? '网络' : 'Network'}
                 </p>
                 <span className="mt-0.5 inline-block rounded border border-[#9fe878]/25 bg-[#dfffcc] px-2 py-0.5 text-xs font-semibold text-[#21351a]">
                   {blob.network}
@@ -179,7 +231,7 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
             {blob.storageStatus && (
               <div>
                 <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                  Storage status
+                  {language === 'zh' ? '存储状态' : 'Storage status'}
                 </p>
                 <p className="mt-0.5 text-xs font-semibold text-[#f4f0e8]">{blob.storageStatus}</p>
               </div>
@@ -243,6 +295,8 @@ interface ResolvedReceiptData {
 }
 
 export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
+  const { language } = useLanguage();
+  const t = receiptCopy[language];
   const [resolved, setResolved] = useState<ResolvedReceiptData | null | undefined>(undefined);
 
   useEffect(() => {
@@ -332,19 +386,18 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
             <ReceiptText className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-semibold  text-[#f4f0e8]">
-            Read receipt not found
+            {t.notFound}
           </h1>
           <p className="mt-3 text-sm leading-6 text-[#9d9a92]">
-            No read receipt with ID{' '}
-            <code className="rounded bg-white/[0.04] px-1 font-mono">{id}</code> exists in demo
-            data or local storage.
+            {t.notFoundBody}{' '}
+            <code className="rounded bg-white/[0.04] px-1 font-mono">{id}</code>
           </p>
           <Link
             href="/dashboard"
             className="mt-6 inline-flex items-center gap-2 shelby-cut bg-[#111217] px-4 py-2.5 text-sm font-semibold text-[#f4f0e8] transition hover:bg-[#1c1d25]"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to index
+            {t.back}
           </Link>
         </div>
       </div>
@@ -362,7 +415,7 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
             className="mb-5 inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#9d9a92] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Dashboard
+            {t.dashboard}
           </Link>
 
           <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
@@ -370,21 +423,20 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[#de8aff]/25 bg-[#eee2ff] px-3 py-1 text-xs font-semibold text-[#470b64]">
                   <ReceiptText className="h-3.5 w-3.5" />
-                  AI read receipt
+                  {t.badge}
                 </span>
                 <ReceiptModeBadge mode={receipt.receiptMode} />
               </div>
               <h1 className="mt-4 max-w-4xl text-4xl font-semibold  text-[#f4f0e8]">
-                Answer provenance and evidence usage.
+                {t.title}
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#9d9a92]">
-                A compact receipt for one agent response: prompt, answer summary, run metadata,
-                referenced blobs, and evidence packs.
+                {t.subtitle}
               </p>
             </div>
             <div className="shelby-cut shelby-surface p-4 shadow-sm">
               <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                Receipt ID
+                {t.receiptId}
               </p>
               <p className="mt-2 truncate font-mono text-sm font-semibold text-[#f4f0e8]">
                 {receipt.id}
@@ -402,9 +454,9 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
                 </div>
                 <div>
                   <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                    Query
+                    {t.query}
                   </p>
-                  <h2 className="text-lg font-semibold text-[#f4f0e8]">User question</h2>
+                  <h2 className="text-lg font-semibold text-[#f4f0e8]">{t.userQuestion}</h2>
                 </div>
               </div>
               <p className="text-base leading-7 text-[#f4f0e8]">{receipt.query}</p>
@@ -417,9 +469,9 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
                 </div>
                 <div>
                   <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                    Answer summary
+                    {t.answerSummary}
                   </p>
-                  <h2 className="text-lg font-semibold text-[#f4f0e8]">Generated response</h2>
+                  <h2 className="text-lg font-semibold text-[#f4f0e8]">{t.generated}</h2>
                 </div>
               </div>
               <p className="text-sm leading-7 text-[#f4f0e8]">{receipt.answerSummary}</p>
@@ -428,7 +480,7 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
             <div className="shelby-cut shelby-surface p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">
                 <Fingerprint className="h-4 w-4 text-[#de8aff]" />
-                Referenced blobs
+                {t.referenced}
                 <span className="ml-auto rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs font-semibold text-[#9d9a92]">
                   {receipt.referencedBlobIds.length}
                 </span>
@@ -448,10 +500,10 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
                         className="shelby-cut shelby-surface px-3 py-3"
                       >
                         <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
-                          Blob
+                          {t.blob}
                         </p>
                         <p className="mt-1 font-mono text-xs text-[#9d9a92]">{bid}</p>
-                        <p className="mt-1 text-xs text-[#9d9a92]">Not found in local storage.</p>
+                        <p className="mt-1 text-xs text-[#9d9a92]">{t.missingBlob}</p>
                       </div>
                     ))}
                 </div>
@@ -477,22 +529,22 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
           </section>
 
           <aside className="space-y-4">
-            <Fact icon={Cpu} label="Run ID">
+            <Fact icon={Cpu} label={t.runId}>
               <code className="font-mono text-xs">{receipt.runId}</code>
             </Fact>
-            <Fact icon={CalendarClock} label="Timestamp">
+            <Fact icon={CalendarClock} label={t.timestamp}>
               {formatDateTime(receipt.timestamp)}
             </Fact>
-            <Fact icon={Braces} label="Agent version">
+            <Fact icon={Braces} label={t.agentVersion}>
               <code className="font-mono text-xs">{receipt.agentVersion}</code>
             </Fact>
-            <Fact icon={Hash} label="Receipt mode">
+            <Fact icon={Hash} label={t.mode}>
               <ReceiptModeBadge mode={receipt.receiptMode} />
             </Fact>
             <div className="shelby-cut shelby-surface p-4 shadow-sm">
               <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">
                 <Database className="h-3.5 w-3.5 text-[#de8aff]" />
-                Evidence packs
+                {t.packs}
               </div>
               <div className="space-y-2">
                 {resolvedPacks.length > 0 ? (

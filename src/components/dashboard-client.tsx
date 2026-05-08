@@ -18,6 +18,7 @@ import type { BlobRecord } from '@/lib/demo-data/blobs';
 import EvidencePackCard from '@/components/evidence-pack-card';
 import { getLocalPacks, getLocalBlobsByPackId, resetLocalData } from '@/lib/store/local-store';
 import { getPersistedPacksAction } from '@/app/actions/persist';
+import { useLanguage } from '@/components/language-state';
 
 interface DashboardClientProps {
   demoPacks: EvidencePack[];
@@ -25,6 +26,76 @@ interface DashboardClientProps {
 }
 
 type SortKey = 'newest' | 'oldest' | 'title-az' | 'blobs';
+
+const dashboardCopy = {
+  zh: {
+    chip: '证据索引',
+    title: 'AI 证据的可检查存储状态。',
+    subtitle: 'Demo 语料、本地浏览器记录与 SQLite 持久化上传统一汇入一个证据索引。',
+    runtime: '运行边界',
+    runtimeValue: '本地 + SQLite',
+    newPack: '新建证据包',
+    metrics: ['已索引证据包', '活跃证据包', '已追踪 Blob', '用户证据包'],
+    search: '搜索与筛选',
+    searchPlaceholder: '搜索标题、标签、分类...',
+    allCategories: '所有分类',
+    allSourceTypes: '所有来源类型',
+    allStatuses: '所有状态',
+    allSources: '所有来源',
+    newest: '最新优先',
+    oldest: '最早优先',
+    titleAz: '标题 A-Z',
+    mostBlobs: 'Blob 最多',
+    clear: '清除筛选',
+    noTitle: '没有匹配的证据包',
+    noBody: '调整搜索词或筛选条件，或重置查看完整索引。',
+    resetFilters: '重置筛选',
+    userChip: '用户创建记录',
+    localWorkspace: '本地工作区',
+    shown: '已显示',
+    resetCache: '重置浏览器缓存',
+    resetCacheConfirm: '再次点击确认重置',
+    noLocal: '当前筛选条件下没有本地记录。',
+    demoChip: '内置语料',
+    demoEvidence: 'Demo 证据',
+    packs: '证据包',
+    noDemo: '当前筛选条件下没有 Demo 证据包。',
+  },
+  en: {
+    chip: 'Evidence index',
+    title: 'Inspectable storage state for AI evidence.',
+    subtitle:
+      'Demo corpus, browser-local records, and SQLite-persisted uploads resolve through one evidence index.',
+    runtime: 'Runtime boundary',
+    runtimeValue: 'Local + SQLite',
+    newPack: 'New evidence pack',
+    metrics: ['Packs indexed', 'Active packs', 'Blobs tracked', 'User packs'],
+    search: 'Search & filter',
+    searchPlaceholder: 'Search title, tags, category...',
+    allCategories: 'All categories',
+    allSourceTypes: 'All source types',
+    allStatuses: 'All statuses',
+    allSources: 'All sources',
+    newest: 'Newest first',
+    oldest: 'Oldest first',
+    titleAz: 'Title A-Z',
+    mostBlobs: 'Most blobs',
+    clear: 'Clear filters',
+    noTitle: 'No packs match your filters',
+    noBody: 'Try adjusting your search query or filters, or reset to see the full index.',
+    resetFilters: 'Reset filters',
+    userChip: 'User-created records',
+    localWorkspace: 'Local workspace',
+    shown: 'shown',
+    resetCache: 'Reset browser cache',
+    resetCacheConfirm: 'Click again to reset browser cache',
+    noLocal: 'No local records match the current filters.',
+    demoChip: 'Built-in corpus',
+    demoEvidence: 'Demo evidence',
+    packs: 'packs',
+    noDemo: 'No demo packs match the current filters.',
+  },
+};
 
 function Metric({
   label,
@@ -76,6 +147,8 @@ function sortPacks(packs: EvidencePack[], sortBy: SortKey): EvidencePack[] {
 }
 
 export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClientProps) {
+  const { language } = useLanguage();
+  const t = dashboardCopy[language];
   const [localPacks, setLocalPacks] = useState<EvidencePack[]>([]);
   const [persistedPacks, setPersistedPacks] = useState<EvidencePack[]>([]);
   const [resetConfirm, setResetConfirm] = useState(false);
@@ -184,14 +257,14 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           <section className="shelby-surface shelby-cut p-6">
             <div className="ui-chip">
               <ShieldCheck size={13} />
-              Evidence index
+              {t.chip}
             </div>
+            <span className="sr-only">Evidence index</span>
             <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1] text-[#f4f0e8] sm:text-5xl">
-              Inspectable storage state for AI evidence.
+              {t.title}
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[#9d9a92]">
-              Demo corpus, browser-local records, and SQLite-persisted uploads resolve through one
-              evidence index.
+              {t.subtitle}
             </p>
           </section>
 
@@ -199,9 +272,9 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">
-                  Runtime boundary
+                  {t.runtime}
                 </p>
-                <p className="mt-2 text-lg font-semibold text-[#f4f0e8]">Local + SQLite</p>
+                <p className="mt-2 text-lg font-semibold text-[#f4f0e8]">{t.runtimeValue}</p>
               </div>
               <div className="grid h-11 w-11 place-items-center border border-[#9fe878]/30 bg-[#9fe878]/10 text-[#9fe878]">
                 <HardDrive size={19} />
@@ -209,27 +282,27 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             </div>
             <Link href="/upload" className="ui-button shelby-cut-sm w-full">
               <FilePlus2 size={16} />
-              New evidence pack
+              {t.newPack}
             </Link>
           </aside>
         </div>
 
         <div className="mb-8 grid border-y border-white/10 bg-white/[0.035] sm:grid-cols-2 lg:grid-cols-4">
           <Metric
-            label="Packs indexed"
+            label={t.metrics[0]}
             value={isFiltered ? `${totalFiltered} / ${allPacks.length}` : allPacks.length}
             tone="text-[#f4f0e8]"
           />
-          <Metric label="Active packs" value={activePacks} tone="text-[#9fe878]" />
-          <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#de8aff]" />
-          <Metric label="User packs" value={allUserPacks.length} tone="text-[#fd8565]" />
+          <Metric label={t.metrics[1]} value={activePacks} tone="text-[#9fe878]" />
+          <Metric label={t.metrics[2]} value={totalBlobs} tone="text-[#de8aff]" />
+          <Metric label={t.metrics[3]} value={allUserPacks.length} tone="text-[#fd8565]" />
         </div>
 
         {/* Search / filter / sort toolbar */}
         <div className="mb-8 border border-white/10 bg-white/[0.025] p-4">
           <div className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase text-[#6f716d]">
             <SlidersHorizontal size={13} />
-            Search &amp; filter
+            {t.search}
           </div>
           <div className="flex flex-wrap gap-3">
             {/* Search input */}
@@ -242,7 +315,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search title, tags, category…"
+                placeholder={t.searchPlaceholder}
                 className="shelby-cut-sm w-full border border-white/12 bg-white/[0.055] py-2 pl-8 pr-3 text-xs font-semibold text-[#f4f0e8] placeholder:font-normal placeholder:text-[#6f716d] focus:border-[#de8aff]/50 focus:outline-none"
               />
             </div>
@@ -254,11 +327,11 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               aria-label="Filter by category"
               className={selectClass}
             >
-              <option value="">All categories</option>
-              <option value="dataset">Dataset</option>
-              <option value="agent-run">Agent run</option>
-              <option value="document">Document</option>
-              <option value="manifest">Manifest</option>
+              <option value="">{t.allCategories}</option>
+              <option value="dataset">{language === 'zh' ? '数据集' : 'Dataset'}</option>
+              <option value="agent-run">{language === 'zh' ? 'Agent 运行' : 'Agent run'}</option>
+              <option value="document">{language === 'zh' ? '文档' : 'Document'}</option>
+              <option value="manifest">{language === 'zh' ? '清单' : 'Manifest'}</option>
             </select>
 
             {/* Source type filter */}
@@ -270,11 +343,11 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               aria-label="Filter by source type"
               className={selectClass}
             >
-              <option value="">All source types</option>
-              <option value="web-scrape">Web scrape</option>
-              <option value="api-export">API export</option>
-              <option value="agent-output">Agent output</option>
-              <option value="manual-upload">Manual upload</option>
+              <option value="">{t.allSourceTypes}</option>
+              <option value="web-scrape">{language === 'zh' ? '网页抓取' : 'Web scrape'}</option>
+              <option value="api-export">{language === 'zh' ? 'API 导出' : 'API export'}</option>
+              <option value="agent-output">{language === 'zh' ? 'Agent 输出' : 'Agent output'}</option>
+              <option value="manual-upload">{language === 'zh' ? '手动上传' : 'Manual upload'}</option>
             </select>
 
             {/* Status filter */}
@@ -284,10 +357,10 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               aria-label="Filter by status"
               className={selectClass}
             >
-              <option value="">All statuses</option>
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
-              <option value="pending">Pending</option>
+              <option value="">{t.allStatuses}</option>
+              <option value="active">{language === 'zh' ? '活跃' : 'Active'}</option>
+              <option value="archived">{language === 'zh' ? '归档' : 'Archived'}</option>
+              <option value="pending">{language === 'zh' ? '待处理' : 'Pending'}</option>
             </select>
 
             {/* Data source filter */}
@@ -297,9 +370,9 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               aria-label="Filter by data source"
               className={selectClass}
             >
-              <option value="">All sources</option>
-              <option value="local">Local / uploaded</option>
-              <option value="demo">Demo corpus</option>
+              <option value="">{t.allSources}</option>
+              <option value="local">{language === 'zh' ? '本地 / 已上传' : 'Local / uploaded'}</option>
+              <option value="demo">{language === 'zh' ? 'Demo 语料' : 'Demo corpus'}</option>
             </select>
 
             {/* Sort */}
@@ -309,10 +382,10 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               aria-label="Sort packs"
               className={selectClass}
             >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-              <option value="title-az">Title A–Z</option>
-              <option value="blobs">Most blobs</option>
+              <option value="newest">{t.newest}</option>
+              <option value="oldest">{t.oldest}</option>
+              <option value="title-az">{t.titleAz}</option>
+              <option value="blobs">{t.mostBlobs}</option>
             </select>
 
             {/* Clear filters */}
@@ -322,7 +395,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
                 className="shelby-cut-sm flex items-center gap-1.5 border border-[#de8aff]/35 bg-[#de8aff]/10 px-3 py-2 text-xs font-semibold text-[#de8aff] transition hover:border-[#de8aff]/55 hover:bg-[#de8aff]/15"
               >
                 <RotateCcw size={12} />
-                Clear filters
+                {t.clear}
               </button>
             )}
           </div>
@@ -333,9 +406,9 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           <div className="mb-10 flex flex-col items-center gap-4 border border-white/10 bg-white/[0.025] px-6 py-12 text-center">
             <Search size={28} className="text-[#6f716d]" />
             <div>
-              <p className="text-base font-semibold text-[#f4f0e8]">No packs match your filters</p>
+              <p className="text-base font-semibold text-[#f4f0e8]">{t.noTitle}</p>
               <p className="mt-1 text-sm text-[#9d9a92]">
-                Try adjusting your search query or filters, or reset to see the full index.
+                {t.noBody}
               </p>
             </div>
             <button
@@ -343,7 +416,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               className="shelby-cut-sm flex items-center gap-1.5 border border-[#de8aff]/35 bg-[#de8aff]/10 px-4 py-2 text-xs font-semibold text-[#de8aff] transition hover:border-[#de8aff]/55 hover:bg-[#de8aff]/15"
             >
               <RotateCcw size={12} />
-              Reset filters
+              {t.resetFilters}
             </button>
           </div>
         )}
@@ -354,21 +427,21 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               <div>
                 <div className="ui-chip">
                   <Activity size={13} />
-                  User-created records
+                  {t.userChip}
                 </div>
-                <h2 className="mt-3 text-xl font-semibold text-[#f4f0e8]">Local workspace</h2>
+                <h2 className="mt-3 text-xl font-semibold text-[#f4f0e8]">{t.localWorkspace}</h2>
               </div>
               <div className="flex items-center gap-3">
                 {isFiltered && (
                   <span className="font-mono text-xs font-semibold text-[#6f716d]">
-                    {filteredUserPacks.length} / {allUserPacks.length} shown
+                    {filteredUserPacks.length} / {allUserPacks.length} {t.shown}
                   </span>
                 )}
                 <button
                   onClick={handleReset}
                   className="shelby-cut-sm border border-white/12 bg-white/[0.055] px-3 py-2 text-xs font-semibold text-[#9d9a92] transition hover:border-[#fd8565]/50 hover:text-[#ffc2ad]"
                 >
-                  {resetConfirm ? 'Click again to reset browser cache' : 'Reset browser cache'}
+                  {resetConfirm ? t.resetCacheConfirm : t.resetCache}
                 </button>
               </div>
             </div>
@@ -380,7 +453,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               </div>
             ) : (
               <p className="text-sm text-[#6f716d]">
-                No local records match the current filters.
+                {t.noLocal}
               </p>
             )}
           </section>
@@ -392,15 +465,15 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               <div>
                 <div className="ui-chip">
                   <Database size={13} />
-                  Built-in corpus
+                  {t.demoChip}
                 </div>
-                <h2 className="mt-3 text-xl font-semibold text-[#f4f0e8]">Demo evidence</h2>
+                <h2 className="mt-3 text-xl font-semibold text-[#f4f0e8]">{t.demoEvidence}</h2>
               </div>
               <div className="hidden items-center gap-2 font-mono text-xs font-semibold uppercase text-[#6f716d] sm:flex">
                 <Layers3 size={14} />
                 {isFiltered
-                  ? `${filteredDemoPacks.length} / ${demoPacks.length} packs`
-                  : `${demoPacks.length} packs`}
+                  ? `${filteredDemoPacks.length} / ${demoPacks.length} ${t.packs}`
+                  : `${demoPacks.length} ${t.packs}`}
               </div>
             </div>
             {filteredDemoPacks.length > 0 ? (
@@ -411,7 +484,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               </div>
             ) : (
               <p className="text-sm text-[#6f716d]">
-                No demo packs match the current filters.
+                {t.noDemo}
               </p>
             )}
           </section>

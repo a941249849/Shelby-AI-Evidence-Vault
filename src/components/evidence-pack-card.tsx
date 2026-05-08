@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { ArrowUpRight, Boxes, CalendarDays, Database, FileText, Workflow } from 'lucide-react';
 import type { EvidencePack } from '@/lib/evidence/types';
 import { formatDate } from '@/lib/utils';
+import { useLanguage } from '@/components/language-state';
 
 interface EvidencePackCardProps {
   pack: EvidencePack;
@@ -10,28 +11,28 @@ interface EvidencePackCardProps {
 
 const categoryStyles: Record<
   EvidencePack['category'],
-  { label: string; color: string; rail: string; icon: ReactNode }
+  { label: { zh: string; en: string }; color: string; rail: string; icon: ReactNode }
 > = {
   dataset: {
-    label: 'Dataset',
+    label: { zh: '数据集', en: 'Dataset' },
     color: 'border-[#9fe878]/40 bg-[#9fe878]/10 text-[#9fe878]',
     rail: 'bg-[#9fe878]',
     icon: <Database size={14} />,
   },
   'agent-run': {
-    label: 'Agent run',
+    label: { zh: 'Agent 运行', en: 'Agent run' },
     color: 'border-[#ff77c9]/42 bg-[#ff77c9]/10 text-[#ffb1df]',
     rail: 'bg-[#ff77c9]',
     icon: <Workflow size={14} />,
   },
   document: {
-    label: 'Document',
+    label: { zh: '文档', en: 'Document' },
     color: 'border-[#de8aff]/38 bg-[#de8aff]/10 text-[#e7b6ff]',
     rail: 'bg-[#de8aff]',
     icon: <FileText size={14} />,
   },
   manifest: {
-    label: 'Manifest',
+    label: { zh: '清单', en: 'Manifest' },
     color: 'border-[#fd8565]/45 bg-[#fd8565]/12 text-[#ffc2ad]',
     rail: 'bg-[#fd8565]',
     icon: <Boxes size={14} />,
@@ -39,6 +40,7 @@ const categoryStyles: Record<
 };
 
 export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
+  const { language } = useLanguage();
   const category = categoryStyles[pack.category];
   const isLocal = pack.dataSource === 'local';
 
@@ -52,7 +54,7 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
             className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-xs font-semibold uppercase ${category.color}`}
           >
             {category.icon}
-            {category.label}
+            {category.label[language]}
           </span>
           <span
             className={`border px-2 py-1 font-mono text-xs font-semibold uppercase ${
@@ -61,7 +63,7 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
                 : 'border-white/12 bg-white/[0.055] text-[#9d9a92]'
             }`}
           >
-            {isLocal ? 'Local' : 'Demo'}
+            {isLocal ? (language === 'zh' ? '本地' : 'Local') : 'Demo'}
           </span>
         </div>
 
@@ -74,15 +76,17 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
 
         <dl className="mt-5 grid grid-cols-3 gap-3 border-y border-white/10 py-3 text-xs">
           <div>
-            <dt className="font-mono uppercase text-[#6f716d]">Blobs</dt>
+            <dt className="font-mono uppercase text-[#6f716d]">
+              {language === 'zh' ? 'Blob' : 'Blobs'}
+            </dt>
             <dd className="mt-1 font-semibold text-[#f4f0e8]">{pack.blobCount}</dd>
           </div>
           <div>
-            <dt className="font-mono uppercase text-[#6f716d]">Source</dt>
+            <dt className="font-mono uppercase text-[#6f716d]">{language === 'zh' ? '来源' : 'Source'}</dt>
             <dd className="mt-1 truncate font-semibold text-[#f4f0e8]">{pack.sourceType}</dd>
           </div>
           <div>
-            <dt className="font-mono uppercase text-[#6f716d]">Created</dt>
+            <dt className="font-mono uppercase text-[#6f716d]">{language === 'zh' ? '创建' : 'Created'}</dt>
             <dd className="mt-1 flex items-center gap-1 font-semibold text-[#f4f0e8]">
               <CalendarDays size={12} />
               {formatDate(pack.createdAt)}
@@ -105,7 +109,7 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
           href={`/dashboard?pack=${pack.id}`}
           className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#9fe878] transition group-hover:text-[#de8aff]"
         >
-          Inspect evidence
+          {language === 'zh' ? '检查证据' : 'Inspect evidence'}
           <ArrowUpRight size={15} />
         </Link>
       </div>

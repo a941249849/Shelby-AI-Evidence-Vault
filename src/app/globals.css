@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #090a0d;
-  --foreground: #f4f0e8;
-  --shelby-void: #090a0d;
-  --shelby-ink: #111217;
-  --shelby-panel: #15161c;
-  --shelby-panel-2: #1c1d25;
-  --shelby-line: rgba(244, 240, 232, 0.13);
-  --shelby-line-strong: rgba(244, 240, 232, 0.22);
-  --shelby-text: #f4f0e8;
-  --shelby-muted: #9d9a92;
-  --shelby-dim: #6f716d;
+  --background: #fffaf4;
+  --foreground: #2b1b10;
+  --shelby-void: #fffaf4;
+  --shelby-ink: #2b1b10;
+  --shelby-panel: #fffdf9;
+  --shelby-panel-2: #fff7fb;
+  --shelby-line: #eadfd6;
+  --shelby-line-strong: #d8c7bb;
+  --shelby-text: #2b1b10;
+  --shelby-muted: #6d5f55;
+  --shelby-dim: #8a7a6f;
   --shelby-violet: #de8aff;
   --shelby-green: #9fe878;
   --shelby-pink: #ff77c9;
@@ -55,7 +55,7 @@ samp,
 
 ::selection {
   background: rgba(222, 138, 255, 0.34);
-  color: var(--shelby-text);
+  color: #2b1b10;
 }
 
 button,
@@ -82,14 +82,16 @@ textarea {
 
 .kinetic-grid {
   background:
-    linear-gradient(90deg, rgba(244, 240, 232, 0.055) 1px, transparent 1px),
-    linear-gradient(rgba(244, 240, 232, 0.055) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(159, 232, 120, 0.08) 0 1px, transparent 1px 28px),
+    radial-gradient(circle at 14% 6%, rgba(159, 232, 120, 0.14), transparent 22rem),
+    radial-gradient(circle at 84% 4%, rgba(255, 95, 184, 0.14), transparent 28rem),
+    linear-gradient(90deg, rgba(47, 31, 18, 0.045) 1px, transparent 1px),
+    linear-gradient(rgba(47, 31, 18, 0.045) 1px, transparent 1px),
     var(--shelby-void);
   background-size:
+    auto,
+    auto,
     72px 72px,
     72px 72px,
-    36px 36px,
     auto;
 }
 
@@ -103,10 +105,10 @@ textarea {
 
 .shelby-surface {
   background:
-    linear-gradient(180deg, rgba(244, 240, 232, 0.07), rgba(244, 240, 232, 0.025)),
+    linear-gradient(180deg, rgba(255, 253, 249, 0.92), rgba(255, 247, 251, 0.76)),
     var(--shelby-panel);
   border: 1px solid var(--shelby-line);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+  box-shadow: 0 22px 58px rgba(47, 31, 18, 0.08);
 }
 
 .shelby-surface-soft {
@@ -133,7 +135,7 @@ textarea {
   place-items: center;
   overflow: hidden;
   border: 1px solid rgba(244, 240, 232, 0.18);
-  background: #111217;
+  background: #fffdf9;
 }
 
 .shelby-mark::before,
@@ -197,8 +199,9 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  border: 1px solid var(--shelby-line);
-  background: rgba(244, 240, 232, 0.055);
+  border: 1px solid #eadfd6;
+  border-radius: 999px;
+  background: rgba(255, 253, 249, 0.82);
   color: var(--shelby-muted);
   padding: 0.42rem 0.62rem;
   font-family: "IBM Plex Mono", "SF Mono", monospace;
@@ -219,9 +222,9 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 1px solid rgba(244, 240, 232, 0.16);
-  background: var(--shelby-text);
-  color: var(--shelby-ink);
+  border: 1px solid #d8c7bb;
+  background: #2f1f12;
+  color: #fffaf4;
   padding: 0.72rem 1rem;
   font-size: 0.9rem;
   font-weight: 750;
@@ -234,12 +237,13 @@ textarea {
 
 .ui-button:hover {
   transform: translateY(-1px);
-  background: var(--shelby-green);
+  background: #ff5fb8;
+  color: #2f1f12;
 }
 
 .ui-button-secondary {
-  background: rgba(244, 240, 232, 0.06);
-  color: var(--shelby-text);
+  background: #fff2f9;
+  color: #2f1f12;
 }
 
 .ui-button-secondary:hover {
@@ -258,10 +262,10 @@ textarea {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, transparent, rgba(159, 232, 120, 0.14), transparent),
+    linear-gradient(90deg, transparent, rgba(255, 95, 184, 0.14), transparent),
     repeating-linear-gradient(
       90deg,
-      rgba(244, 240, 232, 0.16) 0 1px,
+      rgba(47, 31, 18, 0.08) 0 1px,
       transparent 1px 18px
     );
   opacity: 0.7;
@@ -279,6 +283,77 @@ textarea {
   bottom: -0.55rem;
   width: 1px;
   background: linear-gradient(var(--shelby-green), rgba(159, 232, 120, 0));
+}
+
+.kinetic-grid .shelby-cut,
+.kinetic-grid .shelby-cut-sm {
+  clip-path: none;
+  border-radius: 1.05rem;
+}
+
+.kinetic-grid [class*="text-[#f4f0e8]"],
+.kinetic-grid [class*="text-\\[\\#f4f0e8\\]"] {
+  color: #2b1b10 !important;
+}
+
+.kinetic-grid [class*="text-[#9d9a92]"],
+.kinetic-grid [class*="text-\\[\\#9d9a92\\]"],
+.kinetic-grid [class*="text-[#6f716d]"],
+.kinetic-grid [class*="text-\\[\\#6f716d\\]"] {
+  color: #6d5f55 !important;
+}
+
+.kinetic-grid [class*="border-white/"],
+.kinetic-grid [class*="border-white\\\/"] {
+  border-color: #eadfd6 !important;
+}
+
+.kinetic-grid [class*="bg-white/"],
+.kinetic-grid [class*="bg-white\\\/"] {
+  background-color: rgba(255, 253, 249, 0.78) !important;
+}
+
+.kinetic-grid [class*="bg-[#15161c]"],
+.kinetic-grid [class*="bg-\\[\\#15161c\\]"],
+.kinetic-grid [class*="bg-[#1b1d25]"],
+.kinetic-grid [class*="bg-\\[\\#1b1d25\\]"],
+.kinetic-grid [class*="bg-[#111217]"],
+.kinetic-grid [class*="bg-\\[\\#111217\\]"],
+.kinetic-grid [class*="bg-[#101813]"],
+.kinetic-grid [class*="bg-\\[\\#101813\\]"] {
+  background-color: #fff7fb !important;
+}
+
+.kinetic-grid input,
+.kinetic-grid select,
+.kinetic-grid textarea {
+  border-color: #ddcfc5 !important;
+  background: rgba(255, 253, 249, 0.86) !important;
+  color: #2b1b10 !important;
+}
+
+.kinetic-grid input::placeholder,
+.kinetic-grid textarea::placeholder {
+  color: #9a8b81 !important;
+}
+
+.kinetic-grid .ui-button {
+  border-color: #d8c7bb;
+  background: #2f1f12 !important;
+  color: #fffaf4 !important;
+}
+
+.kinetic-grid .ui-button:hover {
+  background: #ff5fb8 !important;
+  color: #2f1f12 !important;
+}
+
+.kinetic-grid .ui-chip {
+  color: #6d5f55 !important;
+}
+
+.kinetic-grid code {
+  color: #352417;
 }
 
 .shelby-home {
