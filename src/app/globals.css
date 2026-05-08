@@ -160,6 +160,39 @@ textarea {
   transform: skewX(-18deg);
 }
 
+.shelby-symbol {
+  position: relative;
+  display: inline-grid;
+  width: 2.55rem;
+  height: 2.55rem;
+  place-items: center;
+  color: #2f1f12;
+}
+
+.shelby-symbol::before,
+.shelby-symbol::after,
+.shelby-symbol span {
+  content: "";
+  position: absolute;
+  width: 1.45rem;
+  height: 0.62rem;
+  border: 3px solid currentColor;
+  border-left-color: #ff5fb8;
+  transform-origin: center;
+}
+
+.shelby-symbol::before {
+  transform: translateY(-0.72rem) rotate(0deg) skewX(-18deg);
+}
+
+.shelby-symbol::after {
+  transform: translate(0.62rem, 0.36rem) rotate(120deg) skewX(-18deg);
+}
+
+.shelby-symbol span {
+  transform: translate(-0.62rem, 0.36rem) rotate(240deg) skewX(-18deg);
+}
+
 .ui-chip {
   display: inline-flex;
   align-items: center;
@@ -248,8 +281,264 @@ textarea {
   background: linear-gradient(var(--shelby-green), rgba(159, 232, 120, 0));
 }
 
+.shelby-home {
+  --home-paper: #fffdf9;
+  --home-cream: #fbf6ef;
+  --home-ink: #2f1f12;
+  --home-line: #eadbd2;
+  --home-pink: #ff5fb8;
+  --home-pink-soft: #ffe4f2;
+  background:
+    linear-gradient(90deg, rgba(47, 31, 18, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(47, 31, 18, 0.035) 1px, transparent 1px),
+    var(--home-paper);
+  background-size: 80px 80px, 80px 80px, auto;
+}
+
+.hero-shell {
+  min-height: calc(100vh - 4.65rem);
+  background:
+    radial-gradient(circle at 55% 52%, rgba(255, 95, 184, 0.08), transparent 34rem),
+    linear-gradient(90deg, rgba(255, 253, 249, 0.99), rgba(255, 253, 249, 0.9)),
+    linear-gradient(135deg, rgba(255, 95, 184, 0.1) 0 20%, transparent 20% 100%),
+    #fffdf9;
+  background-position: center;
+  background-size: cover;
+}
+
+.brand-shard {
+  position: absolute;
+  pointer-events: none;
+  background: #ff69bd;
+  opacity: 0.95;
+  box-shadow: 0 34px 70px rgba(255, 95, 184, 0.18);
+}
+
+.brand-shard-left {
+  left: -5rem;
+  bottom: -7rem;
+  width: 18rem;
+  height: 24rem;
+  clip-path: polygon(0 0, 100% 28%, 56% 100%, 0 78%);
+  transform: rotate(-18deg);
+}
+
+.brand-shard-right {
+  right: -5rem;
+  top: -1rem;
+  width: 23rem;
+  height: 21rem;
+  clip-path: polygon(42% 0, 100% 0, 100% 82%, 0 34%);
+  transform: rotate(7deg);
+}
+
+.brand-shard-center {
+  right: 29rem;
+  bottom: 4.5rem;
+  width: 9rem;
+  height: 12rem;
+  clip-path: polygon(0 0, 100% 24%, 70% 100%, 0 78%);
+  opacity: 0.16;
+  transform: rotate(-24deg);
+}
+
+.shelby-primary-button,
+.shelby-secondary-button,
+.receipt-link,
+.developer-pill {
+  display: inline-flex;
+  min-height: 3.45rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  border: 1px solid #d9c7bb;
+  padding: 0 1.2rem;
+  font-weight: 850;
+  letter-spacing: 0;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.shelby-primary-button {
+  background: #2f1f12;
+  color: white;
+}
+
+.shelby-primary-button:hover,
+.shelby-secondary-button:hover,
+.developer-pill:hover {
+  transform: translateY(-1px);
+  border-color: #ff5fb8;
+}
+
+.shelby-primary-button:hover .button-arrow {
+  background: #ff5fb8;
+  color: #2f1f12;
+}
+
+.button-arrow {
+  display: grid;
+  width: 3rem;
+  align-self: stretch;
+  place-items: center;
+  margin-right: -1.2rem;
+  background: #ff5fb8;
+  color: #2f1f12;
+}
+
+.shelby-secondary-button,
+.developer-pill {
+  background: #fff2f9;
+  color: #2f1f12;
+}
+
+.receipt-link {
+  min-height: auto;
+  border-color: transparent;
+  background: transparent;
+  color: #2f1f12;
+  padding-inline: 0.3rem;
+}
+
+.receipt-link:hover {
+  color: #ff4faf;
+}
+
+.metric-cell {
+  border-left: 1px solid #e4d5cc;
+  padding: 0.85rem 1rem;
+}
+
+.metric-cell:first-child {
+  border-left: 0;
+}
+
+.metric-cell p {
+  font-family: "IBM Plex Mono", "SF Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 750;
+  color: #7b695d;
+  text-transform: uppercase;
+}
+
+.metric-cell strong {
+  display: block;
+  margin-top: 0.5rem;
+  color: #2f1f12;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.proof-board {
+  border: 1px solid #e4d5cc;
+  background: rgba(255, 253, 249, 0.86);
+  padding: clamp(1rem, 2.6vw, 1.75rem);
+  box-shadow: 0 28px 80px rgba(47, 31, 18, 0.1);
+  backdrop-filter: blur(18px);
+}
+
+.flow-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.proof-node {
+  min-height: 12.8rem;
+  border: 1px solid #f0bfd5;
+  background: rgba(255, 255, 255, 0.68);
+  padding: 1rem;
+}
+
+.proof-node-active {
+  background: #ffe4f2;
+  box-shadow: inset 0 0 0 1px rgba(255, 95, 184, 0.25);
+}
+
+.proof-table {
+  margin-top: 1rem;
+  border: 1px solid #e5d7cf;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.proof-row {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr) 8rem;
+  gap: 1rem;
+  border-top: 1px solid #eadbd2;
+  padding: 0.78rem 1rem;
+  align-items: center;
+}
+
+.proof-row:first-child {
+  border-top: 0;
+}
+
+.proof-row span,
+.proof-row strong {
+  font-family: "IBM Plex Mono", "SF Mono", monospace;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #6d5f55;
+}
+
+.proof-row code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #2f1f12;
+  font-size: 0.78rem;
+}
+
+.proof-row strong {
+  color: #3a8f25;
+}
+
+.feature-tile {
+  min-height: 16rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.55rem;
+  border: 1px solid #eadbd2;
+  background: rgba(255, 253, 249, 0.86);
+  padding: clamp(1.25rem, 2.4vw, 2rem);
+  box-shadow: 0 18px 58px rgba(47, 31, 18, 0.08);
+}
+
+@media (max-width: 980px) {
+  .flow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .brand-shard-right {
+    opacity: 0.45;
+  }
+
+  .brand-shard-center {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .shelby-cut {
     clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  }
+
+  .flow-grid,
+  .feature-tile {
+    grid-template-columns: 1fr;
+  }
+
+  .proof-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .brand-shard-left {
+    width: 14rem;
+    height: 22rem;
   }
 }
