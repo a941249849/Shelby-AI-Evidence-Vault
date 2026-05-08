@@ -450,12 +450,66 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-C7 SQLite persistence is the current stage (this PR).
+C8 agent-run integration example is the current stage (this PR).
 
-After C7 merges, the next task options include:
+After C8 merges, the next task options include:
 
-- **X2 (Codex):** UI redesign pass — now that protocol boundaries are stable through C7.
+- **X2 (Codex):** UI redesign pass — now that protocol boundaries are stable through C8.
 - **C6:** Search and filter on the dashboard (operator-requested feature).
-- **C8:** Agent run integration example — a scripted agent that produces an evidence pack and read receipt.
 
 Do not dispatch small patch tasks to Copilot. Next Copilot task should be a large bounded implementation with clear acceptance criteria.
+
+### Task C8: Agent run evidence-pack integration example
+
+Owner: Copilot
+
+Size: Large
+
+Status: **Complete** — implemented in this PR.
+
+When to start:
+
+After C7 SQLite persistence merges.
+
+Goal:
+
+Add a deterministic agent-run integration example demonstrating the full product story:
+`source evidence → agent run output → EvidencePack → BlobRecord → ReadReceipt`
+
+Scope:
+
+- `scripts/generate-agent-run.mjs` — deterministic Node.js script. Reads `fixtures/c8-agent-input.json`, computes SHA-256 of input and output, builds EvidencePack + 2 BlobRecords + ReadReceipt, persists all to SQLite via `INSERT OR REPLACE` (idempotent). No LLM calls, no credentials.
+- `fixtures/c8-agent-input.json` — small public synthetic AI benchmark fixture (input for the agent run).
+- `package.json` — `generate-agent-run` script added.
+- `docs/demo-script.md` — Step 8 (C8 agent-run) added.
+- `docs/architecture.md` — C8 write flow + script entries added.
+- `docs/production-queue.md` — C8 task documented.
+
+Hard boundaries:
+
+- No UI redesign.
+- No real LLM/API calls.
+- No private key, seed phrase, or server signer.
+- No wallet payment UX.
+- No marketplace/trading/token features.
+- Existing upload, testnet, and demo-receipt paths unchanged.
+- DB file not committed.
+
+Acceptance:
+
+- `npm run generate-agent-run` creates `c8-pack-agent-sentinel-v1`, `c8-blob-input-v1`, `c8-blob-output-v1`, and `c8-rr-agent-sentinel-v1` in SQLite.
+- `/read-receipt/c8-rr-agent-sentinel-v1` resolves after running the script (SQLite path in `ReadReceiptClient`).
+- Dashboard shows the C8 pack after page refresh.
+- Existing upload flow still works with zero env vars.
+- Existing demo receipts (`rr-001` etc.) still work.
+- SQLite failures are non-fatal.
+- Script is idempotent (`INSERT OR REPLACE`) — safe to run multiple times.
+- `npm run lint` passes.
+- `npm run build` passes.
+
+Deliverables:
+
+- `scripts/generate-agent-run.mjs`
+- `fixtures/c8-agent-input.json`
+- `package.json` — `generate-agent-run` script
+- `docs/demo-script.md`, `docs/architecture.md`, `docs/production-queue.md` — updated

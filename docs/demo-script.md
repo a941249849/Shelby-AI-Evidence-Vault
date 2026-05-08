@@ -1,8 +1,14 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **M4/M5 evidence vault** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **M4/M5/C8 evidence vault** to stakeholders or the community.
 
-> **Current scope:** Local mock upload works with zero configuration — the default. A browser-wallet Shelby testnet upload path exists for operators with funded wallets. Built-in demo data uses illustrative `shelby://demo/blob/` references. Local uploads get `shelby://mock/blob/{id}` references. Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require operator prerequisites.
+> **Current scope:**
+> - Local mock upload works with zero configuration (the default).
+> - Browser-wallet Shelby testnet upload path exists for operators with funded wallets.
+> - Built-in demo data uses illustrative `shelby://demo/blob/` references.
+> - Local uploads get `shelby://mock/blob/{id}` references.
+> - Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require operator prerequisites.
+> - The C8 agent-run script (`npm run generate-agent-run`) produces a deterministic evidence pack, blobs, and read receipt with zero credentials.
 
 ## Prerequisites
 
@@ -135,13 +141,58 @@ Navigate back to `/dashboard`.
 
 ---
 
-## Step 8 — Code walkthrough (optional, for technical audience)
+## Step 8 — C8 agent-run example (scripted end-to-end)
+
+This step shows the full product story — `source evidence → agent run → EvidencePack → BlobRecord → ReadReceipt` — with zero credentials using the deterministic C8 script.
+
+**In a separate terminal (dev server must already be running):**
+
+```bash
+npm run generate-agent-run
+```
+
+The script:
+1. Reads `fixtures/c8-agent-input.json` (synthetic AI benchmark data — no network call).
+2. Computes SHA-256 of the input and generates a deterministic analysis output.
+3. Produces and persists to SQLite:
+   - One EvidencePack: `c8-pack-agent-sentinel-v1`
+   - Two BlobRecords: `c8-blob-input-v1` (input fixture), `c8-blob-output-v1` (agent output)
+   - One ReadReceipt: `c8-rr-agent-sentinel-v1`
+4. Prints generated IDs and the exact URL to inspect.
+
+**Navigate to the read receipt:**
+
+```
+http://localhost:3000/read-receipt/c8-rr-agent-sentinel-v1
+```
+
+**Point out:**
+- **Receipt mode** badge: "Local demo upload"
+- **Query** block: the agent's task description
+- **Answer summary**: deterministic benchmark analysis — top models per task, average accuracy scores
+- **Referenced blobs**: two blob cards showing Shelby refs, SHA-256 hashes, and sources
+  - `c8-blob-input-v1`: source `fixture://fixtures/c8-agent-input.json`
+  - `c8-blob-output-v1`: source `agent://shelby-vault/c8/sentinel-v1/output.json`
+- **Run ID**: `run-c8-agent-sentinel-v1`
+- **Agent version**: `shelby-vault/c8-sentinel/1.0 (deterministic, no-llm)`
+
+**Refresh the page** — the receipt resolves from SQLite (not localStorage), so it survives browser refresh and localStorage resets.
+
+**Navigate to `/dashboard`** — the C8 pack appears in the "Locally uploaded" section.
+
+The script is idempotent — running it again produces the same IDs via `INSERT OR REPLACE`.
+
+---
+
+## Step 9 — Code walkthrough (optional, for technical audience)
 
 Open the repo in your editor.
 
-1. **`src/lib/demo-data/`** — TypeScript types and static demo arrays (illustrative `shelby://demo/blob/` refs)
-2. **`src/lib/evidence/service.ts`** — service functions (clean, no framework)
-3. **`src/lib/shelby/`** — the adapter and browser-wallet layer:
+1. **`fixtures/c8-agent-input.json`** — public synthetic benchmark fixture (input for the C8 agent)
+2. **`scripts/generate-agent-run.mjs`** — C8 deterministic agent-run script (zero credentials)
+3. **`src/lib/demo-data/`** — TypeScript types and static demo arrays (illustrative `shelby://demo/blob/` refs)
+4. **`src/lib/evidence/service.ts`** — service functions (clean, no framework)
+5. **`src/lib/shelby/`** — the adapter and browser-wallet layer:
    - `adapter.ts` — interface and types
    - `mock-adapter.ts` — deterministic local mock (produces `shelby://mock/blob/` refs)
    - `testnet-adapter.ts` — legacy server-side testnet placeholder

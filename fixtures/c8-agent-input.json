@@ -1,0 +1,71 @@
+{
+  "dataset": "ai-model-benchmark-sample",
+  "version": "1.0",
+  "source": "public/synthetic",
+  "description": "Synthetic AI model benchmark data for C8 agent-run example. Public domain — safe for demo use.",
+  "records": [
+    {
+      "model": "gpt-4o",
+      "task": "reasoning",
+      "accuracy": 0.921,
+      "latency_ms": 1340,
+      "benchmark": "mmlu-pro"
+    },
+    {
+      "model": "claude-3-5-sonnet",
+      "task": "reasoning",
+      "accuracy": 0.908,
+      "latency_ms": 1120,
+      "benchmark": "mmlu-pro"
+    },
+    {
+      "model": "llama-3-70b",
+      "task": "reasoning",
+      "accuracy": 0.864,
+      "latency_ms": 890,
+      "benchmark": "mmlu-pro"
+    },
+    {
+      "model": "gpt-4o",
+      "task": "code-generation",
+      "accuracy": 0.884,
+      "latency_ms": 1580,
+      "benchmark": "humaneval"
+    },
+    {
+      "model": "claude-3-5-sonnet",
+      "task": "code-generation",
+      "accuracy": 0.897,
+      "latency_ms": 1260,
+      "benchmark": "humaneval"
+    },
+    {
+      "model": "llama-3-70b",
+      "task": "code-generation",
+      "accuracy": 0.821,
+      "latency_ms": 950,
+      "benchmark": "humaneval"
+    },
+    {
+      "model": "gpt-4o",
+      "task": "summarisation",
+      "accuracy": 0.872,
+      "latency_ms": 1210,
+      "benchmark": "summeval"
+    },
+    {
+      "model": "claude-3-5-sonnet",
+      "task": "summarisation",
+      "accuracy": 0.891,
+      "latency_ms": 1050,
+      "benchmark": "summeval"
+    },
+    {
+      "model": "llama-3-70b",
+      "task": "summarisation",
+      "accuracy": 0.843,
+      "latency_ms": 840,
+      "benchmark": "summeval"
+    }
+  ]
+}

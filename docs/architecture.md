@@ -118,6 +118,13 @@ src/
 data/
 └── shelby-vault.sqlite         SQLite database (gitignored, created at runtime)
                                 Override path: SHELBY_DB_PATH env var
+
+fixtures/
+└── c8-agent-input.json         Public synthetic AI benchmark data (C8 agent-run input fixture)
+
+scripts/
+├── shelby-smoke.mjs            C3: opt-in Shelby testnet smoke harness
+└── generate-agent-run.mjs      C8: deterministic agent-run example script
 ```
 
 ---
@@ -309,6 +316,22 @@ Upload form (testnet mode)
   → storageStatus: 'registered' (promote to 'ready' after RPC retrieval check)
 ```
 
+### Write flow (C8 agent-run script)
+```
+npm run generate-agent-run
+  → reads fixtures/c8-agent-input.json (static public fixture)
+  → SHA-256 hash computed in Node.js (crypto.createHash)
+  → deterministic analysis output generated (no LLM — pure computation)
+  → SHA-256 hash computed for output artifact
+  → EvidencePack built    (category: agent-run, id: c8-pack-agent-sentinel-v1)
+  → BlobRecord (input)    (id: c8-blob-input-v1,  shelbyRef: shelby://mock/blob/{hash-prefix})
+  → BlobRecord (output)   (id: c8-blob-output-v1, shelbyRef: shelby://mock/blob/{hash-prefix})
+  → ReadReceipt built     (id: c8-rr-agent-sentinel-v1, receiptMode: 'local')
+  → All three persisted to SQLite via INSERT OR REPLACE (idempotent)
+  → /read-receipt/c8-rr-agent-sentinel-v1 resolves via SQLite path in ReadReceiptClient
+  → /dashboard shows c8-pack-agent-sentinel-v1 in the locally-uploaded section
+```
+
 ---
 
 ## Design decisions
@@ -320,3 +343,4 @@ Upload form (testnet mode)
 - **localStorage for demo persistence.** No server database is needed. Uploads, receipts, and blob records survive page refresh but are browser-specific.
 - **Tailwind v4.** Uses CSS-first configuration (`@import "tailwindcss"` in globals.css). No `tailwind.config.js` needed.
 - **Conservative status mapping.** `status-map.ts` defines `registered → ready → failed → unknown`. The React SDK hook returns `void` on success, so `storageStatus` is `registered` until a retrieval check confirms `ready`.
+- **C8 deterministic script.** `scripts/generate-agent-run.mjs` is the canonical agent-run example — runs with zero credentials, uses `better-sqlite3` directly (same schema as `lib/server/db.ts`), and is idempotent via `INSERT OR REPLACE`. Stable IDs (`c8-*`) ensure the generated receipt URL is predictable.
