@@ -2,7 +2,13 @@
 
 A step-by-step walkthrough for demonstrating the **M4/M5/C8 evidence vault** to stakeholders or the community.
 
-> **Current scope:** Local mock upload works with zero configuration — the default. A browser-wallet Shelby testnet upload path exists for operators with funded wallets. Built-in demo data uses illustrative `shelby://demo/blob/` references. Local uploads get `shelby://mock/blob/{id}` references. Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require operator prerequisites. The C8 agent-run script produces a deterministic evidence pack, blobs, and read receipt with zero credentials.
+> **Current scope:**
+> - Local mock upload works with zero configuration (the default).
+> - Browser-wallet Shelby testnet upload path exists for operators with funded wallets.
+> - Built-in demo data uses illustrative `shelby://demo/blob/` references.
+> - Local uploads get `shelby://mock/blob/{id}` references.
+> - Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require operator prerequisites.
+> - The C8 agent-run script (`npm run generate-agent-run`) produces a deterministic evidence pack, blobs, and read receipt with zero credentials.
 
 ## Prerequisites
 

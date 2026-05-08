@@ -107,7 +107,11 @@ for (const r of inputData.records) {
 /** @type {Array<{ task: string; topModel: string; topAccuracy: number; topLatencyMs: number; benchmark: string }>} */
 const topPerformers = [];
 for (const [task, records] of byTask) {
-  const top = records.reduce((a, b) => (a.accuracy >= b.accuracy ? a : b));
+  // Primary sort: highest accuracy. Tie-break: lowest latency (faster is better).
+  const top = records.reduce((a, b) => {
+    if (a.accuracy !== b.accuracy) return a.accuracy > b.accuracy ? a : b;
+    return a.latency_ms <= b.latency_ms ? a : b;
+  });
   topPerformers.push({
     task,
     topModel: top.model,
