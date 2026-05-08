@@ -86,7 +86,7 @@ src/
 │   ├── status-badge.tsx        Evidence pack status badge
 │   ├── evidence-pack-card.tsx  Card for an evidence pack
 │   ├── page-header.tsx         Page title + subtitle
-│   ├── dashboard-client.tsx    Client: merges demo + browser cache + SQLite packs
+│   ├── dashboard-client.tsx    Client: merges demo + browser cache + SQLite packs; C10 search/filter/sort
 │   ├── blob-detail-client.tsx  Client: resolves demo / localStorage / SQLite blobs
 │   └── read-receipt-client.tsx Client: resolves receipts from demo / localStorage / SQLite
 └── lib/
@@ -346,6 +346,26 @@ npm run verify-community-demo
   → exits 0 on success, 1 on any assertion failure
 ```
 
+### Dashboard read flow (C10 search/filter/sort)
+```
+/dashboard (DashboardClient — client component)
+  → useEffect: loads localPacks (localStorage) + persistedPacks (SQLite via getPersistedPacksAction)
+  → merges: allUserPacks = [localPacks..., dedupedPersistedPacks...]
+  → merges: allPacks = [allUserPacks..., demoPacks...]
+  → search state: searchQuery, filterCategory, filterSourceType, filterStatus, filterDataSource, sortBy
+  → applyFilters(packs): text search across title/description/category/sourceType/status/tags/dataSource
+                          then category/sourceType/status/dataSource dropdown filters
+                          then sortPacks() by selected sort key
+  → filteredUserPacks = applyFilters(allUserPacks)
+  → filteredDemoPacks = applyFilters(demoPacks)
+  → "Local workspace" section: visible when filteredUserPacks.length > 0 OR (no filter active AND allUserPacks.length > 0)
+  → "Demo evidence" section: visible when filteredDemoPacks.length > 0 OR no filter active
+  → empty state: shown when filter is active AND totalFiltered === 0
+  → "Clear filters" button: resets all state to defaults; also shown in empty state as "Reset filters"
+  → Metric bar "Packs indexed": shows "N / total" when filtered
+  → Section count label: shows "N / total shown" when filtered
+```
+
 ---
 
 ## Design decisions
@@ -358,3 +378,4 @@ npm run verify-community-demo
 - **Tailwind v4.** Uses CSS-first configuration (`@import "tailwindcss"` in globals.css). No `tailwind.config.js` needed.
 - **Conservative status mapping.** `status-map.ts` defines `registered → ready → failed → unknown`. The React SDK hook returns `void` on success, so `storageStatus` is `registered` until a retrieval check confirms `ready`.
 - **C8 deterministic script.** `scripts/generate-agent-run.mjs` is the canonical agent-run example — runs with zero credentials, uses `better-sqlite3` directly (same schema as `lib/server/db.ts`), and is idempotent via `INSERT OR REPLACE`. Stable IDs (`c8-*`) ensure the generated receipt URL is predictable.
+- **C10 client-side search/filter/sort.** All search, filter, and sort logic in `DashboardClient` is pure client-side state with no server round-trips. `useMemo` wraps the filter/sort computation so it only recomputes when inputs change. Sorting uses `localeCompare` for deterministic, locale-aware ordering. The existing Local workspace / Built-in corpus section split is preserved; sections become invisible only when their filtered result set is empty.

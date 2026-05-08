@@ -141,6 +141,46 @@ Navigate back to `/dashboard`.
 
 ---
 
+## Step 7.5 — Dashboard search, filter, and sort (C10 operator flow)
+
+The dashboard toolbar lets reviewers quickly narrow the full evidence index without leaving the page.
+
+**Search:**
+- Type into the **Search title, tags, category…** input box above the sections.
+- The search covers pack title, description, category, source type, status, tags, and data source label.
+- Example queries to try:
+  - `C8` — finds the C8 agent-run pack
+  - `benchmark` — finds the C8 pack and the Synthetic QA Benchmark demo pack
+  - `agent-run` — finds all agent-run category packs
+  - `archived` — finds the archived policy document
+  - `local` — narrows to user-created/local records only
+
+**Filters (dropdown controls next to the search box):**
+- **All categories** — filter to `dataset`, `agent-run`, `document`, or `manifest`
+- **All source types** — filter to `web-scrape`, `api-export`, `agent-output`, or `manual-upload`
+- **All statuses** — filter to `active`, `archived`, or `pending`
+- **All sources** — filter to `Local / uploaded` (your records) or `Demo corpus` (built-in)
+
+**Sort:**
+- **Newest first** (default) — most recently created packs appear first
+- **Oldest first** — chronological order
+- **Title A–Z** — alphabetical sort
+- **Most blobs** — packs with the most blobs at the top
+
+**Counts:**
+- The **"Packs indexed"** metric shows `N / total` when a filter is active (e.g. `3 / 6`).
+- Section headers show `N / total shown` for the filtered subset.
+
+**Clear/reset:**
+- When any filter or search is active, a **"Clear filters"** button (violet, top-right of the toolbar) resets all controls back to defaults.
+
+**Empty state:**
+- If no packs match the current filters, a **"No packs match your filters"** message appears with a **"Reset filters"** button.
+
+**Important:** Filters and sort are client-side — they do not modify any stored data. The **"Reset browser cache"** button in the Local workspace section still only clears browser-cached local records; SQLite-persisted packs remain.
+
+---
+
 ## Step 8 — C8 agent-run example (scripted end-to-end)
 
 This step shows the full product story — `source evidence → agent run → EvidencePack → BlobRecord → ReadReceipt` — with zero credentials using the deterministic C8 script.

@@ -32,7 +32,10 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - C3 smoke harness is merged: `scripts/shelby-smoke.mjs`, `src/lib/shelby/status-map.ts`, `docs/c3-smoke-test-guide.md`.
 - M4 read receipt binding is merged: `ReadReceiptClient`, localStorage receipt persistence, BlobRecord identity surface.
 - M5 public ecosystem package is merged in PR #14: README rewrite, demo script update, architecture update, ecosystem submission pack.
-- C7 SQLite backend persistence is the current stage: `lib/server/db.ts`, `lib/server/evidence-store.ts`, `app/actions/persist.ts`.
+- C7 SQLite backend persistence is merged: `lib/server/db.ts`, `lib/server/evidence-store.ts`, `app/actions/persist.ts`.
+- C8 agent-run example is merged: `scripts/generate-agent-run.mjs`, `fixtures/c8-agent-input.json`.
+- C9 community experiment verification is merged: `scripts/verify-community-demo.mjs`, `docs/community-experiment-runbook.md`.
+- C10 evidence index search/filter/sort is the current stage: `src/components/dashboard-client.tsx`.
 - UI redesign remains paused — Task X2 is deferred until backend state is stable.
 
 ## Stage Gate
@@ -450,14 +453,12 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-C9 community experiment release hardening and verification is the current stage (this PR).
+C10 evidence index search/filter and operator workflow hardening is the current stage (this PR).
 
-After C9 merges, the next task options include:
+After C10 merges, the next task options include:
 
-- **X2 (Codex):** UI redesign pass — now that backend/protocol boundaries are stable through C9.
-- **C6:** Search and filter on the dashboard (operator-requested feature).
-
-Do not dispatch small patch tasks to Copilot. Next Copilot task should be a large bounded implementation with clear acceptance criteria.
+- **X2 (Codex):** UI redesign pass — now that backend/protocol boundaries are stable through C10.
+- Further operator tooling or community-facing improvements as prioritized.
 
 ### Task C8: Agent run evidence-pack integration example
 
@@ -567,3 +568,54 @@ Deliverables:
 - `docs/community-experiment-runbook.md`
 - `package.json` — `verify-community-demo` script
 - `docs/production-queue.md`, `docs/demo-script.md`, `docs/architecture.md` — updated
+
+### Task C10: Evidence index search/filter and operator workflow hardening
+
+Owner: Copilot
+
+Size: Large
+
+Status: **Complete** — implemented in this PR.
+
+When to start:
+
+After C9 merges.
+
+Goal:
+
+Make the evidence index usable for community testers and operators once the vault contains demo records, C8 agent-run records, and user-uploaded records. Add search, filters, sort, and empty states to the dashboard without changing the visual direction.
+
+Scope:
+
+- `src/components/dashboard-client.tsx` — search input covering title, description, category, sourceType, status, tags, and dataSource; dropdown filters for category, source type, status, and data source (demo/local); sort controls (newest first, oldest first, title A–Z, most blobs); clear/reset filters button; filtered result counts on metric bar and section headers; empty state with reset control.
+- `docs/demo-script.md` — new Step 7.5 covering the dashboard operator search/filter/sort workflow.
+- `docs/community-experiment-runbook.md` — new section on search/filter/sort for community testers.
+- `docs/architecture.md` — C10 entry added.
+- `docs/production-queue.md` — C10 task documented; Current State updated.
+
+Hard boundaries:
+
+- No UI redesign or visual polish pass. Existing design language and component patterns used throughout.
+- No GPT/image generation work.
+- No real LLM/API calls.
+- No private key, seed phrase, server signer, wallet payment UX, or marketplace/trading/token features.
+- No real Shelby upload enabled by default.
+- Existing mock/local path preserved.
+- No committed runtime DB files.
+- Testnet behavior fail-closed when config is incomplete.
+
+Acceptance:
+
+- Search, filters, clear/reset, and sort work on the dashboard across demo + browser-cache + SQLite packs.
+- `npm run generate-agent-run` followed by dev server shows the C8 pack; it is findable by searching for `C8`, `benchmark`, or `agent-run`.
+- Default dashboard with no filters still shows the existing corpus and local workspace records.
+- Filtered empty state is clear and recoverable via "Reset filters".
+- Browser-cache reset does not delete SQLite-persisted C8 records.
+- `npm run verify-community-demo` passes.
+- `npm run build` passes.
+- Docs reflect the actual UI labels and behavior.
+
+Deliverables:
+
+- `src/components/dashboard-client.tsx` — search, filter, sort, empty state
+- `docs/demo-script.md`, `docs/community-experiment-runbook.md`, `docs/architecture.md`, `docs/production-queue.md` — updated

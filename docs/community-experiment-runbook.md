@@ -1,6 +1,6 @@
 # Community Experiment Runbook — Shelby AI Evidence Vault
 
-**Stage: C9 — Release hardening and verification**
+**Stage: C10 — Evidence index search/filter and operator workflow hardening**
 
 This runbook is written for community testers and reviewers who want to clone the repo, run the zero-credential path, inspect persisted records, and understand what is mock/local/demo vs Shelby testnet.
 
@@ -16,10 +16,11 @@ There are no hidden setup steps. Everything documented here is the complete pict
 4. [Verification commands](#4-verification-commands)
 5. [Expected IDs and data shapes](#5-expected-ids-and-data-shapes)
 6. [Inspecting the SQLite database](#6-inspecting-the-sqlite-database)
-7. [Resetting local runtime data](#7-resetting-local-runtime-data)
-8. [Optional: Shelby testnet path](#8-optional-shelby-testnet-path)
-9. [Known boundaries](#9-known-boundaries)
-10. [Architecture quick-reference](#10-architecture-quick-reference)
+7. [Using the dashboard search, filter, and sort](#7-using-the-dashboard-search-filter-and-sort)
+8. [Resetting local runtime data](#8-resetting-local-runtime-data)
+9. [Optional: Shelby testnet path](#9-optional-shelby-testnet-path)
+10. [Known boundaries](#10-known-boundaries)
+11. [Architecture quick-reference](#11-architecture-quick-reference)
 
 ---
 
@@ -286,7 +287,86 @@ Each `payload` column contains the full typed object as JSON. This means future 
 
 ---
 
-## 7. Resetting local runtime data
+## 7. Using the dashboard search, filter, and sort
+
+Navigate to `http://localhost:3000/dashboard` (dev server must be running).
+
+The toolbar above the evidence sections lets you narrow the full index without modifying any stored data. All filtering and sorting is client-side.
+
+### Search
+
+Type any text into the **"Search title, tags, category…"** input. The search covers:
+
+- Pack title
+- Pack description
+- Category (e.g. `dataset`, `agent-run`)
+- Source type (e.g. `agent-output`, `web-scrape`)
+- Status (e.g. `active`, `archived`)
+- Tags
+- Data source label (`local` or `demo`)
+
+**Useful queries to try:**
+
+| Query | What it finds |
+|-------|---------------|
+| `C8` | The C8 agent-run pack |
+| `benchmark` | C8 pack + Synthetic QA Benchmark demo pack |
+| `agent-run` | All agent-run category packs |
+| `archived` | Archived policy document |
+| `local` | All user-created/local packs |
+
+### Filters
+
+Four dropdown controls are available next to the search box:
+
+| Control | Options |
+|---------|---------|
+| Category | All categories / dataset / agent-run / document / manifest |
+| Source type | All source types / web-scrape / api-export / agent-output / manual-upload |
+| Status | All statuses / active / archived / pending |
+| Data source | All sources / "Local / uploaded" / "Demo corpus" |
+
+### Sort
+
+The sort dropdown to the right of the filter controls supports:
+
+| Value | Behaviour |
+|-------|-----------|
+| **Newest first** (default) | Most recently created packs first |
+| **Oldest first** | Chronological order |
+| **Title A–Z** | Alphabetical by title |
+| **Most blobs** | Packs with the highest blob count first |
+
+Sorting is deterministic and stable — identical inputs always produce the same order.
+
+### Counts
+
+- The **"Packs indexed"** metric shows `filtered / total` when a filter is active (e.g. `3 / 6`).
+- Each section header shows `N / total shown` for its filtered subset.
+
+### Clear/reset filters
+
+When any filter, search, or sort (other than default "Newest first") is active:
+
+- A **"Clear filters"** button (violet) appears at the right end of the toolbar.
+- Clicking it resets all search, filter, and sort controls to their defaults.
+
+### Empty state
+
+If no packs match the current filters:
+
+- A **"No packs match your filters"** message appears in place of the pack grids.
+- A **"Reset filters"** button lets you return to the full index in one click.
+
+### Section visibility
+
+- The **Local workspace** section only appears when there are user-created packs in the filtered result.
+- The **Demo evidence** section is always shown when unfiltered; it is hidden only if filters exclude all demo packs.
+- When both sections have results, they are shown with their existing section headers so you can always tell which source each card belongs to.
+
+---
+
+## 8. Resetting local runtime data
 
 ### SQLite database
 
@@ -306,7 +386,7 @@ The button asks for confirmation (click once → "Click again to reset browser c
 
 ---
 
-## 8. Optional: Shelby testnet path
+## 9. Optional: Shelby testnet path
 
 > **Honest prerequisites:** This path requires infrastructure that is not available from a clean checkout. It is documented here for completeness. Community testers should not need it.
 
@@ -339,7 +419,7 @@ For Shelby testnet retrieval verification after a real upload, see `docs/c3-smok
 
 ---
 
-## 9. Known boundaries
+## 10. Known boundaries
 
 | Item | Status |
 |------|--------|
@@ -350,13 +430,14 @@ For Shelby testnet retrieval verification after a real upload, see `docs/c3-smok
 | No private keys | No key, seed phrase, or signing material anywhere |
 | No real uploads by default | Mock mode is the default; testnet upload requires explicit opt-in |
 | Browser localStorage | Used as a fallback for demo persistence; browser-specific |
+| Dashboard filters | Client-side only — do not modify stored data |
 | UI redesign | Paused (Task X2 — deferred) |
 | Marketplace / trading | Out of scope |
 | Tokenomics | Out of scope |
 
 ---
 
-## 10. Architecture quick-reference
+## 11. Architecture quick-reference
 
 ```
 fixtures/c8-agent-input.json    ← synthetic public benchmark data (input)
@@ -370,6 +451,8 @@ src/app/actions/persist.ts      ← Server Actions: persistUploadAction, getPers
 src/lib/shelby/adapter.ts       ← ShelbyAdapter interface
 src/lib/shelby/mock-adapter.ts  ← Mock adapter: shelby://mock/blob/{id}
 src/lib/shelby/config.ts        ← reads SHELBY_MODE env var (server-only)
+
+src/components/dashboard-client.tsx ← C10: search, filter, sort, empty state
 
 data/shelby-vault.sqlite        ← runtime DB (gitignored; created on first run)
 ```
