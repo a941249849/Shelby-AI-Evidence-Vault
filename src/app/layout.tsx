@@ -20,7 +20,7 @@ export default function RootLayout({
       lang="en"
       className="h-full antialiased"
     >
-      <body className="min-h-full flex flex-col bg-[#f4efe2] text-[#2d211c]">
+      <body className="min-h-full flex flex-col bg-[#fcfaf8] text-[#322312]">
         <LanguageProvider>
           <Nav />
           <main className="flex-1">{children}</main>

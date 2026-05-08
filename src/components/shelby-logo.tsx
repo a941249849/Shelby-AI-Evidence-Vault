@@ -1,52 +1,37 @@
 interface ShelbyLogoProps {
   className?: string;
+  title?: string;
 }
 
-export default function ShelbyLogo({ className = 'h-10 w-10' }: ShelbyLogoProps) {
+export default function ShelbyLogo({ className = 'h-10 w-10', title = 'Shelby' }: ShelbyLogoProps) {
   return (
     <svg
       className={className}
-      viewBox="0 0 96 96"
+      viewBox="740 405 205 195"
       role="img"
-      aria-label="Shelby"
+      aria-label={title}
       xmlns="http://www.w3.org/2000/svg"
     >
+      <title>{title}</title>
       <path
-        d="M30 6h36l23 23v38L66 90H30L7 67V29L30 6Z"
-        fill="#2d211c"
-        opacity="0.12"
+        transform="matrix(1,0,0,-1,745,570.37747)"
+        d="M47.994028 100.045169C50.368989 104.157367 53.150774 107.87374 56.26241 111.19429L41.660795 136.48325C40.11047 139.16606 36.251157 139.16606 34.700838 136.48325L3.232587 81.969058C-1.077529 74.51431-1.077529 65.322338 3.232587 57.86759L34.700838 3.353424C36.251157 .670593 40.11047 .670593 41.660795 3.353424L56.26241 28.642365C38.516168 47.499124 34.381978 76.460468 47.994028 100.034168V100.045169Z"
+        fill="currentColor"
       />
       <path
-        d="M30 4h36l22 22v39L66 88H30L8 65V26L30 4Z"
-        fill="#fff8ea"
-        stroke="#2d211c"
-        strokeOpacity="0.16"
-        strokeWidth="2"
+        transform="matrix(1,0,0,-1,822.2661,479.60108)"
+        d="M66.96817 72.60132H4.020685C.931035 72.60132-1.004124 69.25878 .546199 66.57595L15.158813 41.265016C29.56252 44.651536 45.24167 42.771356 59.062627 34.788846 72.88359 26.806332 82.35046 14.172855 86.61659 .000046H115.84183C118.93147 .000046 120.866619 3.342583 119.31629 6.025414L87.84805 60.53959C83.53793 68.005329 75.57741 72.60132 66.96817 72.60132Z"
+        fill="currentColor"
       />
       <path
-        d="M33 14h30l16 16v31L63 78H33L17 61V30L33 14Z"
-        fill="#dff2c8"
-      />
-      <path d="M33 14h30l16 16-46 48H17V30l16-16Z" fill="#efe2ff" opacity="0.82" />
-      <path d="M79 30v31L63 78H33l46-48Z" fill="#ffe0cf" opacity="0.9" />
-      <circle cx="48" cy="46" r="27" fill="#fff8ea" stroke="#157a4c" strokeWidth="4" />
-      <path d="M30 63h28l8-13H38l8-13h25" fill="none" stroke="#2d211c" strokeWidth="9" strokeLinecap="square" strokeLinejoin="miter" />
-      <path d="M34 63h22l5-8H39l8-13h20" fill="none" stroke="#fff8ea" strokeWidth="4" strokeLinecap="square" strokeLinejoin="miter" />
-      <path d="M37 65h17" stroke="#157a4c" strokeWidth="5" strokeLinecap="round" />
-      <path d="M47 38h18" stroke="#ef6f4d" strokeWidth="5" strokeLinecap="round" />
-      <path
-        d="M71 24l5 5-5 5-5-5 5-5Z"
-        fill="#f0c846"
-        stroke="#2d211c"
-        strokeOpacity="0.18"
+        transform="matrix(1,0,0,-1,822.2661,593.9182)"
+        d="M15.147826 31.31437 .546199 6.025421C-1.004124 3.34259 .931035 .000061 4.020685 .000061H66.96818C75.577419 .000061 83.53795 4.596054 87.837078 12.0508L119.30532 66.56497C120.855648 69.247798 118.92048 72.59033 115.83083 72.59033H86.627597C85.308177 68.23624 83.48296 63.970106 81.108 59.857904 67.49595 36.27321 40.348817 25.387959 15.147826 31.31437Z"
+        fill="currentColor"
       />
       <path
-        d="M21 30 33 18h30"
-        fill="none"
-        stroke="#fff8ea"
-        strokeOpacity="0.75"
-        strokeWidth="3"
-        strokeLinecap="round"
+        transform="matrix(1,0,0,-1,805.2754,559.1406)"
+        d="M30.137833 117.32959C18.801787 114.668758 8.246396 108.731349 0 99.94618L16.866633 70.720958C21.17675 63.266214 21.17675 54.074239 16.866633 46.61949L0 17.394265C3.93628 13.205093 8.543267 9.510712 13.787975 6.48703 19.021689 3.463356 24.530282 1.319298 30.126835-.000122L46.99346 29.22509C51.303579 36.679834 59.253107 41.275827 67.86234 41.275827H101.60659C105.09207 52.80979 104.949138 64.904499 101.595607 76.06462H67.873348C59.264104 76.06462 51.30358 80.660617 47.00446 88.11536L30.137833 117.318599V117.32959Z"
+        fill="currentColor"
       />
     </svg>
   );

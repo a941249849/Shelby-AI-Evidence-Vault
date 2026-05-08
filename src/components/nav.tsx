@@ -1,49 +1,65 @@
 'use client';
 
 import Link from 'next/link';
-import { Database, FileUp, GitBranch, Languages, ReceiptText } from 'lucide-react';
+import { Circle, GitBranch, Languages } from 'lucide-react';
 import { useI18n } from '@/components/language-provider';
 import ShelbyLogo from '@/components/shelby-logo';
 
 const links = [
-  { href: '/dashboard', labelKey: 'nav.index', icon: Database },
-  { href: '/upload', labelKey: 'nav.upload', icon: FileUp },
-  { href: '/read-receipt/rr-001', labelKey: 'nav.receipt', icon: ReceiptText },
+  { href: '/', labelKey: 'nav.product' },
+  { href: '/#evidence-flow', labelKey: 'nav.solution' },
+  { href: '/#developers', labelKey: 'nav.developers' },
+  { href: 'https://docs.shelby.xyz/', labelKey: 'nav.docs', external: true },
+  { href: '/#ecosystem', labelKey: 'nav.ecosystem' },
 ];
 
 export default function Nav() {
   const { language, toggleLanguage, t } = useI18n();
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-[#2d211c]/10 bg-[#f4efe2]/86 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 z-50 border-b border-[#322312]/10 bg-[#fcfaf8]/88 backdrop-blur-xl">
+      <div className="mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group flex min-w-0 items-center gap-3">
-          <ShelbyLogo className="h-11 w-11 flex-none" />
+          <ShelbyLogo className="h-9 w-9 flex-none text-[#322312]" />
           <span className="hidden min-w-0 sm:block">
-            <span className="block text-sm font-semibold text-[#2d211c] transition group-hover:text-[#157a4c]">
-              Shelby AI Evidence Vault
+            <span className="brand-wordmark block text-xl leading-none text-[#322312] transition group-hover:text-[#ff77c9]">
+              Shelby <span className="text-[#ff77c9]">AI Evidence Vault</span>
             </span>
-            <span className="block font-mono text-[0.65rem] font-semibold uppercase text-[#6f6258]">
+            <span className="mt-1 block font-mono text-[0.65rem] font-medium uppercase text-[#454039]">
               {t('nav.subtitle')}
             </span>
           </span>
         </Link>
 
-        <div className="flex items-center gap-1">
-          {links.map(({ href, labelKey, icon: Icon }) => (
+        <div className="hidden items-center gap-9 lg:flex">
+          {links.map(({ href, labelKey, external }) => (
             <Link
               key={href}
               href={href}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-transparent px-3 text-sm font-semibold text-[#5f554d] transition hover:border-[#2d211c]/10 hover:bg-[#fff8ea] hover:text-[#2d211c]"
+              target={external ? '_blank' : undefined}
+              rel={external ? 'noopener noreferrer' : undefined}
+              className="text-sm font-semibold text-[#322312] transition hover:text-[#ff77c9]"
             >
-              <Icon size={15} />
-              <span className="hidden sm:inline">{t(labelKey)}</span>
+              {t(labelKey)}
             </Link>
           ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard"
+            className="hidden h-9 items-center rounded-full border border-[#322312]/12 bg-[#fcfaf8] px-4 text-sm font-semibold text-[#322312] transition hover:border-[#ff77c9]/50 hover:text-[#ff77c9] md:inline-flex"
+          >
+            {t('nav.launch')}
+          </Link>
+          <div className="hidden h-9 items-center gap-2 rounded-full border border-[#322312]/12 bg-[#fcfaf8] px-4 font-mono text-xs text-[#322312] xl:inline-flex">
+            <Circle size={9} className="fill-[#9fe878] text-[#9fe878]" />
+            {t('nav.ready')}
+          </div>
           <button
             type="button"
             onClick={toggleLanguage}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#2d211c]/10 bg-[#fff8ea]/72 px-3 text-sm font-semibold text-[#5f554d] transition hover:border-[#157a4c]/30 hover:text-[#157a4c]"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#322312]/10 bg-[#fcfaf8] px-3 text-sm font-semibold text-[#322312] transition hover:border-[#ff77c9]/50 hover:text-[#ff77c9]"
             aria-label={t('nav.language')}
           >
             <Languages size={15} />
@@ -53,7 +69,7 @@ export default function Nav() {
             href="https://github.com/a941249849/Shelby-AI-Evidence-Vault"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#2d211c]/12 bg-[#2d211c] px-3 text-sm font-semibold text-[#fff8ea] transition hover:bg-[#157a4c]"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#322312]/12 bg-[#322312] px-3 text-sm font-semibold text-[#fcfaf8] transition hover:bg-[#ff77c9] hover:text-[#322312]"
           >
             <GitBranch size={15} />
             <span className="hidden md:inline">GitHub</span>
