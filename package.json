@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "smoke": "node scripts/shelby-smoke.mjs"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^6.3.1",

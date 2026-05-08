@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# smoke harness runtime output (gitignored — never commit real test results)
+/tmp/
+/artifacts/shelby-smoke/

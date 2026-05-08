@@ -228,6 +228,8 @@ Owner: Copilot
 
 Size: Large
 
+Status: **Complete** — implemented in this PR.
+
 When to start:
 
 After C2 lands and real testnet credentials/account/funding are available.
@@ -256,6 +258,17 @@ Acceptance:
 - Smoke harness is opt-in and disabled unless env vars are explicitly set.
 - Mock/local app behavior remains unchanged.
 - Output clearly distinguishes local proof, RPC upload result, transaction hash, and explorer/RPC verification.
+
+Deliverables:
+
+- `scripts/shelby-smoke.mjs` — opt-in Node.js smoke harness
+- `src/lib/shelby/status-map.ts` — conservative evidence status mapping utilities
+- `docs/c3-smoke-test-guide.md` — exact manual steps, env vars, expected output
+- `.env.example` — smoke env vars added (`SHELBY_SMOKE`, `SHELBY_SMOKE_ACCOUNT_ADDRESS`, `SHELBY_SMOKE_BLOB_NAME`)
+- `.gitignore` — `tmp/` and `artifacts/shelby-smoke/` added
+- `package.json` — `smoke` script added
+
+PR note: A real Shelby testnet smoke upload was **not** run. The CI environment has no funded Aptos testnet wallet and no Shelby testnet API access. The manual browser upload path is documented in `docs/c3-smoke-test-guide.md`. All opt-in gates, fail-closed behavior, and machine-readable output were verified locally.
 
 ## Codex Task Queue
 
