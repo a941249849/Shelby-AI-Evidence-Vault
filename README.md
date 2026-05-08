@@ -66,10 +66,15 @@ No environment variables required. Mock mode is the default — uploads work imm
 ## Verification commands
 
 ```bash
-npm run lint   # ESLint check — must pass before any PR
-npm run build  # Next.js production build — must pass
-npm run smoke  # Opt-in Shelby testnet smoke harness (requires SHELBY_SMOKE=true)
+npm run lint                    # ESLint check — must pass before any PR
+npm run build                   # Next.js production build — must pass
+npm run shelby-doctor           # C11: mock-mode readiness check (zero credentials, always passes)
+npm run verify-community-demo   # C9: 35 DB-level assertions, zero credentials
+npm run verify-release-candidate # C12: full release-candidate gate (build + routes + doctor)
+npm run smoke                   # Opt-in Shelby testnet smoke harness (requires SHELBY_SMOKE=true)
 ```
+
+The `verify-release-candidate` command (C12) is the one-command release-candidate gate. It runs from a clean checkout with zero Shelby credentials. See `docs/release-candidate-checklist.md` for the full checklist.
 
 ---
 

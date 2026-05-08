@@ -36,7 +36,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - C8 agent-run example is merged: `scripts/generate-agent-run.mjs`, `fixtures/c8-agent-input.json`.
 - C9 community experiment verification is merged: `scripts/verify-community-demo.mjs`, `docs/community-experiment-runbook.md`.
 - C10 evidence index search/filter/sort is merged: `src/components/dashboard-client.tsx`.
-- C11 Shelby testnet readiness doctor is the current stage: `scripts/shelby-doctor.mjs`, `docs/shelby-testnet-operator-runbook.md`.
+- C11 Shelby testnet readiness doctor is merged: `scripts/shelby-doctor.mjs`, `docs/shelby-testnet-operator-runbook.md`.
+- C12 release-candidate acceptance harness is the current stage: `scripts/verify-release-candidate.mjs`, `docs/release-candidate-checklist.md`.
 - UI redesign remains paused — Task X2 is deferred until backend state is stable.
 
 ## Stage Gate
@@ -454,12 +455,69 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-C11 Shelby testnet readiness doctor and operator verification package is the current stage.
+C12 community release-candidate acceptance harness is the current stage.
 
-After C11 merges, the next task options include:
+After C12 merges, the next task options include:
 
-- **X2 (Codex):** UI redesign pass — now that backend/protocol and operator-readiness boundaries are stable through C11.
+- **X2 (Codex):** UI redesign pass — now that backend/protocol and operator-readiness boundaries are stable through C12.
 - Further community-facing or operator-readiness improvements as prioritized.
+
+### Task C12: Community release candidate acceptance harness and product QA gate
+
+Owner: Copilot
+
+Size: Large
+
+Status: **Complete** — implemented in this PR.
+
+When to start:
+
+After C11 merges.
+
+Goal:
+
+Turn the current community experiment into a release-candidate style package with one deterministic acceptance command that verifies the product loop end to end from a clean zero-credential checkout.
+
+Scope:
+
+- `scripts/verify-release-candidate.mjs` — zero-credential, zero-network RC acceptance harness. Runs shelby-doctor (mock PASS, testnet fail-closed, public-key guard), verify-community-demo, generate-agent-run (with isolated DB, C8 ID assertions), npm run build, starts next start on an available local port, smoke-fetches 6 routes (HTTP 200 + page marker), and shuts down cleanly.
+- `package.json` — `verify-release-candidate` script added.
+- `.gitignore` — `artifacts/release-candidate/` added.
+- `docs/release-candidate-checklist.md` — release-candidate checklist and expected output.
+- `README.md`, `docs/community-experiment-runbook.md`, `docs/demo-script.md`, `docs/architecture.md`, `docs/production-queue.md` — updated to reference C12.
+
+Hard boundaries:
+
+- No UI redesign, logo changes, visual polish, or GPT/image generation.
+- No real Shelby upload enabled by default.
+- No private key, seed phrase, mnemonic, or server signer.
+- No real LLM/API calls.
+- No external network calls in the RC verifier.
+- No marketplace, trading, token, or payment features.
+- No committed runtime DB files or generated artifacts.
+- Do not print secrets.
+- Do not weaken existing fail-closed behavior.
+
+Acceptance:
+
+- `npm run verify-release-candidate` passes from a clean checkout with zero Shelby credentials.
+- The verifier uses an isolated temp DB and does not require the operator's normal local DB.
+- Route smoke checks prove the dashboard/blob/read-receipt pages are reachable from the built app.
+- `SHELBY_MODE=testnet npm run shelby-doctor` still fails closed without required config.
+- Public `NEXT_PUBLIC_SHELBY_API_KEY` still fails closed.
+- `npm run verify-community-demo` still passes.
+- `npm run shelby-doctor` still passes in mock mode.
+- `npm run lint` passes.
+- `npm run build` passes.
+- Docs accurately describe C12 without implying mainnet/production readiness.
+
+Deliverables:
+
+- `scripts/verify-release-candidate.mjs`
+- `package.json` — `verify-release-candidate` script
+- `.gitignore` — artifact entry
+- `docs/release-candidate-checklist.md`
+- `README.md`, `docs/community-experiment-runbook.md`, `docs/demo-script.md`, `docs/architecture.md`, `docs/production-queue.md` — updated
 
 ### Task C8: Agent run evidence-pack integration example
 

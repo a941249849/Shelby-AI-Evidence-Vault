@@ -10,7 +10,8 @@
     "shelby-doctor": "node scripts/shelby-doctor.mjs",
     "smoke": "node scripts/shelby-smoke.mjs",
     "generate-agent-run": "node scripts/generate-agent-run.mjs",
-    "verify-community-demo": "node scripts/verify-community-demo.mjs"
+    "verify-community-demo": "node scripts/verify-community-demo.mjs",
+    "verify-release-candidate": "node scripts/verify-release-candidate.mjs"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^6.3.1",

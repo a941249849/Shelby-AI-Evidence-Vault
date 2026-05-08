@@ -123,10 +123,15 @@ fixtures/
 └── c8-agent-input.json         Public synthetic AI benchmark data (C8 agent-run input fixture)
 
 scripts/
-├── shelby-smoke.mjs            C3: opt-in Shelby testnet smoke harness
-├── generate-agent-run.mjs      C8: deterministic agent-run example script
-├── verify-community-demo.mjs   C9: zero-credential verification harness (35 assertions)
-└── shelby-doctor.mjs           C11: zero-secret readiness doctor (mock + testnet config validation)
+├── shelby-smoke.mjs                C3: opt-in Shelby testnet smoke harness
+├── generate-agent-run.mjs          C8: deterministic agent-run example script
+├── verify-community-demo.mjs       C9: zero-credential verification harness (35 assertions)
+├── shelby-doctor.mjs               C11: zero-secret readiness doctor (mock + testnet config validation)
+└── verify-release-candidate.mjs    C12: release-candidate acceptance harness (build + routes + doctor)
+
+artifacts/
+└── release-candidate/
+    └── latest.json                 Machine-readable RC verification result (gitignored, runtime artifact)
 ```
 
 ---
