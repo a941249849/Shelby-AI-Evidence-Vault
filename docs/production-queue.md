@@ -450,11 +450,11 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-C8 agent-run integration example is the current stage (this PR).
+C9 community experiment release hardening and verification is the current stage (this PR).
 
-After C8 merges, the next task options include:
+After C9 merges, the next task options include:
 
-- **X2 (Codex):** UI redesign pass — now that protocol boundaries are stable through C8.
+- **X2 (Codex):** UI redesign pass — now that backend/protocol boundaries are stable through C9.
 - **C6:** Search and filter on the dashboard (operator-requested feature).
 
 Do not dispatch small patch tasks to Copilot. Next Copilot task should be a large bounded implementation with clear acceptance criteria.
@@ -513,3 +513,57 @@ Deliverables:
 - `fixtures/c8-agent-input.json`
 - `package.json` — `generate-agent-run` script
 - `docs/demo-script.md`, `docs/architecture.md`, `docs/production-queue.md` — updated
+
+### Task C9: Community experiment release hardening and verification stage
+
+Owner: Copilot
+
+Size: Large
+
+Status: **Complete** — implemented in this PR.
+
+When to start:
+
+After C8 merges.
+
+Goal:
+
+Turn the current Shelby AI Evidence Vault demo into a cleaner community-experiment candidate by hardening the local product loop, verification commands, and release documentation around the now-complete chain:
+`source evidence → agent run output → EvidencePack → BlobRecord → ReadReceipt → dashboard/read pages`
+
+Scope:
+
+- `scripts/verify-community-demo.mjs` — zero-credential verification harness. Uses isolated temp SQLite DB, runs the C8 generation path twice, asserts all expected IDs and relationships, asserts idempotency (35 assertions). No network calls, no credentials.
+- `docs/community-experiment-runbook.md` — community experiment runbook covering setup, zero-credential demo path, verification commands, expected IDs, DB inspection, reset instructions, testnet boundaries.
+- `package.json` — `verify-community-demo` script added.
+- `docs/production-queue.md` — C8 marked complete; C9 added as active stage; Immediate Next Action updated.
+- `docs/demo-script.md` — C9 verification step reference added.
+- `docs/architecture.md` — C9 script entry added.
+
+Hard boundaries:
+
+- No UI redesign.
+- No real LLM/API calls.
+- No private key, seed phrase, or server signer.
+- No wallet payment UX.
+- No marketplace/trading/token features.
+- Existing upload, testnet, and demo-receipt paths unchanged.
+- DB file not committed.
+- No committed runtime DB.
+
+Acceptance:
+
+- `npm run verify-community-demo` passes from a clean checkout with zero Shelby credentials.
+- `npm run generate-agent-run` still works and remains idempotent.
+- `npm run lint` passes.
+- `npm run build` passes.
+- The new runbook gives a reviewer enough information to run and inspect the demo without asking for hidden context.
+- C8 receipt/blob/dashboard flow remains intact.
+- Docs consistently distinguish demo/local/mock vs Shelby testnet.
+
+Deliverables:
+
+- `scripts/verify-community-demo.mjs`
+- `docs/community-experiment-runbook.md`
+- `package.json` — `verify-community-demo` script
+- `docs/production-queue.md`, `docs/demo-script.md`, `docs/architecture.md` — updated
