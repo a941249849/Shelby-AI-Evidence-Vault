@@ -125,7 +125,8 @@ fixtures/
 scripts/
 ├── shelby-smoke.mjs            C3: opt-in Shelby testnet smoke harness
 ├── generate-agent-run.mjs      C8: deterministic agent-run example script
-└── verify-community-demo.mjs   C9: zero-credential verification harness (35 assertions)
+├── verify-community-demo.mjs   C9: zero-credential verification harness (35 assertions)
+└── shelby-doctor.mjs           C11: zero-secret readiness doctor (mock + testnet config validation)
 ```
 
 ---

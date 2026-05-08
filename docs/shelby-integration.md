@@ -30,11 +30,11 @@ Shelby AI Evidence Vault integrates with Shelby through an adapter pattern. All 
 | Blob detail demo/local resolution | ✅ Implemented |
 | Reset local demo data | ✅ Implemented |
 | Validation helpers | ✅ Implemented |
-| Real Shelby SDK upload | ❌ Blocked until M2 |
-| Wallet signing | ❌ Blocked until M2 |
-| On-chain commitment registration | ❌ Blocked until M2 |
-| Shelbynet network calls | ❌ Blocked until M2 |
-| APT / ShelbyUSD token funding | ❌ Blocked until M2 |
+| Real Shelby SDK upload | ✅ Implemented (M3 browser-wallet path — see `use-shelby-upload.ts`) |
+| Wallet signing | ✅ Implemented (M3 — AptosWalletAdapterProvider + useUploadBlobs) |
+| On-chain commitment registration | ✅ Implemented via SDK (M3) |
+| Shelby testnet network calls | ✅ Available via browser-wallet path (M3) |
+| APT / ShelbyUSD token funding | Requires operator setup — not provided by the app |
 
 ---
 
@@ -127,13 +127,19 @@ In mock mode:
 
 ---
 
-## Configuring Shelby testnet mode (blocked until M2)
+## Configuring Shelby testnet mode
 
-Setting `SHELBY_MODE=testnet` will cause uploads to fail with a clear blocked message. This is intentional — the real adapter is a documented placeholder until M2.
+> **Current status (M3+):** Real Shelby testnet upload is implemented via the browser-wallet path. See `src/lib/shelby/use-shelby-upload.ts` and `docs/shelby-testnet-operator-runbook.md` for the full operator setup.
 
-> **M1B:** The real testnet adapter (`src/lib/shelby/testnet-adapter.ts`) is blocked until M2. See the file for the full M2+ implementation guide, including the multi-step upload flow and signing/funding prerequisites.
+Setting `SHELBY_MODE=testnet` enables the browser-wallet upload path. Run the readiness doctor first:
 
-If you want to prepare the environment for future M2 testing:
+```bash
+SHELBY_MODE=testnet npm run shelby-doctor
+```
+
+This validates all required env vars and catches configuration mistakes before any upload attempt.
+
+If you want to prepare the environment for testnet mode:
 
 1. Copy `.env.example` to `.env.local` (never commit `.env.local`):
 
@@ -141,7 +147,7 @@ If you want to prepare the environment for future M2 testing:
    cp .env.example .env.local
    ```
 
-2. Edit `.env.local` (values for reference only — uploads will still fail until M2):
+2. Edit `.env.local` with real testnet values (see `docs/shelby-testnet-operator-runbook.md` § 3 for the complete list):
 
    ```env
    SHELBY_MODE=testnet
@@ -153,19 +159,25 @@ If you want to prepare the environment for future M2 testing:
    APTOS_NETWORK=testnet
    SHELBY_APTOS_FULLNODE_URL=https://api.testnet.aptoslabs.com/v1
    SHELBY_INDEXER_URL=https://api.testnet.aptoslabs.com/v1/graphql
+   NEXT_PUBLIC_SHELBY_NETWORK=testnet
+   NEXT_PUBLIC_SHELBY_RPC_URL=https://api.testnet.shelby.xyz/shelby
+   NEXT_PUBLIC_SHELBY_INDEXER_URL=https://api.testnet.aptoslabs.com/nocode/v1/public/alias/shelby/testnet/v1/graphql
+   NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS=24
    ```
 
 ---
 
 ## What happens when SHELBY_MODE=testnet
 
-The upload page shows a red/amber **"Real Shelby upload blocked until M2"** indicator. Any upload attempt returns:
+The upload page shows the browser-wallet upload path. The wallet-connect section appears, allowing users with a connected Aptos wallet and testnet funds to upload real blobs to the Shelby testnet.
 
-```
-Real Shelby upload is blocked until M2. Official integration requires commitment
-generation, on-chain registration, RPC upload, network selection, signer/wallet
-design, API key handling, and funding. Set SHELBY_MODE=mock to use the local demo adapter.
-```
+**Prerequisites for real upload:**
+- Aptos wallet extension (e.g. Petra) connected to Aptos testnet
+- Testnet APT for gas fees
+- Shelby storage credits (ShelbyUSD or SHEL tokens)
+- Complete `.env.local` as described in `docs/shelby-testnet-operator-runbook.md`
+
+Run `SHELBY_MODE=testnet npm run shelby-doctor` to verify all required env vars before starting the dev server.
 
 ---
 

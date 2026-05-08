@@ -35,7 +35,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - C7 SQLite backend persistence is merged: `lib/server/db.ts`, `lib/server/evidence-store.ts`, `app/actions/persist.ts`.
 - C8 agent-run example is merged: `scripts/generate-agent-run.mjs`, `fixtures/c8-agent-input.json`.
 - C9 community experiment verification is merged: `scripts/verify-community-demo.mjs`, `docs/community-experiment-runbook.md`.
-- C10 evidence index search/filter/sort is the current stage: `src/components/dashboard-client.tsx`.
+- C10 evidence index search/filter/sort is merged: `src/components/dashboard-client.tsx`.
+- C11 Shelby testnet readiness doctor is the current stage: `scripts/shelby-doctor.mjs`, `docs/shelby-testnet-operator-runbook.md`.
 - UI redesign remains paused — Task X2 is deferred until backend state is stable.
 
 ## Stage Gate
@@ -453,12 +454,12 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-C10 evidence index search/filter and operator workflow hardening is the current stage (this PR).
+C11 Shelby testnet readiness doctor and operator verification package is the current stage.
 
-After C10 merges, the next task options include:
+After C11 merges, the next task options include:
 
-- **X2 (Codex):** UI redesign pass — now that backend/protocol boundaries are stable through C10.
-- Further operator tooling or community-facing improvements as prioritized.
+- **X2 (Codex):** UI redesign pass — now that backend/protocol and operator-readiness boundaries are stable through C11.
+- Further community-facing or operator-readiness improvements as prioritized.
 
 ### Task C8: Agent run evidence-pack integration example
 
@@ -619,3 +620,60 @@ Deliverables:
 
 - `src/components/dashboard-client.tsx` — search, filter, sort, empty state
 - `docs/demo-script.md`, `docs/community-experiment-runbook.md`, `docs/architecture.md`, `docs/production-queue.md` — updated
+
+### Task C11: Shelby testnet readiness doctor and operator verification package
+
+Owner: Copilot
+
+Size: Large
+
+Status: **Complete** — implemented in this PR.
+
+When to start:
+
+After C10 merges.
+
+Goal:
+
+Add an operator-facing readiness layer for the real Shelby testnet path: validate environment configuration, catch unsafe/public secret mistakes, keep testnet/shelbynet endpoint families from being mixed, make smoke-test prerequisites explicit, and give operators a repeatable preflight before attempting a manual wallet upload.
+
+Scope:
+
+- `scripts/shelby-doctor.mjs` — zero-secret readiness doctor. Validates SHELBY_MODE, SHELBY_NETWORK, SHELBY_RPC_URL, SHELBY_API_KEY (presence only — value never printed), SHELBY_ACCOUNT_ADDRESS, SHELBY_BLOB_EXPIRATION_MICROS, APTOS_NETWORK, SHELBY_APTOS_FULLNODE_URL, SHELBY_INDEXER_URL, NEXT_PUBLIC_SHELBY_NETWORK, NEXT_PUBLIC_SHELBY_RPC_URL, NEXT_PUBLIC_SHELBY_INDEXER_URL, NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS. Fails on NEXT_PUBLIC_SHELBY_API_KEY or similar. Warns on endpoint family mismatch, network label disagreement, Aptos/Shelby RPC confusion. Optional `--json` output.
+- `package.json` — `shelby-doctor` script added.
+- `docs/shelby-testnet-operator-runbook.md` — operator runbook: prerequisites, env setup, doctor command, manual browser-wallet upload path, smoke retrieval path, expected outputs, failure modes, security rules, and explicit operator verification items.
+- `docs/community-experiment-runbook.md` — updated to reference doctor/runbook for testnet readiness; verification commands section updated.
+- `docs/production-queue.md` — C10 marked complete; C11 added as current stage; Immediate Next Action updated.
+- `docs/shelby-integration.md` — header updated to clarify current status (M3 browser-wallet path exists).
+- `docs/architecture.md` — C11 entry added.
+- `docs/demo-script.md` — C11 doctor reference added.
+
+Hard boundaries:
+
+- No UI redesign, logo changes, visual polish, or GPT/image generation.
+- No real upload enabled by default.
+- No wallet payment UX.
+- No private key, seed phrase, mnemonic, or server signer.
+- No real LLM/API calls.
+- No marketplace/trading/token features.
+- No committed runtime DB files.
+- Do not print secrets.
+- Do not silently treat missing/incomplete testnet config as success.
+
+Acceptance:
+
+- `npm run shelby-doctor` passes in default/mock mode with zero credentials and clearly states that real upload is disabled.
+- `SHELBY_MODE=testnet npm run shelby-doctor` fails closed (exit 1) when required testnet config is missing, with actionable messages.
+- Setting a fake `NEXT_PUBLIC_SHELBY_API_KEY` causes the doctor to fail with a clear public-secret warning.
+- Endpoint family mismatch cases produce clear warnings.
+- `npm run smoke` remains opt-in and disabled unless `SHELBY_SMOKE=true`.
+- `npm run verify-community-demo` passes.
+- `npm run lint` passes.
+- `npm run build` passes.
+
+Deliverables:
+
+- `scripts/shelby-doctor.mjs`
+- `package.json` — `shelby-doctor` script
+- `docs/shelby-testnet-operator-runbook.md`
+- `docs/community-experiment-runbook.md`, `docs/production-queue.md`, `docs/shelby-integration.md`, `docs/architecture.md`, `docs/demo-script.md` — updated
