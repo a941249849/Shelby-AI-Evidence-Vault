@@ -1,10 +1,14 @@
 # Community Experiment Runbook — Shelby AI Evidence Vault
 
-**Stage: C10 — Evidence index search/filter and operator workflow hardening**
+**Stage: C11 — Shelby testnet readiness doctor and operator verification package**
 
 This runbook is written for community testers and reviewers who want to clone the repo, run the zero-credential path, inspect persisted records, and understand what is mock/local/demo vs Shelby testnet.
 
 There are no hidden setup steps. Everything documented here is the complete picture.
+
+> **Testnet operators:** For the real Shelby testnet path (browser-wallet upload), see:
+> - `docs/shelby-testnet-operator-runbook.md` — prerequisites, env setup, doctor command, manual upload path, smoke check
+> - `npm run shelby-doctor` — zero-secret readiness preflight (mock mode passes with no credentials)
 
 ---
 
@@ -132,6 +136,23 @@ npm run build
 ```
 
 Expected: Next.js production build succeeds with no TypeScript or ESLint errors.
+
+### C11 readiness doctor (zero credentials)
+
+```bash
+npm run shelby-doctor
+```
+
+Expected in mock/local mode:
+```
+[shelby-doctor] PASS — mock/local mode is ready. No credentials needed.
+```
+Exit code `0`.
+
+To check testnet readiness (fails closed with missing config):
+```bash
+SHELBY_MODE=testnet npm run shelby-doctor
+```
 
 ### C8 generation (idempotent)
 
@@ -389,18 +410,37 @@ The button asks for confirmation (click once → "Click again to reset browser c
 ## 9. Optional: Shelby testnet path
 
 > **Honest prerequisites:** This path requires infrastructure that is not available from a clean checkout. It is documented here for completeness. Community testers should not need it.
+> **For full operator instructions**, see `docs/shelby-testnet-operator-runbook.md`.
+
+### Readiness doctor
+
+Before attempting any testnet operation, run the readiness doctor:
+
+```bash
+npm run shelby-doctor
+# Mock mode — should always pass with zero credentials
+
+SHELBY_MODE=testnet npm run shelby-doctor
+# Testnet mode — fails closed when required vars are missing
+```
+
+The doctor validates environment configuration only. It never makes network calls, never prints secrets, and never enables real uploads.
 
 ### What is required
 
 - An Aptos wallet browser extension (e.g. [Petra](https://petra.app/))
 - Testnet APT for gas fees (from [Aptos testnet faucet](https://aptoslabs.com/testnet-faucet))
 - Shelby storage credits on the connected wallet account
-- A `.env.local` file with:
+- A `.env.local` file with all required testnet vars (see `docs/shelby-testnet-operator-runbook.md` § 3)
+
+Minimum required in `.env.local` to start:
 
 ```env
 SHELBY_MODE=testnet
 NEXT_PUBLIC_SHELBY_NETWORK=testnet
 ```
+
+Run `SHELBY_MODE=testnet npm run shelby-doctor` for the full list of required variables.
 
 ### What it does
 
@@ -411,11 +451,15 @@ When testnet mode is active, the upload page shows a wallet connect button. Afte
 - It does not move mainnet funds.
 - It does not grant access to any production system.
 - It does not affect other users of this repo.
-- The C9 verification harness does not require or test this path.
+- The C9/C11 verification harnesses do not require or test this path.
 
-### Smoke harness (advanced)
+### Smoke harness (post-upload)
 
 For Shelby testnet retrieval verification after a real upload, see `docs/c3-smoke-test-guide.md` and `scripts/shelby-smoke.mjs`. The smoke harness is opt-in and disabled unless `SHELBY_SMOKE=true` is set explicitly.
+
+```bash
+SHELBY_SMOKE=true npm run smoke
+```
 
 ---
 
@@ -443,6 +487,7 @@ For Shelby testnet retrieval verification after a real upload, see `docs/c3-smok
 fixtures/c8-agent-input.json    ← synthetic public benchmark data (input)
 scripts/generate-agent-run.mjs  ← C8 deterministic generator (zero credentials)
 scripts/verify-community-demo.mjs ← C9 verification harness (this runbook's § 4)
+scripts/shelby-doctor.mjs       ← C11 readiness doctor (zero credentials)
 
 src/lib/server/db.ts            ← SQLite connection + schema (better-sqlite3)
 src/lib/server/evidence-store.ts ← CRUD helpers for packs, blobs, receipts
@@ -459,3 +504,4 @@ data/shelby-vault.sqlite        ← runtime DB (gitignored; created on first run
 
 For the complete architecture diagram, see `docs/architecture.md`.
 For the full step-by-step demo walk-through, see `docs/demo-script.md`.
+For the Shelby testnet operator path, see `docs/shelby-testnet-operator-runbook.md`.

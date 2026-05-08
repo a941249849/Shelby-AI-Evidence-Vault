@@ -20,16 +20,18 @@
  *   families in a single runtime config.
  *   Official testnet Aptos fullnode: https://api.testnet.aptoslabs.com/v1
  *   Official testnet indexer:        https://api.testnet.aptoslabs.com/v1/graphql
- *   These are not consumed in M1 — defined here for M2+ reference.
- *   Aptos signing/transactions are NOT part of M1.
+ *   The browser-wallet testnet path consumes the browser-safe side of this
+ *   configuration through src/lib/shelby/browser-client.ts. Server-side private
+ *   key custody is intentionally not implemented.
  *
  * Shelby coordination contract/account:
  *   Must be verified against current official Shelby docs and explorer
- *   at M2 implementation time. Do not hardcode earlier audit values in M1B.
- *   Explorer: https://explorer.shelby.xyz/testnet (verify at M2)
+ *   before operator testnet use. Do not hardcode earlier audit values without
+ *   checking the current official docs/explorer.
+ *   Explorer: https://explorer.shelby.xyz/testnet
  */
 
-/** Default real-integration target. Real upload remains blocked until M2. */
+/** Default real-integration target for the browser-wallet testnet path. */
 export const DEFAULT_SHELBY_NETWORK = 'testnet' as const;
 
 export type ShelbyMode = 'mock' | 'testnet';
@@ -44,7 +46,7 @@ export interface ShelbyConfig {
   accountAddress?: string;
   /**
    * Blob upload expiration in microseconds (required for real Shelby uploads).
-   * Must be provided when wiring the real SDK in M2+.
+   * Must be provided for real Shelby testnet uploads.
    * Not used by the mock adapter.
    */
   blobExpirationMicros?: string;
@@ -66,18 +68,16 @@ export function getShelbyConfig(): ShelbyConfig {
 
 /**
  * Aptos coordination plane configuration (Plane 2).
- * Read-only in M1 — not consumed by any adapter yet.
  * Defined here to make the architectural boundary explicit.
  *
  * Current Shelby testnet uses Aptos testnet fullnode/indexer URLs alongside
  * Shelby's own testnet RPC URL. Older shelbynet endpoints are legacy prototype
  * context and must not be mixed with testnet endpoint values.
  *
- * Aptos signing and transaction submission are NOT part of M1.
- * When required in M2+, signing must be handled server-side or via a secure
- * wallet integration — never by committing private keys.
+ * Aptos signing and transaction submission happen through the browser-wallet
+ * path. Server-side private key custody is intentionally not implemented.
  *
- * SDK packages needed for M2+ coordination:
+ * SDK packages used for coordination:
  *   @shelby-protocol/sdk  — Shelby Node/browser SDK
  *   @aptos-labs/ts-sdk    — Aptos TypeScript SDK for testnet coordination
  */
