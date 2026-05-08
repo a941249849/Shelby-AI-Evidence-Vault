@@ -28,9 +28,10 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - M1A official docs audit is complete in `docs/shelby-official-docs-audit.md`.
 - M1B is merged from PR #4.
 - The frozen post-M1B architecture plan is `docs/m2-m4-product-architecture-plan.md`.
+- M2 implementation design is complete in `docs/m2-shelby-testnet-integration-design.md`.
 - M1B scope is local/mock only.
 - UI is frozen for now.
-- Real Shelby upload remains blocked until M2.
+- Real Shelby upload remains blocked until M3 implementation.
 - Current real-integration target should be Shelby testnet, not the older shelbynet developer-prototype default.
 
 ## Stage Gate
@@ -85,7 +86,7 @@ Complete in `docs/m2-m4-product-architecture-plan.md`.
 
 ### Task C1: M2 official Shelby testnet integration design spike
 
-Owner: Copilot
+Owner: Codex
 
 Size: Large
 
@@ -96,6 +97,10 @@ Only after `docs/m2-m4-product-architecture-plan.md` is accepted as the frozen p
 Goal:
 
 Produce an implementation-ready M2 design for real Shelby testnet integration without wiring production upload into the UI.
+
+Status:
+
+Complete in `docs/m2-shelby-testnet-integration-design.md`.
 
 Scope:
 
@@ -181,7 +186,7 @@ Size: Large
 
 When to start:
 
-Only after C1 is reviewed by Codex and the signer/account strategy is approved.
+Now that Codex has completed `docs/m2-shelby-testnet-integration-design.md`, this is the next Copilot-sized production task.
 
 Goal:
 
@@ -197,6 +202,8 @@ Scope:
 - Preserve mock mode as the default.
 - Preserve fail-closed errors when config is incomplete.
 - Add focused tests or smoke scripts for adapter config and disabled/missing-config behavior.
+- Use browser wallet signing as the first implementation path.
+- Do not implement server signer.
 
 Hard boundaries:
 
@@ -280,4 +287,4 @@ Review C1 output before any real upload implementation starts.
 
 Do not give Copilot small patch tasks.
 
-After `docs/m2-m4-product-architecture-plan.md` is accepted, dispatch Task C1 as the next Copilot task.
+Dispatch Task C2 as one large Copilot production task when ready.

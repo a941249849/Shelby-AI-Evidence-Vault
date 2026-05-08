@@ -52,6 +52,10 @@ These boundaries are product safety rails and must remain visible in docs, UI, a
 
 M1B is merged as the local/mock baseline.
 
+M2 implementation design is complete in:
+
+- `docs/m2-shelby-testnet-integration-design.md`
+
 Current implemented behavior:
 
 - User selects files.
@@ -287,6 +291,10 @@ Deliverable:
 
 - `docs/m2-shelby-testnet-integration-design.md`
 
+Status:
+
+Complete.
+
 This document must answer:
 
 - Exact official package versions and import paths at time of design.
@@ -311,7 +319,7 @@ Owner: Copilot for protocol/backend implementation; Codex for review and UI guar
 
 Start condition:
 
-- M2 design accepted.
+- M2 design exists in `docs/m2-shelby-testnet-integration-design.md`.
 - Signer strategy approved.
 - API key/funding requirements known.
 - Required testnet account/funding available or the task is scoped to fail-closed implementation only.
@@ -462,12 +470,12 @@ Copilot must not receive:
 
 ## Next Copilot Task Packet
 
-Do not dispatch until this plan is accepted.
+Dispatch only as one large implementation task.
 
 Task name:
 
 ```txt
-M2: Shelby testnet integration design document
+M3: Implement browser-wallet Shelby testnet upload behind adapter boundary
 ```
 
 Owner:
@@ -485,19 +493,22 @@ One PR against `main`.
 Expected output:
 
 ```txt
-docs/m2-shelby-testnet-integration-design.md
+Real testnet upload path behind the existing adapter boundary, with mock mode preserved.
 ```
 
 Allowed code changes:
 
-- None by default.
-- Type/interface comments only if absolutely required and explained in PR summary.
+- SDK package installation approved by `docs/m2-shelby-testnet-integration-design.md`.
+- Shelby adapter/service code under `src/lib/shelby/`.
+- Minimal upload-flow integration required to store real BlobRecord fields.
+- Focused tests or smoke scripts if practical.
 
 Task instructions:
 
 ```txt
 Read:
 - docs/m2-m4-product-architecture-plan.md
+- docs/m2-shelby-testnet-integration-design.md
 - docs/shelby-official-docs-audit.md
 - docs/shelby-integration.md
 - docs/m1b-readiness-review.md
@@ -505,26 +516,24 @@ Read:
 - src/app/actions/upload.ts
 - .env.example
 
-Create docs/m2-shelby-testnet-integration-design.md.
+Implement browser-wallet Shelby testnet upload behind the existing adapter boundary.
 
-Do not implement real upload.
-Do not add SDK packages.
-Do not modify UI.
+Keep mock mode as the default and keep it working with zero env vars.
+Use Shelby testnet and Network.TESTNET.
+Use browser wallet signing first.
+Fail closed when wallet/config/API-key requirements are not satisfied.
+
 Do not introduce private key, seed phrase, mnemonic, or wallet UI.
+Do not implement server signer.
+Do not redesign UI.
 Do not add production DB.
 
-The design must be implementation-ready for M3 and must include:
-- official package/API surface checked
-- testnet network config
-- SDK config decision or documented ambiguity
-- signer strategy decision matrix
-- API key boundary
-- env var plan
-- data-model mapping
-- upload sequence
-- read receipt implications
-- M3 implementation task outline
-- blockers and verification checklist
+Implementation must preserve:
+- local/mock upload path
+- deterministic mock refs
+- localStorage persistence
+- fail-closed behavior for incomplete testnet config
+- clear distinction between mock/demo refs and real account+blobName identity
 
 Run:
 - npm run lint
@@ -535,10 +544,7 @@ Run:
 
 Before dispatching Copilot M2:
 
-- This plan exists on `main`.
-- Product owner accepts the plan direction.
-- Prior paused C1 instruction remains superseded.
-- Copilot receives the task packet above, not a free-form instruction.
+Complete. M2 design is owned by Codex and exists in `docs/m2-shelby-testnet-integration-design.md`.
 
 Before dispatching Copilot M3:
 
@@ -546,7 +552,7 @@ Before dispatching Copilot M3:
 - Codex has reviewed it.
 - Signer strategy is approved.
 - API key boundary is approved.
-- Testnet funding/account requirement is known.
+- Testnet funding/account requirement is either known or explicitly scoped as a fail-closed blocker.
 - Failure modes are defined.
 
 Before dispatching M4:
@@ -562,8 +568,7 @@ The project should now proceed by gated stages:
 ```txt
 M1B merged
 -> Codex frozen M2-M4 plan
--> Copilot M2 design document
--> Codex review
+-> Codex M2 implementation design
 -> Copilot M3 real upload implementation
 -> Codex UI/product integration
 -> M4 read receipt binding
