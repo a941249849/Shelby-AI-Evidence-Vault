@@ -1,5 +1,13 @@
 # Shelby Integration — M1B Guide
 
+> **⚠ Historical document — M1B archive.** This file describes the M1B local-mock-only state of the project. It is preserved for reference but is superseded by the M4/M5 documents. For current integration facts, see:
+> - `README.md` — product overview, modes, and env vars
+> - `docs/architecture.md` — current code structure and browser-wallet upload path
+> - `docs/c3-smoke-test-guide.md` — smoke harness and manual testnet verification
+> - `docs/m4-read-receipt-binding.md` — read receipt BlobRecord identity binding
+>
+> In particular: real Shelby testnet upload is **no longer blocked** — a browser-wallet testnet path exists in `src/lib/shelby/use-shelby-upload.ts` (M3). Read receipts now bind to real BlobRecord identity (M4). The smoke harness verifies RPC connectivity and retrieval (C3).
+
 ## Overview
 
 Shelby AI Evidence Vault integrates with Shelby through an adapter pattern. All Shelby-specific code lives in `src/lib/shelby/`. The rest of the app calls the adapter through a server action (`src/app/actions/upload.ts`) so API keys are never exposed to the browser.
