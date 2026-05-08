@@ -87,15 +87,25 @@ The script prints a human-readable summary:
   Network      : testnet
   RPC URL      : https://api.testnet.shelby.xyz/shelby
   Config       : ✓ pass
-  RPC connect  : ✓ HTTP 200 from https://api.testnet.shelby.xyz/shelby/v1/health
+  Host reach.  : ✓ HTTP 200 — host reachable, endpoint confirmed.
   Retrieval    : ✓ Blob retrieved successfully (HTTP 200).
   StorageStatus: ready
-  Explorer URL : https://explorer.shelby.xyz/testnet/account/0x.../blob/evidence%2F...
+  Explorer URL : see output JSON file
   Upload smoke : — skipped (browser-wallet upload cannot be automated)
   Overall      : retrieval-ok
   Output file  : /path/to/tmp/shelby-smoke/smoke-2026-05-08T04-05-30-000Z.json
 [shelby-smoke] ────────────────────────────────────────────────────────
 ```
+
+If the Shelby RPC does not expose `/v1/health` (expected), the host reachability
+line shows `~` (inconclusive) rather than `✗` or `✓`:
+
+```
+  Host reach.  : ~ HTTP 404 — host reachable but probe endpoint returned an error (inconclusive).
+```
+
+`~` means the host TCP/HTTP stack responded; it is not an RPC error. The overall
+status will be `host-reachable-inconclusive` (exit 0).
 
 It also writes a machine-readable JSON file to `tmp/shelby-smoke/smoke-{timestamp}.json`.
 
@@ -114,19 +124,19 @@ It also writes a machine-readable JSON file to `tmp/shelby-smoke/smoke-{timestam
   "rpcConnectivity": {
     "checked": true,
     "probeUrl": "https://api.testnet.shelby.xyz/shelby/v1/health",
-    "httpStatus": 200,
-    "ok": true,
-    "detail": "HTTP 200 from https://api.testnet.shelby.xyz/shelby/v1/health"
+    "httpStatus": 404,
+    "ok": null,
+    "detail": "HTTP 404 — host reachable but probe endpoint returned an error (inconclusive). ..."
   },
   "retrievalCheck": {
     "checked": true,
     "accountAddress": "0x...",
     "blobName": "evidence/pack-id/abcdef01-filename.json",
-    "url": "https://api.testnet.shelby.xyz/shelby/v1/blobs/0x.../evidence%2Fpack-id%2Fabcdef01-filename.json",
+    "url": "https://api.testnet.shelby.xyz/shelby/v1/blobs/0x.../evidence/pack-id/abcdef01-filename.json",
     "httpStatus": 200,
     "ok": true,
     "storageStatus": "ready",
-    "explorerUrl": "https://explorer.shelby.xyz/testnet/account/0x.../blob/evidence%2Fpack-id%2Fabcdef01-filename.json",
+    "explorerUrl": "https://explorer.shelby.xyz/testnet/account/0x.../blob/evidence/pack-id/abcdef01-filename.json",
     "detail": "Blob retrieved successfully (HTTP 200)."
   },
   "uploadSmoke": {
@@ -138,12 +148,25 @@ It also writes a machine-readable JSON file to `tmp/shelby-smoke/smoke-{timestam
 }
 ```
 
+Note: blob names with slash separators (e.g. `evidence/pack-id/abcdef01-filename.json`)
+are encoded segment-by-segment, preserving `/` in the URL path. The blob name
+`evidence/pack-id/abcdef01-filename.json` produces the path
+`evidence/pack-id/abcdef01-filename.json` (slashes preserved), not `evidence%2Fpack-id%2F...`.
+
+### `rpcConnectivity.ok` tri-state
+
+| Value | Meaning |
+|---|---|
+| `true` | 2xx response — host confirmed reachable |
+| `null` | Non-2xx response — host reachable, probe endpoint inconclusive |
+| `false` | Network error — host unreachable |
+
 ### Exit codes
 
 | Code | Meaning |
 |---|---|
-| `0` | Connectivity verified (or nothing to check). |
-| `1` | Config incomplete or RPC unreachable. |
+| `0` | Host reachable or inconclusive (or nothing to check). |
+| `1` | Config incomplete or host truly unreachable (network error). |
 | `2` | Opt-in gate not set (`SHELBY_SMOKE` not `true`). |
 
 ---

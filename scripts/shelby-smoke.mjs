@@ -17,7 +17,10 @@
  *
  * WHAT THIS SCRIPT DOES:
  *   1. Validates that required env vars are present (config check).
- *   2. Checks RPC connectivity via a non-destructive HTTP GET.
+ *   2. Checks host reachability via a non-destructive HTTP GET probe.
+ *      A 2xx response = host confirmed reachable.
+ *      A non-2xx response = host reachable but probe endpoint inconclusive.
+ *      A network error = host unreachable.
  *   3. If SHELBY_SMOKE_ACCOUNT_ADDRESS + SHELBY_SMOKE_BLOB_NAME are set,
  *      attempts a retrieval check for a previously uploaded blob.
  *   4. Writes a machine-readable JSON result to tmp/shelby-smoke/.
@@ -42,14 +45,22 @@
  *   tmp/shelby-smoke/smoke-{ISO_TIMESTAMP}.json  (gitignored)
  *
  * EXIT CODES:
- *   0  — connectivity verified (or nothing to check)
- *   1  — config incomplete or RPC unreachable
+ *   0  — host reachable (or inconclusive probe) or nothing to check
+ *   1  — config incomplete or host truly unreachable (network error)
  *   2  — opt-in gate not set
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ── Blob name path encoding ───────────────────────────────────────────────────
+// Blob names contain slash separators (e.g. evidence/{packId}/{hash}-{file}).
+// Encode each segment individually and preserve '/' — matching the Shelby SDK's
+// encodeURIComponentKeepSlashes behaviour.
+function encodeBlobNamePath(blobName) {
+  return blobName.split('/').map(encodeURIComponent).join('/');
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -88,7 +99,8 @@ const result = {
     checked: false,
     probeUrl: '',
     httpStatus: /** @type {number | null} */ (null),
-    ok: false,
+    /** true = 2xx confirmed; false = network error; null = inconclusive (4xx/5xx response) */
+    ok: /** @type {boolean | null} */ (null),
     detail: '',
   },
   retrievalCheck: {
@@ -128,11 +140,14 @@ if (!result.configCheck.pass) {
   );
 }
 
-// ── Step 2: RPC connectivity check ───────────────────────────────────────────
+// ── Step 2: Host reachability check ──────────────────────────────────────────
+// Probes the RPC base URL to test whether the host is reachable.
+// This is a host reachability check, not a confirmed RPC operation.
+// Only a 2xx response on a known Shelby endpoint constitutes RPC-verified.
+// The Shelby RPC does not document a /v1/health endpoint; a 404 from that path
+// means the host is reachable but the endpoint is unknown (inconclusive).
 if (rpcUrl) {
   result.rpcConnectivity.checked = true;
-  // Probe the RPC health endpoint. Any HTTP response (even 404/401) confirms
-  // the server is reachable. Only network/timeout errors mean unreachable.
   const probeUrl = `${rpcUrl}/v1/health`;
   result.rpcConnectivity.probeUrl = probeUrl;
 
@@ -142,9 +157,18 @@ if (rpcUrl) {
       signal: AbortSignal.timeout(10_000),
     });
     result.rpcConnectivity.httpStatus = res.status;
-    // Any HTTP response (including 4xx) means server is reachable
-    result.rpcConnectivity.ok = true;
-    result.rpcConnectivity.detail = `HTTP ${res.status} from ${probeUrl}`;
+    if (res.status >= 200 && res.status < 300) {
+      // 2xx: host reachable and endpoint responded successfully
+      result.rpcConnectivity.ok = true;
+      result.rpcConnectivity.detail = `HTTP ${res.status} — host reachable, endpoint confirmed.`;
+    } else {
+      // 4xx/5xx: host is reachable but the probe endpoint returned an error.
+      // Cannot confirm RPC is operating correctly; treat as inconclusive.
+      result.rpcConnectivity.ok = null;
+      result.rpcConnectivity.detail =
+        `HTTP ${res.status} — host reachable but probe endpoint returned an error (inconclusive). ` +
+        'The Shelby RPC may not expose /v1/health. This is not a confirmed RPC error.';
+    }
   } catch (/** @type {unknown} */ err) {
     result.rpcConnectivity.ok = false;
     result.rpcConnectivity.detail =
@@ -158,10 +182,10 @@ if (rpcUrl) {
 if (smokeAccountAddress && smokeBlobName) {
   result.retrievalCheck.checked = true;
   const retrievalUrl =
-    `${rpcUrl}/v1/blobs/${smokeAccountAddress}/${encodeURIComponent(smokeBlobName)}`;
+    `${rpcUrl}/v1/blobs/${smokeAccountAddress}/${encodeBlobNamePath(smokeBlobName)}`;
   const explorerUrl =
     `https://explorer.shelby.xyz/${network}/account/${smokeAccountAddress}` +
-    `/blob/${encodeURIComponent(smokeBlobName)}`;
+    `/blob/${encodeBlobNamePath(smokeBlobName)}`;
   result.retrievalCheck.url = retrievalUrl;
   result.retrievalCheck.explorerUrl = explorerUrl;
 
@@ -203,12 +227,15 @@ if (smokeAccountAddress && smokeBlobName) {
 // ── Step 4: Overall status ────────────────────────────────────────────────────
 if (!result.configCheck.pass) {
   result.overallStatus = 'config-incomplete';
-} else if (result.rpcConnectivity.checked && !result.rpcConnectivity.ok) {
-  result.overallStatus = 'rpc-unreachable';
+} else if (result.rpcConnectivity.checked && result.rpcConnectivity.ok === false) {
+  result.overallStatus = 'host-unreachable';
 } else if (result.retrievalCheck.checked) {
   result.overallStatus = result.retrievalCheck.ok ? 'retrieval-ok' : 'retrieval-failed';
-} else if (result.rpcConnectivity.ok) {
-  result.overallStatus = 'connectivity-ok-no-retrieval';
+} else if (result.rpcConnectivity.ok === true) {
+  result.overallStatus = 'host-reachable-no-retrieval';
+} else if (result.rpcConnectivity.ok === null) {
+  // Host responded but probe endpoint was inconclusive (e.g. 404 on /v1/health)
+  result.overallStatus = 'host-reachable-inconclusive';
 } else {
   result.overallStatus = 'config-incomplete';
 }
@@ -227,7 +254,7 @@ if (smokeAccountAddress) {
   const explorerBase =
     `https://explorer.shelby.xyz/${network || 'testnet'}/account/${smokeAccountAddress}`;
   result.manualVerificationNotes.push(
-    `Manual explorer check: ${explorerBase}${smokeBlobName ? `/blob/${encodeURIComponent(smokeBlobName)}` : ''}`
+    `Manual explorer check: ${explorerBase}${smokeBlobName ? `/blob/${encodeBlobNamePath(smokeBlobName)}` : ''}`
   );
 }
 
@@ -249,9 +276,10 @@ console.log(`  RPC URL      : ${result.rpcUrl}`);
 console.log(`  Config       : ${result.configCheck.pass ? ok(true) + ' pass' : ok(false) + ' INCOMPLETE — missing: ' + result.configCheck.missing.join(', ')}`);
 
 if (result.rpcConnectivity.checked) {
-  console.log(`  RPC connect  : ${ok(result.rpcConnectivity.ok)} ${result.rpcConnectivity.detail}`);
+  const icon = result.rpcConnectivity.ok === true ? '✓' : result.rpcConnectivity.ok === null ? '~' : '✗';
+  console.log(`  Host reach.  : ${icon} ${result.rpcConnectivity.detail}`);
 } else {
-  console.log(`  RPC connect  : — skipped`);
+  console.log(`  Host reach.  : — skipped`);
 }
 
 if (result.retrievalCheck.checked) {
@@ -271,6 +299,6 @@ console.log(`  Overall      : ${result.overallStatus}`);
 console.log(`  Output file  : ${outputPath}`);
 console.log('[shelby-smoke] ────────────────────────────────────────────────────────\n');
 
-// Exit non-zero only for hard failures (config incomplete or RPC unreachable)
-const exitCode = ['config-incomplete', 'rpc-unreachable'].includes(result.overallStatus) ? 1 : 0;
+// Exit non-zero only for hard failures (config incomplete or host truly unreachable)
+const exitCode = ['config-incomplete', 'host-unreachable'].includes(result.overallStatus) ? 1 : 0;
 process.exit(exitCode);
