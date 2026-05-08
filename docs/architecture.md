@@ -124,7 +124,8 @@ fixtures/
 
 scripts/
 ├── shelby-smoke.mjs            C3: opt-in Shelby testnet smoke harness
-└── generate-agent-run.mjs      C8: deterministic agent-run example script
+├── generate-agent-run.mjs      C8: deterministic agent-run example script
+└── verify-community-demo.mjs   C9: zero-credential verification harness (35 assertions)
 ```
 
 ---
@@ -330,6 +331,19 @@ npm run generate-agent-run
   → All three persisted to SQLite via INSERT OR REPLACE (idempotent)
   → /read-receipt/c8-rr-agent-sentinel-v1 resolves via SQLite path in ReadReceiptClient
   → /dashboard shows c8-pack-agent-sentinel-v1 in the locally-uploaded section
+```
+
+### Verification flow (C9 harness)
+```
+npm run verify-community-demo
+  → creates isolated temp SQLite database (OS tmpdir)
+  → runs scripts/generate-agent-run.mjs [pass 1] (SHELBY_DB_PATH=<tmp>)
+  → asserts: 1 pack, 2 blobs, 1 receipt — correct IDs and payload fields
+  → asserts: blob→pack references, receipt→blob and receipt→pack references
+  → runs scripts/generate-agent-run.mjs [pass 2 — idempotency]
+  → asserts: row counts unchanged, payloads bit-for-bit identical
+  → removes temp database
+  → exits 0 on success, 1 on any assertion failure
 ```
 
 ---

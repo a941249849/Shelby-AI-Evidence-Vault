@@ -275,8 +275,11 @@ See `docs/c3-smoke-test-guide.md` for full instructions, expected output, and ex
 These commands verify the app without requiring a funded wallet:
 
 ```bash
-npm run lint   # Must pass
-npm run build  # Must pass
+npm run lint                  # Must pass
+npm run build                 # Must pass
+npm run verify-community-demo # C9 harness: 35 DB-level assertions, zero credentials
 ```
+
+The `verify-community-demo` harness (C9) creates an isolated temp SQLite database, runs the C8 generation path twice, and asserts all expected IDs, relationships, and idempotency in one automated step. See `docs/community-experiment-runbook.md` for the complete runbook.
 
 The smoke harness is opt-in and disabled unless `SHELBY_SMOKE=true` is explicitly set.

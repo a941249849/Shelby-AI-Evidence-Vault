@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "smoke": "node scripts/shelby-smoke.mjs",
-    "generate-agent-run": "node scripts/generate-agent-run.mjs"
+    "generate-agent-run": "node scripts/generate-agent-run.mjs",
+    "verify-community-demo": "node scripts/verify-community-demo.mjs"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^6.3.1",
