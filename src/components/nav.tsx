@@ -10,7 +10,7 @@ const links = [
   { href: '/#evidence-flow', labelKey: 'nav.solution' },
   { href: '/#developers', labelKey: 'nav.developers' },
   { href: 'https://docs.shelby.xyz/', labelKey: 'nav.docs', external: true },
-  { href: '/#ecosystem', labelKey: 'nav.ecosystem' },
+  { href: '/#experiment', labelKey: 'nav.ecosystem' },
 ];
 
 export default function Nav() {

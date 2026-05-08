@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Box,
   Code2,
-  Database,
   FileText,
   FolderOpen,
   Globe2,
@@ -14,43 +13,54 @@ import {
   UploadCloud,
   Webhook,
 } from 'lucide-react';
-import { evidencePacks } from '@/lib/demo-data';
-import EvidencePackCard from '@/components/evidence-pack-card';
 import { useI18n } from '@/components/language-provider';
 import ShelbyLogo from '@/components/shelby-logo';
 
-const demoPacks = evidencePacks.slice(0, 3);
+function SplitCta({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="group inline-flex min-h-12 overflow-hidden rounded-lg border border-[#322312]/14 bg-[#322312] text-[#fcfaf8] shadow-[0_16px_38px_rgba(50,35,18,0.16)] transition hover:-translate-y-0.5 hover:border-[#ff77c9]/70"
+    >
+      <span className="inline-flex items-center gap-2 px-5 text-sm font-semibold">
+        <UploadCloud size={18} />
+        {children}
+      </span>
+      <span className="grid min-w-14 place-items-center bg-[#ff77c9] text-[#322312] transition group-hover:bg-[#ffc2e1]">
+        <ArrowRight size={18} />
+      </span>
+    </Link>
+  );
+}
 
-function FlowCard({
+function FlowNode({
   index,
   icon: Icon,
   title,
   subtitle,
-  meta,
-  active = false,
+  tone,
 }: {
   index: string;
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   subtitle: string;
-  meta: string;
-  active?: boolean;
+  tone: 'circle' | 'hex' | 'dark';
 }) {
+  const iconShell =
+    tone === 'dark'
+      ? 'bg-[#322312] text-[#fcfaf8] shadow-[0_18px_38px_rgba(50,35,18,0.22)] [clip-path:polygon(25%_5%,75%_5%,100%_50%,75%_95%,25%_95%,0_50%)]'
+      : tone === 'hex'
+        ? 'bg-[#ffc2e1] text-[#322312] [clip-path:polygon(25%_5%,75%_5%,100%_50%,75%_95%,25%_95%,0_50%)]'
+        : 'rounded-full bg-[#ffc2e1] text-[#322312]';
+
   return (
-    <div className="min-w-0">
-      <p className="mb-3 font-mono text-xs font-semibold text-[#ff77c9]">{index}</p>
-      <div className={`evidence-flow-card ${active ? 'evidence-flow-card-active' : ''} rounded-lg p-5`}>
-        <div className="mx-auto grid h-16 w-16 place-items-center rounded-md border border-[#ff77c9]/35 bg-[#ffdfef]/74 text-[#322312]">
-          <Icon className="h-8 w-8" />
-        </div>
-        <h3 className="mt-5 text-center text-base font-semibold text-[#322312]">{title}</h3>
-        <p className="mt-1 text-center text-xs font-semibold text-[#454039]">{subtitle}</p>
+    <div className="relative z-10 text-center">
+      <div className={`mx-auto grid h-20 w-20 place-items-center ${iconShell}`}>
+        <Icon className="h-9 w-9" />
       </div>
-      <div className="mt-4 rounded-lg border border-[#ff77c9]/28 bg-[#fcfaf8] p-3">
-        <p className="font-mono text-[0.66rem] font-medium uppercase leading-5 text-[#454039]">
-          {meta}
-        </p>
-      </div>
+      <p className="mt-5 font-mono text-xs font-semibold text-[#322312]">{index}</p>
+      <h3 className="mt-2 text-base font-semibold text-[#322312]">{title}</h3>
+      <p className="mx-auto mt-2 max-w-[10rem] text-sm leading-6 text-[#454039]">{subtitle}</p>
     </div>
   );
 }
@@ -67,15 +77,21 @@ function FeatureTile({
   meta: string;
 }) {
   return (
-    <article className="rounded-lg border border-[#ff77c9]/28 bg-[#fcfaf8]/88 p-5 shadow-[0_14px_45px_rgba(50,35,18,0.06)]">
-      <div className="mb-6 grid h-16 w-16 place-items-center rounded-md border border-[#ff77c9]/26 bg-[#ffdfef] text-[#322312]">
-        <Icon className="h-8 w-8" />
+    <article className="group rounded-lg border border-[#322312]/14 bg-[#fcfaf8]/92 p-7 shadow-[0_16px_46px_rgba(50,35,18,0.07)] transition hover:-translate-y-1 hover:border-[#ff77c9]/45 hover:shadow-[0_22px_60px_rgba(50,35,18,0.10)]">
+      <div className="flex items-center gap-5">
+        <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-[#ffc2e1] text-[#322312]">
+          <Icon className="h-8 w-8" />
+        </div>
+        <h3 className="text-2xl font-bold leading-tight text-[#322312]">{title}</h3>
       </div>
-      <h3 className="text-xl font-semibold text-[#322312]">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-[#454039]">{body}</p>
-      <p className="mt-5 inline-flex rounded-md border border-[#ff77c9]/24 bg-[#fcfaf8] px-3 py-1 font-mono text-[0.68rem] font-medium uppercase text-[#322312]">
-        {meta}
-      </p>
+      <p className="mt-8 min-h-20 text-base leading-8 text-[#454039]">{body}</p>
+      <Link
+        href={meta}
+        className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#ff77c9] transition group-hover:text-[#322312]"
+      >
+        {useI18n().t('home.learnMore')}
+        <ArrowRight size={16} />
+      </Link>
     </article>
   );
 }
@@ -88,46 +104,71 @@ function EvidenceFlowPanel() {
       icon: FileText,
       title: t('home.flow.source.title'),
       subtitle: t('home.flow.source.subtitle'),
-      meta: t('home.flow.source.meta'),
+      tone: 'circle' as const,
     },
     {
       index: '02',
       icon: Box,
       title: t('home.flow.pack.title'),
       subtitle: t('home.flow.pack.subtitle'),
-      meta: t('home.flow.pack.meta'),
-      active: true,
+      tone: 'hex' as const,
     },
     {
       index: '03',
       icon: ShelbyLogo,
       title: t('home.flow.blob.title'),
       subtitle: t('home.flow.blob.subtitle'),
-      meta: t('home.flow.blob.meta'),
+      tone: 'dark' as const,
     },
     {
       index: '04',
       icon: ReceiptText,
       title: t('home.flow.receipt.title'),
       subtitle: t('home.flow.receipt.subtitle'),
-      meta: t('home.flow.receipt.meta'),
+      tone: 'circle' as const,
     },
+  ];
+  const receiptRow = [
+    ['HASH (SHA256)', 'c3f6e8...9a7b2d'],
+    ['SHELBY REF', 'shelby://ref/c3f6e8...9a7b2d'],
+    ['NETWORK', 'Shelby Testnet'],
+    ['STATUS', 'verified'],
+    ['PACK TYPE', 'dataset.pack'],
   ];
 
   return (
-    <section id="evidence-flow" className="rounded-lg border border-[#ff77c9]/30 bg-[#fcfaf8]/86 p-5 shadow-[0_24px_90px_rgba(50,35,18,0.10)] backdrop-blur">
-      <p className="mb-7 font-mono text-xs font-medium uppercase tracking-[0.16em] text-[#ff77c9]">
+    <section
+      id="evidence-flow"
+      className="min-w-0 rounded-[22px] border border-[#322312]/14 bg-[#fcfaf8]/92 p-5 shadow-[0_28px_90px_rgba(50,35,18,0.12)] backdrop-blur sm:p-7"
+    >
+      <p className="font-mono text-sm font-semibold uppercase text-[#ff77c9]">
         {t('home.flow.eyebrow')}
       </p>
-      <div className="grid gap-4 md:grid-cols-4">
-        {flow.map((item, index) => (
-          <div key={item.index} className="relative">
-            {index < flow.length - 1 && (
-              <div className="absolute left-[calc(100%-0.35rem)] top-[6.4rem] z-10 hidden w-8 border-t border-dashed border-[#ff77c9]/60 md:block" />
-            )}
-            <FlowCard {...item} />
-          </div>
+      <div className="relative mt-11 grid gap-9 md:grid-cols-4 md:gap-4">
+        <div className="absolute left-[11%] right-[11%] top-10 hidden border-t border-dashed border-[#ff77c9]/55 md:block" />
+        {flow.map((item) => (
+          <FlowNode key={item.index} {...item} />
         ))}
+      </div>
+      <div className="mt-11 overflow-hidden rounded-lg border border-[#322312]/14 bg-[#fcfaf8]">
+        <div className="grid min-w-0 grid-cols-[1fr_1.35fr_0.88fr_0.72fr_0.85fr]">
+          {receiptRow.map(([label, value]) => (
+            <div key={label} className="min-w-0 border-r border-[#322312]/10 px-3 py-4 last:border-r-0 lg:px-4">
+              <p className="truncate font-mono text-[0.64rem] font-semibold uppercase text-[#454039]">
+                {label}
+              </p>
+              <p className="mt-3 truncate font-mono text-xs text-[#322312]">
+                {label === 'STATUS' ? (
+                  <span className="rounded-md border border-[#74d481]/50 bg-[#dfffcc] px-2 py-0.5 text-[#2f7c3c]">
+                    {value}
+                  </span>
+                ) : (
+                  value
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -140,43 +181,49 @@ export default function HomePage() {
       icon: Box,
       title: t('home.feature.packs.title'),
       body: t('home.feature.packs.body'),
-      meta: 'PACK_HASH - ITEMS - CREATED_AT',
+      meta: '/upload',
     },
     {
       icon: ShelbyLogo,
       title: t('home.feature.blob.title'),
       body: t('home.feature.blob.body'),
-      meta: 'SHELBY_REF - NETWORK - IMMUTABLE',
+      meta: '/dashboard',
     },
     {
       icon: ReceiptText,
       title: t('home.feature.receipt.title'),
       body: t('home.feature.receipt.body'),
-      meta: 'RECEIPT_ID - SIGNER - VERIFIED',
+      meta: '/read-receipt/rr-001',
     },
   ];
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#fcfaf8] text-[#322312]">
-      <div className="brand-pattern-hero -right-28 top-20 h-[38rem] w-[28rem] rotate-90 md:right-0 md:w-[34rem]" />
-      <div className="brand-pattern-hero -bottom-40 -left-40 h-[34rem] w-[30rem] rotate-[60deg] opacity-70" />
+      <div className="brand-pattern-hero brand-pattern-brown -right-28 top-28 h-[31rem] w-[24rem] rotate-90 opacity-95 md:-right-16" />
+      <div className="brand-pattern-hero -right-44 top-32 h-[31rem] w-[24rem] rotate-90 opacity-90 md:-right-28" />
+      <div className="brand-pattern-hero -bottom-32 -left-48 h-[24rem] w-[24rem] rotate-[60deg] opacity-70" />
 
-      <section className="relative px-4 pb-10 pt-14 sm:px-6 lg:px-8 lg:pb-12 lg:pt-16">
+      <section className="relative px-4 pb-10 pt-16 sm:px-6 lg:px-8 lg:pb-12 lg:pt-24">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
-          <div className="relative z-10">
-            <p className="font-mono text-xs font-medium uppercase tracking-[0.16em] text-[#ff77c9]">
+          <div className="relative z-10 min-w-0">
+            <p className="font-mono text-sm font-semibold uppercase text-[#ff77c9]">
               {t('home.eyebrow')}
             </p>
-            <h1 className="mt-7 max-w-3xl text-5xl font-black leading-[0.93] tracking-[-0.05em] text-[#322312] sm:text-6xl lg:text-7xl">
-              {t('home.title')}
+            <h1 className="mt-7 max-w-3xl text-5xl font-black leading-[0.98] text-[#322312] sm:text-6xl lg:text-6xl">
+              {t('home.title')
+                .split('\n')
+                .map((line) => (
+                  <span key={line} className="block sm:whitespace-nowrap">
+                    {line}
+                  </span>
+                ))}
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#322312]">{t('home.body')}</p>
+            <p className="mt-7 max-w-xl whitespace-pre-line text-lg leading-9 text-[#322312]">
+              {t('home.body')}
+            </p>
 
             <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Link href="/upload" className="ui-button rounded-lg">
-                <UploadCloud size={18} />
-                {t('home.cta.upload')}
-              </Link>
+              <SplitCta href="/upload">{t('home.cta.upload')}</SplitCta>
               <Link href="/dashboard" className="ui-button ui-button-secondary rounded-lg">
                 <FolderOpen size={18} />
                 {t('home.cta.index')}
@@ -186,12 +233,12 @@ export default function HomePage() {
                 className="inline-flex min-h-11 items-center gap-2 border-b border-[#322312]/35 text-sm font-semibold text-[#322312] transition hover:border-[#ff77c9] hover:text-[#ff77c9]"
               >
                 {t('home.cta.receipt')}
-                <ArrowRight size={16} />
+                <ArrowRight size={16} className="-rotate-45" />
               </Link>
             </div>
           </div>
 
-          <div className="relative z-10 lg:translate-y-5">
+          <div className="relative z-10 min-w-0 lg:translate-y-5">
             <EvidenceFlowPanel />
           </div>
         </div>
@@ -206,7 +253,7 @@ export default function HomePage() {
       </section>
 
       <section id="developers" className="relative px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 rounded-lg border border-[#ff77c9]/28 bg-[#ffdfef]/52 p-5 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 rounded-lg border border-[#ff77c9]/34 bg-[#ffdfef]/58 p-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <div className="grid h-12 w-12 place-items-center rounded-lg border border-[#ff77c9]/32 bg-[#fcfaf8] text-[#ff77c9]">
               <Code2 className="h-6 w-6" />
@@ -216,53 +263,62 @@ export default function HomePage() {
               <p className="mt-1 max-w-2xl text-sm leading-6 text-[#454039]">{t('home.dev.body')}</p>
             </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-4">
+          <div className="flex flex-wrap items-center gap-3">
             {[
-              [Globe2, 'REST API', 'HTTP'],
-              [Terminal, 'TypeScript SDK', 'npm install'],
-              [Terminal, 'CLI', 'shelby-vault'],
-              [Webhook, 'Webhooks', t('home.dev.webhooks')],
-            ].map(([Icon, label, sub]) => {
+              [Globe2, 'REST API'],
+              [Terminal, 'TypeScript SDK'],
+              [Terminal, 'CLI'],
+              [Webhook, 'Webhooks'],
+            ].map(([Icon, label]) => {
               const DevIcon = Icon as React.ComponentType<{ className?: string }>;
               return (
-                <div
+                <span
                   key={String(label)}
-                  className="rounded-lg border border-[#322312]/10 bg-[#fcfaf8] px-4 py-3"
+                  className="inline-flex items-center gap-2 rounded-md border border-[#322312]/12 bg-[#fcfaf8] px-3 py-2 text-xs font-semibold text-[#322312]"
                 >
-                  <DevIcon className="mb-2 h-5 w-5 text-[#322312]" />
-                  <p className="text-sm font-semibold text-[#322312]">{label as string}</p>
-                  <p className="font-mono text-[0.66rem] text-[#454039]">{sub as string}</p>
-                </div>
+                  <DevIcon className="h-4 w-4" />
+                  {label as string}
+                </span>
               );
             })}
+            <Link
+              href="https://docs.shelby.xyz/"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[#ff77c9] transition hover:text-[#322312]"
+            >
+              {t('home.dev.docCta')}
+              <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
       </section>
 
-      <section id="ecosystem" className="relative px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <section id="experiment" className="relative px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl rounded-lg border border-[#322312]/14 bg-[#fcfaf8]/90 p-6 shadow-[0_16px_46px_rgba(50,35,18,0.06)]">
+          <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
             <div>
-              <div className="ui-chip">
-                <Database size={13} />
-                {t('home.corpus.eyebrow')}
-              </div>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-[#322312]">
-                {t('home.corpus.title')}
+              <p className="font-mono text-xs font-semibold uppercase text-[#ff77c9]">
+                {t('home.experiment.eyebrow')}
+              </p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight text-[#322312]">
+                {t('home.experiment.title')}
               </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#454039]">
+                {t('home.experiment.body')}
+              </p>
             </div>
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#322312] transition hover:text-[#ff77c9]"
-            >
-              {t('home.corpus.full')}
-              <ArrowRight size={15} />
-            </Link>
-          </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {demoPacks.map((pack) => (
-              <EvidencePackCard key={pack.id} pack={pack} />
-            ))}
+            <div className="grid gap-3 md:grid-cols-3">
+              {[
+                ['01', t('home.experiment.sandbox.title'), t('home.experiment.sandbox.body')],
+                ['02', t('home.experiment.testnet.title'), t('home.experiment.testnet.body')],
+                ['03', t('home.experiment.receipt.title'), t('home.experiment.receipt.body')],
+              ].map(([index, title, body]) => (
+                <div key={index} className="rounded-lg border border-[#322312]/10 bg-[#f7f1e9]/70 p-4">
+                  <p className="font-mono text-xs font-semibold text-[#ff77c9]">{index}</p>
+                  <h3 className="mt-3 text-base font-semibold text-[#322312]">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#454039]">{body}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
