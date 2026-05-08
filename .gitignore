@@ -45,6 +45,9 @@ next-env.d.ts
 /tmp/
 /artifacts/shelby-smoke/
 
+# Release-candidate verifier output (gitignored — runtime artifacts, never commit)
+/artifacts/release-candidate/
+
 # SQLite database (runtime artifact — never commit)
 /data/*.sqlite
 /data/*.sqlite-shm

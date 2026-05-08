@@ -1,6 +1,6 @@
 # Community Experiment Runbook — Shelby AI Evidence Vault
 
-**Stage: C11 — Shelby testnet readiness doctor and operator verification package**
+**Stage: C12 — Community release candidate acceptance harness and product QA gate**
 
 This runbook is written for community testers and reviewers who want to clone the repo, run the zero-credential path, inspect persisted records, and understand what is mock/local/demo vs Shelby testnet.
 
@@ -203,7 +203,15 @@ Expected output (abbreviated):
 
 Exit code `0` on success, `1` on any assertion failure.
 
-**Note on live server checks:** The harness does not start a live HTTP server. Starting a full Next.js dev server inside a verification script is too heavy for CI and introduces timing and port-availability dependencies. The DB-level assertions are deterministic, reproducible, and cover the full record chain. For end-to-end UI verification, follow the manual steps in Section 3 above.
+### C12 release-candidate acceptance harness
+
+```bash
+npm run verify-release-candidate
+```
+
+This is the one-command release-candidate gate (C12). It runs the complete product loop end to end, including all of the above plus a production build and route smoke checks against a live server instance. It is zero-credential and mock-safe by default.
+
+See `docs/release-candidate-checklist.md` for the full list of checks.
 
 ---
 
