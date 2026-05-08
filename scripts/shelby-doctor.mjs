@@ -93,13 +93,14 @@ function isPositiveInteger(value) {
 /**
  * Returns true if the URL looks like an Aptos fullnode or indexer URL
  * rather than a Shelby RPC URL.
+ * Note: SHELBY_RPC_URL should point to Shelby's blob storage API (Plane 1),
+ * not the Aptos fullnode or its aliased indexer endpoints (Plane 2).
  * @param {string} url
  */
 function looksLikeAptosEndpoint(url) {
   return (
     url.includes('aptoslabs.com') ||
     url.includes('/v1/graphql') ||
-    url.includes('nocode.shelby.xyz') ||
     (url.includes('/v1') && !url.includes('shelby'))
   );
 }
