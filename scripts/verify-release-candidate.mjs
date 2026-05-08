@@ -40,7 +40,7 @@
  *   Receipt : c8-rr-agent-sentinel-v1
  *
  * ROUTES SMOKE-CHECKED (HTTP 200 + page marker):
- *   /                                      Verifiable memory for AI systems
+ *   /                                      Evidence Vault (footer text)
  *   /dashboard                             Evidence index
  *   /upload                                Package files into a verifiable
  *   /blob/blob-001                         Shelby AI Evidence Vault
@@ -52,15 +52,13 @@
  *   1  — one or more checks failed
  */
 
-import { spawnSync, spawn } from 'node:child_process';
-import { execFileSync } from 'node:child_process';
+import { spawnSync, spawn, execFileSync, execSync } from 'node:child_process';
 import { existsSync, mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { createServer } from 'node:net';
-import { execSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
