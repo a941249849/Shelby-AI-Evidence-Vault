@@ -18,6 +18,7 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { Network } from '@aptos-labs/ts-sdk';
+import type { AdapterWallet, AdapterNotDetectedWallet } from '@aptos-labs/wallet-adapter-react';
 import { shelbyUploadAction, getShelbyModeAction } from '@/app/actions/upload';
 import { parseTags, buildEvidencePack, buildBlobRecord } from '@/lib/validation';
 import { addLocalPack, addLocalBlob } from '@/lib/store/local-store';
@@ -153,8 +154,8 @@ function WalletConnector({
   connect,
   disconnect,
 }: {
-  wallets: ReadonlyArray<{ name: string; icon: string; url: string }>;
-  notDetectedWallets: ReadonlyArray<{ name: string; url: string }>;
+  wallets: ReadonlyArray<AdapterWallet>;
+  notDetectedWallets: ReadonlyArray<AdapterNotDetectedWallet>;
   walletConnected: boolean;
   walletAddress: string | null;
   walletName: string | null;
@@ -650,11 +651,11 @@ function UploadPageContent() {
 
         {isTestnet && (
           <WalletConnector
-            wallets={shelbyUpload.wallets as ReadonlyArray<{ name: string; icon: string; url: string }>}
-            notDetectedWallets={shelbyUpload.notDetectedWallets as ReadonlyArray<{ name: string; url: string }>}
+            wallets={shelbyUpload.wallets}
+            notDetectedWallets={shelbyUpload.notDetectedWallets}
             walletConnected={shelbyUpload.walletConnected}
             walletAddress={shelbyUpload.walletAddress}
-            walletName={null}
+            walletName={shelbyUpload.walletName}
             connect={shelbyUpload.connect}
             disconnect={shelbyUpload.disconnect}
           />

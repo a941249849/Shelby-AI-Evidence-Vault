@@ -66,6 +66,8 @@ export interface UseShelbyUploadReturn {
   walletAddress: string | null;
   /** Network name reported by the connected wallet, or null if not connected. */
   walletNetwork: Network | null;
+  /** The name of the currently connected wallet (e.g. "Petra"), or null. */
+  walletName: string | null;
   /** Whether the upload path is fully ready (wallet connected + testnet + config valid). */
   isReady: boolean;
   /** Whether an upload is currently in progress. */
@@ -181,6 +183,7 @@ export function useShelbyUpload(): UseShelbyUploadReturn {
     walletConnected: wallet.connected,
     walletAddress,
     walletNetwork,
+    walletName: wallet.wallet?.name ?? null,
     isReady,
     isPending: uploadBlobsMutation.isPending,
     error: uploadBlobsMutation.error,
