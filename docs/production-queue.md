@@ -26,7 +26,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 
 - M0 is merged.
 - M1A official docs audit is complete in `docs/shelby-official-docs-audit.md`.
-- PR #4 is the active M1B PR.
+- M1B is merged from PR #4.
+- The frozen post-M1B architecture plan is `docs/m2-m4-product-architecture-plan.md`.
 - M1B scope is local/mock only.
 - UI is frozen for now.
 - Real Shelby upload remains blocked until M2.
@@ -52,9 +53,33 @@ Required:
 - `npm run lint` passes.
 - `npm run build` passes.
 
+Status:
+
+Complete.
+
 Copilot involvement:
 
-None, unless a large regression appears.
+None.
+
+### Gate G2: M2-M4 plan freeze
+
+Owner: Codex
+
+Goal:
+
+Create a complete staged product/architecture plan before dispatching any post-M1B Copilot task.
+
+Required:
+
+- Official Shelby docs translated into product architecture.
+- M2/M3/M4 scope and handoff gates defined.
+- Browser wallet vs server signer treated as an explicit M2 decision.
+- API key, funding, expiration, account/blobName, and read receipt implications included.
+- Copilot task policy defined: large bounded tasks only, no small patches.
+
+Status:
+
+Complete in `docs/m2-m4-product-architecture-plan.md`.
 
 ## Copilot Task Queue
 
@@ -66,7 +91,7 @@ Size: Large
 
 When to start:
 
-After PR #4 is merged or explicitly accepted as the M1B baseline.
+Only after `docs/m2-m4-product-architecture-plan.md` is accepted as the frozen plan.
 
 Goal:
 
@@ -114,8 +139,10 @@ Suggested Copilot prompt:
 Use PR #4 as the M1B baseline. Do not implement real upload yet.
 
 Read:
+- docs/m2-m4-product-architecture-plan.md
 - docs/shelby-official-docs-audit.md
 - docs/shelby-integration.md
+- docs/m1b-readiness-review.md
 - src/lib/shelby/*
 - .env.example
 
@@ -251,6 +278,6 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-Do not give Copilot another small patch task.
+Do not give Copilot small patch tasks.
 
-Codex should finish M1B readiness locally. After M1B is accepted, dispatch Task C1 as the next Copilot task.
+After `docs/m2-m4-product-architecture-plan.md` is accepted, dispatch Task C1 as the next Copilot task.
