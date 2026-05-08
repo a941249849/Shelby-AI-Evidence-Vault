@@ -22,6 +22,7 @@ import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import { formatDateTime } from '@/lib/utils';
 import { getLocalReadReceiptById, getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getReadReceiptById, getBlobById, getEvidencePackById } from '@/lib/evidence/service';
+import { getPersistedReceiptAction, getPersistedBlobAction } from '@/app/actions/persist';
 
 interface ReadReceiptClientProps {
   id: string;
@@ -276,7 +277,37 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
       return;
     }
 
-    setResolved(null);
+    // Fall through to SQLite-persisted records (survive localStorage resets)
+    getPersistedReceiptAction(id)
+      .then(async (persistedReceipt) => {
+        if (!persistedReceipt) {
+          setResolved(null);
+          return;
+        }
+
+        // Resolve each referenced blob — check localStorage first, then SQLite.
+        const resolvedBlobs: BlobRecord[] = [];
+        for (const bid of persistedReceipt.referencedBlobIds) {
+          const b =
+            getLocalBlobById(bid) ??
+            getBlobById(bid) ??
+            (await getPersistedBlobAction(bid).catch(() => null));
+          if (b) resolvedBlobs.push(b);
+        }
+
+        const resolvedPacks: EvidencePack[] = persistedReceipt.evidencePackIds
+          .map((pid) => getLocalPackById(pid) ?? getEvidencePackById(pid))
+          .filter(Boolean) as EvidencePack[];
+
+        setResolved({
+          receipt: persistedReceipt,
+          blobs: resolvedBlobs,
+          packs: resolvedPacks,
+        });
+      })
+      .catch(() => {
+        setResolved(null);
+      });
   }, [id]);
 
   // Loading state — renders nothing until localStorage is checked

@@ -6,14 +6,15 @@
 ┌──────────────────────────────────────────────────────────────────┐
 │                            Browser                                │
 │  /  /dashboard  /upload  /blob  /read-receipt                     │
-│  localStorage: packs + blobs + receipts (M1/M4)                   │
+│  localStorage: packs + blobs + receipts (M1/M4 — fallback)       │
 │  Browser wallet: Aptos wallet extension (testnet mode only)       │
 └──────────────────────┬───────────────────────────────────────────┘
                        │ HTTP / Server Actions
 ┌──────────────────────▼───────────────────────────────────────────┐
 │                   Next.js App Router                              │
 │  Server Components + Client Components                            │
-│  Server Actions: upload.ts (shelbyUploadAction — mock path)      │
+│  Server Actions: upload.ts    (shelbyUploadAction — mock path)   │
+│                  persist.ts   (persistUploadAction — C7 SQLite)  │
 └──────┬───────────────────────────────┬────────────────────────────┘
        │                               │
 ┌──────▼──────┐          ┌─────────────▼──────────────────────────┐
@@ -40,6 +41,18 @@
                          │  use-shelby-upload.ts (React hook)      │
                          │  status-map.ts    (status utilities)    │
                          │  index.ts         (getAdapter)          │
+                         └─────────────┬──────────────────────────┘
+                                       │ C7: persist after upload
+                         ┌─────────────▼──────────────────────────┐
+                         │  lib/server/  (server-only — C7)        │
+                         │  db.ts             SQLite init/schema   │
+                         │  evidence-store.ts CRUD helpers         │
+                         └────────────────────────────────────────┘
+                                       │
+                         ┌─────────────▼──────────────────────────┐
+                         │  data/shelby-vault.sqlite               │
+                         │  (gitignored runtime file)              │
+                         │  Override: SHELBY_DB_PATH env var       │
                          └────────────────────────────────────────┘
 ```
 
@@ -54,7 +67,8 @@ src/
 │   ├── globals.css             Tailwind + custom utilities
 │   ├── page.tsx                Landing page (server component)
 │   ├── actions/
-│   │   └── upload.ts           Server Action: shelbyUploadAction + getShelbyModeAction
+│   │   ├── upload.ts           Server Action: shelbyUploadAction + getShelbyModeAction
+│   │   └── persist.ts          Server Actions: persistUploadAction + getPersistedX (C7)
 │   ├── dashboard/
 │   │   └── page.tsx            Server component → DashboardClient
 │   ├── upload/
@@ -72,9 +86,9 @@ src/
 │   ├── status-badge.tsx        Evidence pack status badge
 │   ├── evidence-pack-card.tsx  Card for an evidence pack
 │   ├── page-header.tsx         Page title + subtitle
-│   ├── dashboard-client.tsx    Client: merges demo + localStorage packs
-│   ├── blob-detail-client.tsx  Client: resolves demo + localStorage blobs
-│   └── read-receipt-client.tsx Client: resolves receipts from demo data or localStorage
+│   ├── dashboard-client.tsx    Client: merges demo + localStorage + SQLite packs
+│   ├── blob-detail-client.tsx  Client: resolves demo / localStorage / SQLite blobs
+│   └── read-receipt-client.tsx Client: resolves receipts from demo / localStorage / SQLite
 └── lib/
     ├── demo-data/
     │   ├── evidence-packs.ts   5 demo packs + EvidencePack type
@@ -84,6 +98,9 @@ src/
     ├── evidence/
     │   ├── types.ts            Re-exports types from demo-data
     │   └── service.ts          Service functions (read from demo-data)
+    ├── server/                 Server-only SQLite persistence layer (C7)
+    │   ├── db.ts               SQLite connection + schema init (better-sqlite3)
+    │   └── evidence-store.ts   CRUD helpers: insertPack/Blob/Receipt + getters
     ├── shelby/
     │   ├── adapter.ts          ShelbyAdapter interface + payload/result types
     │   ├── config.ts           getShelbyConfig() — reads SHELBY_MODE etc. (server-side only)
@@ -94,9 +111,13 @@ src/
     │   ├── status-map.ts       Conservative evidence storage status mapping utilities
     │   └── index.ts            getAdapter() factory + re-exports
     ├── store/
-    │   └── local-store.ts      Browser localStorage: packs, blobs, and receipts
+    │   └── local-store.ts      Browser localStorage: packs, blobs, and receipts (fallback)
     ├── validation.ts           parseTags, isValidSHA256, buildEvidencePack, buildBlobRecord
     └── utils.ts                formatBytes, formatDate, formatDateTime
+
+data/
+└── shelby-vault.sqlite         SQLite database (gitignored, created at runtime)
+                                Override path: SHELBY_DB_PATH env var
 ```
 
 ---
@@ -162,9 +183,9 @@ The browser-wallet path is wrapped in `UploadProviders` (`src/app/upload/provide
 
 ---
 
-## localStorage persistence (M1/M4)
+## localStorage persistence (M1/M4 — fallback layer)
 
-All three data types are persisted to browser localStorage:
+All three data types are persisted to browser localStorage as a compatibility/fallback layer:
 
 | Key | Content |
 |---|---|
@@ -173,6 +194,37 @@ All three data types are persisted to browser localStorage:
 | `shelby_vault_receipts` | `ReadReceipt[]` — created automatically on upload (M4) |
 
 `resetLocalData()` clears all three keys atomically. This is called by the "Reset local data" button on the dashboard.
+
+Existing localStorage records continue to work unchanged. The SQLite layer (C7) is the primary cross-session persistence path; localStorage is retained as a low-latency in-browser fallback.
+
+---
+
+## SQLite persistence (C7)
+
+After every successful upload (mock or testnet), `persistUploadAction` writes the pack, blob records, and read receipt to a local SQLite database via `better-sqlite3`.
+
+**Database path:**
+- Default: `data/shelby-vault.sqlite` (relative to project root, gitignored)
+- Override: `SHELBY_DB_PATH` environment variable
+
+**Schema:**
+```sql
+evidence_packs   (id PK, created_at, payload JSON)
+blob_records     (id PK, evidence_pack_id INDEX, created_at, payload JSON)
+read_receipts    (id PK, created_at, payload JSON)
+```
+
+The `payload` column stores the complete typed object as JSON so future model-field additions do not require schema migrations.
+
+**Access pattern (C7 lookup chain):**
+
+| Page | Lookup order |
+|---|---|
+| Dashboard | demo data (server) + localStorage (client) + SQLite via `getPersistedPacksAction` |
+| Blob detail | demo data → localStorage → SQLite via `getPersistedBlobAction` |
+| Read receipt | demo data → localStorage → SQLite via `getPersistedReceiptAction` (blobs resolved similarly) |
+
+SQLite failures are non-fatal — the app degrades gracefully to localStorage-only mode.
 
 ---
 
@@ -190,18 +242,20 @@ Upload form submit
       evidencePackIds:  [pack.id]
       receiptMode:      'local' | 'shelby-testnet'
   → addLocalReadReceipt()
+  → persistUploadAction(pack, blobs, receipt) [SQLite — C7]
   → Upload success screen shows link to /read-receipt/{receiptId}
 ```
 
-The read receipt page uses `ReadReceiptClient` (`src/components/read-receipt-client.tsx`) — a client component that resolves receipts from demo data or localStorage in `useEffect`. This pattern parallels `BlobDetailClient` and `DashboardClient`.
+The read receipt page uses `ReadReceiptClient` (`src/components/read-receipt-client.tsx`) — a client component that resolves receipts from demo data, localStorage, or SQLite in `useEffect`. This pattern parallels `BlobDetailClient` and `DashboardClient`.
 
 ```
 /read-receipt/[id] (thin server shell)
   → ReadReceiptClient (client component)
-      1. getReadReceiptById(id)      — checks demo data (rr-001 to rr-004)
-      2. getLocalReadReceiptById(id) — checks localStorage
-      3. Resolves referenced blobs and evidence packs from both sources
-      4. Renders full identity surface per blob: shelbyRef, hash, source,
+      1. getReadReceiptById(id)             — checks demo data (rr-001 to rr-004)
+      2. getLocalReadReceiptById(id)        — checks localStorage
+      3. getPersistedReceiptAction(id)      — checks SQLite (C7)
+      4. Resolves referenced blobs: localStorage → demo → SQLite
+      5. Renders full identity surface per blob: shelbyRef, hash, source,
          accountAddress, blobName, network, storageStatus, explorerUrl, retrievalUrl
 ```
 
@@ -221,7 +275,10 @@ Shelby integration is planned against the official **testnet** endpoint family. 
 ### Read flow
 ```
 Browser → Server Component → service.getX() → demo-data array → return to component
-Browser → Client Component → useEffect → localStorage.getItem() → merge with demo data
+Browser → Client Component → useEffect:
+  1. Check demo-data (static arrays)
+  2. Check localStorage (browser)
+  3. Call SQLite Server Action (cross-session, survives localStorage reset)
 ```
 
 ### Write flow (mock)
@@ -234,7 +291,8 @@ Upload form
   → buildEvidencePack() + buildBlobRecord() [lib/validation.ts]
   → addLocalPack() + addLocalBlob() [lib/store/local-store.ts]
   → ReadReceipt constructed → addLocalReadReceipt()
-  → dashboard reads localStorage on next mount
+  → persistUploadAction(pack, blobs, receipt) [SQLite — C7]
+  → dashboard reads localStorage + SQLite on next mount
 ```
 
 ### Write flow (testnet browser-wallet)
@@ -247,6 +305,7 @@ Upload form (testnet mode)
     → returns void on success (transactionHash not available from React hook)
   → buildEvidencePack() + buildBlobRecord() [with real accountAddress, blobName, network]
   → addLocalPack() + addLocalBlob() + addLocalReadReceipt()
+  → persistUploadAction(pack, blobs, receipt) [SQLite — C7]
   → storageStatus: 'registered' (promote to 'ready' after RPC retrieval check)
 ```
 

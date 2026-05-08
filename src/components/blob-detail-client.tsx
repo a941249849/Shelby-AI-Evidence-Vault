@@ -19,6 +19,7 @@ import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import { formatBytes, formatDateTime } from '@/lib/utils';
 import { getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getBlobById, getEvidencePackById } from '@/lib/evidence/service';
+import { getPersistedBlobAction } from '@/app/actions/persist';
 
 interface BlobDetailClientProps {
   id: string;
@@ -98,7 +99,24 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
       return;
     }
 
-    setBlob(null);
+    // Fall through to SQLite-persisted records (survive localStorage resets)
+    getPersistedBlobAction(id)
+      .then((persistedBlob) => {
+        if (persistedBlob) {
+          setBlob(persistedBlob);
+          // Pack is only in demo data or localStorage at this point; SQLite pack
+          // lookup is not needed for display — just show "Unknown pack" if absent.
+          const pack =
+            getLocalPackById(persistedBlob.evidencePackId) ??
+            getEvidencePackById(persistedBlob.evidencePackId);
+          setPack(pack);
+        } else {
+          setBlob(null);
+        }
+      })
+      .catch(() => {
+        setBlob(null);
+      });
   }, [id]);
 
   if (blob === undefined) {
