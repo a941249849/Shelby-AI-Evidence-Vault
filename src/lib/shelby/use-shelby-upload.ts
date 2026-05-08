@@ -114,7 +114,7 @@ export function useShelbyUpload(): UseShelbyUploadReturn {
       );
     }
 
-    const accountAddress = walletAddress!;
+    const accountAddress = walletAddress ?? wallet.account.address.toString();
     const blobName = buildBlobName(input.packId, input.hash, input.fileName);
     const expirationMicros = computeExpirationMicros(browserConfig.expirationHours);
 

@@ -446,6 +446,7 @@ function UploadPageContent() {
   }
 
   const isTestnet = mode === 'testnet';
+  const testnetRequiresWallet = isTestnet && !shelbyUpload.walletConnected;
   const submitLabel = uploading
     ? isTestnet
       ? 'Uploading to testnet'
@@ -693,13 +694,13 @@ function UploadPageContent() {
               </p>
               <button
                 type="submit"
-                disabled={uploading || files.length === 0 || (isTestnet && !shelbyUpload.walletConnected)}
+                disabled={uploading || files.length === 0 || testnetRequiresWallet}
                 className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#fcfaf8] px-4 py-3 text-sm font-semibold text-[#4f192a] transition hover:bg-[#fcfaf8] disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {submitLabel}
               </button>
-              {isTestnet && !shelbyUpload.walletConnected && (
+              {testnetRequiresWallet && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
                   Connect an Aptos wallet to enable testnet upload.
                 </p>
