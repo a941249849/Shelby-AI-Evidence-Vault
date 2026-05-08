@@ -1,23 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #090a0d;
-  --foreground: #f4f0e8;
-  --shelby-void: #090a0d;
-  --shelby-ink: #111217;
-  --shelby-panel: #15161c;
-  --shelby-panel-2: #1c1d25;
-  --shelby-line: rgba(244, 240, 232, 0.13);
-  --shelby-line-strong: rgba(244, 240, 232, 0.22);
-  --shelby-text: #f4f0e8;
-  --shelby-muted: #9d9a92;
-  --shelby-dim: #6f716d;
-  --shelby-violet: #de8aff;
-  --shelby-green: #9fe878;
-  --shelby-pink: #ff77c9;
-  --shelby-coral: #fd8565;
-  --shelby-paper: #f3efe7;
-  --shelby-paper-2: #d8d0c4;
+  --background: #f4efe2;
+  --foreground: #2d211c;
+  --shelby-void: #f4efe2;
+  --shelby-ink: #2d211c;
+  --shelby-panel: #fff8ea;
+  --shelby-panel-2: #eadfca;
+  --shelby-line: rgba(33, 26, 22, 0.13);
+  --shelby-line-strong: rgba(33, 26, 22, 0.23);
+  --shelby-text: #2d211c;
+  --shelby-muted: #6f6258;
+  --shelby-dim: #978978;
+  --shelby-violet: #6a3ea1;
+  --shelby-green: #157a4c;
+  --shelby-pink: #d94f83;
+  --shelby-coral: #ef6f4d;
+  --shelby-yellow: #f0c846;
+  --shelby-paper: #fff8ea;
+  --shelby-paper-2: #eadfca;
 }
 
 @theme inline {
@@ -40,7 +41,7 @@ body {
   background: var(--shelby-void);
   color: var(--shelby-text);
   font-family:
-    "Inter", "SF Pro Display", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    "Inter", "Space Grotesk", "SF Pro Display", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
   text-rendering: geometricPrecision;
 }
 
@@ -54,7 +55,7 @@ samp,
 }
 
 ::selection {
-  background: rgba(222, 138, 255, 0.34);
+  background: rgba(239, 111, 77, 0.28);
   color: var(--shelby-text);
 }
 
@@ -82,14 +83,16 @@ textarea {
 
 .kinetic-grid {
   background:
-    linear-gradient(90deg, rgba(244, 240, 232, 0.055) 1px, transparent 1px),
-    linear-gradient(rgba(244, 240, 232, 0.055) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(159, 232, 120, 0.08) 0 1px, transparent 1px 28px),
+    linear-gradient(120deg, rgba(106, 62, 161, 0.08), transparent 34%),
+    linear-gradient(300deg, rgba(239, 111, 77, 0.12), transparent 38%),
+    linear-gradient(90deg, rgba(33, 26, 22, 0.055) 1px, transparent 1px),
+    linear-gradient(rgba(33, 26, 22, 0.055) 1px, transparent 1px),
     var(--shelby-void);
   background-size:
+    auto,
+    auto,
     72px 72px,
     72px 72px,
-    36px 36px,
     auto;
 }
 
@@ -103,10 +106,10 @@ textarea {
 
 .shelby-surface {
   background:
-    linear-gradient(180deg, rgba(244, 240, 232, 0.07), rgba(244, 240, 232, 0.025)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 248, 234, 0.86)),
     var(--shelby-panel);
   border: 1px solid var(--shelby-line);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+  box-shadow: 0 24px 70px rgba(80, 48, 24, 0.14);
 }
 
 .shelby-surface-soft {
@@ -119,11 +122,13 @@ textarea {
 }
 
 .shelby-cut {
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+  border-radius: 24px;
+  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 0 100%);
 }
 
 .shelby-cut-sm {
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  border-radius: 16px;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
 }
 
 .shelby-mark {
@@ -132,32 +137,34 @@ textarea {
   display: grid;
   place-items: center;
   overflow: hidden;
-  border: 1px solid rgba(244, 240, 232, 0.18);
-  background: #111217;
+  border: 1px solid rgba(33, 26, 22, 0.18);
+  background: #fff8ea;
+  clip-path: polygon(20% 4%, 80% 4%, 100% 50%, 80% 96%, 20% 96%, 0 50%);
 }
 
 .shelby-mark::before,
 .shelby-mark::after {
   content: "";
   position: absolute;
-  inset: 12%;
+  inset: 15%;
   border: 2px solid var(--shelby-green);
-  transform: skewX(-18deg);
+  border-radius: 999px;
 }
 
 .shelby-mark::after {
-  inset: 28%;
+  inset: 27%;
   border-color: var(--shelby-violet);
-  transform: skewX(-18deg) translateX(10%);
+  clip-path: polygon(20% 4%, 80% 4%, 100% 50%, 80% 96%, 20% 96%, 0 50%);
+  border-radius: 0;
 }
 
 .shelby-mark span {
   position: relative;
   z-index: 1;
-  width: 9px;
-  height: 44%;
+  width: 8px;
+  height: 38%;
   background: var(--shelby-coral);
-  transform: skewX(-18deg);
+  transform: rotate(14deg);
 }
 
 .ui-chip {
@@ -165,8 +172,8 @@ textarea {
   align-items: center;
   gap: 0.45rem;
   border: 1px solid var(--shelby-line);
-  background: rgba(244, 240, 232, 0.055);
-  color: var(--shelby-muted);
+  background: rgba(255, 248, 234, 0.78);
+  color: var(--shelby-ink);
   padding: 0.42rem 0.62rem;
   font-family: "IBM Plex Mono", "SF Mono", monospace;
   font-size: 0.72rem;
@@ -186,9 +193,9 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 1px solid rgba(244, 240, 232, 0.16);
-  background: var(--shelby-text);
-  color: var(--shelby-ink);
+  border: 1px solid rgba(33, 26, 22, 0.14);
+  background: var(--shelby-ink);
+  color: #fff8ea;
   padding: 0.72rem 1rem;
   font-size: 0.9rem;
   font-weight: 750;
@@ -202,17 +209,18 @@ textarea {
 .ui-button:hover {
   transform: translateY(-1px);
   background: var(--shelby-green);
+  color: #fff8ea;
 }
 
 .ui-button-secondary {
-  background: rgba(244, 240, 232, 0.06);
-  color: var(--shelby-text);
+  background: rgba(255, 248, 234, 0.72);
+  color: var(--shelby-ink);
 }
 
 .ui-button-secondary:hover {
   border-color: rgba(222, 138, 255, 0.5);
-  background: rgba(222, 138, 255, 0.16);
-  color: var(--shelby-text);
+  background: rgba(106, 62, 161, 0.12);
+  color: var(--shelby-ink);
 }
 
 .data-rail {
@@ -228,7 +236,7 @@ textarea {
     linear-gradient(90deg, transparent, rgba(159, 232, 120, 0.14), transparent),
     repeating-linear-gradient(
       90deg,
-      rgba(244, 240, 232, 0.16) 0 1px,
+      rgba(33, 26, 22, 0.12) 0 1px,
       transparent 1px 18px
     );
   opacity: 0.7;
@@ -250,6 +258,39 @@ textarea {
 
 @media (max-width: 640px) {
   .shelby-cut {
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+    border-radius: 18px;
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
   }
+}
+
+.duotone-lilac {
+  background:
+    linear-gradient(135deg, rgba(106, 62, 161, 0.16), transparent 52%),
+    #efe2ff;
+}
+
+.duotone-coral {
+  background:
+    linear-gradient(135deg, rgba(239, 111, 77, 0.22), transparent 52%),
+    #ffe0cf;
+}
+
+.duotone-green {
+  background:
+    linear-gradient(135deg, rgba(21, 122, 76, 0.18), transparent 52%),
+    #dff2c8;
+}
+
+.hex-field {
+  background-image:
+    linear-gradient(30deg, rgba(33, 26, 22, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(33, 26, 22, 0.08) 87.5%, rgba(33, 26, 22, 0.08)),
+    linear-gradient(150deg, rgba(33, 26, 22, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(33, 26, 22, 0.08) 87.5%, rgba(33, 26, 22, 0.08)),
+    linear-gradient(30deg, rgba(33, 26, 22, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(33, 26, 22, 0.08) 87.5%, rgba(33, 26, 22, 0.08)),
+    linear-gradient(150deg, rgba(33, 26, 22, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(33, 26, 22, 0.08) 87.5%, rgba(33, 26, 22, 0.08));
+  background-position:
+    0 0,
+    0 0,
+    22px 38px,
+    22px 38px;
+  background-size: 44px 76px;
 }

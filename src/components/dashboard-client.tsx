@@ -24,8 +24,8 @@ function Metric({
   tone: string;
 }) {
   return (
-    <div className="border-l border-white/10 px-4 py-3 first:border-l-0">
-      <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">{label}</p>
+    <div className="border-l border-[#2d211c]/10 px-4 py-3 first:border-l-0">
+      <p className="font-mono text-xs font-semibold uppercase text-[#978978]">{label}</p>
       <p className={`mt-2 text-3xl font-semibold ${tone}`}>{value}</p>
     </div>
   );
@@ -68,7 +68,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
   const activePacks = allPacks.filter((p) => p.status === 'active').length;
 
   return (
-    <main className="kinetic-grid min-h-[calc(100vh-64px)] px-4 py-10 sm:px-6 lg:px-8">
+    <main className="kinetic-grid min-h-[calc(100vh-64px)] px-4 py-10 text-[#2d211c] sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 grid gap-5 lg:grid-cols-[1fr_390px] lg:items-stretch">
           <section className="shelby-surface shelby-cut p-6">
@@ -76,10 +76,10 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
               <ShieldCheck size={13} />
               Evidence index
             </div>
-            <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1] text-[#f4f0e8] sm:text-5xl">
+            <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1] text-[#2d211c] sm:text-5xl">
               Inspectable storage state for AI evidence.
             </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-[#9d9a92]">
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-[#6f6258]">
               Demo corpus, browser-local records, and SQLite-persisted uploads resolve through one
               evidence index.
             </p>
@@ -88,12 +88,12 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           <aside className="shelby-surface shelby-cut p-5">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">
+                <p className="font-mono text-xs font-semibold uppercase text-[#978978]">
                   Runtime boundary
                 </p>
-                <p className="mt-2 text-lg font-semibold text-[#f4f0e8]">Local + SQLite</p>
+                <p className="mt-2 text-lg font-semibold text-[#2d211c]">Local + SQLite</p>
               </div>
-              <div className="grid h-11 w-11 place-items-center border border-[#9fe878]/30 bg-[#9fe878]/10 text-[#9fe878]">
+              <div className="grid h-11 w-11 place-items-center rounded-full border border-[#157a4c]/25 bg-[#dff2c8] text-[#157a4c]">
                 <HardDrive size={19} />
               </div>
             </div>
@@ -104,11 +104,11 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           </aside>
         </div>
 
-        <div className="mb-8 grid border-y border-white/10 bg-white/[0.035] sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Packs indexed" value={allPacks.length} tone="text-[#f4f0e8]" />
-          <Metric label="Active packs" value={activePacks} tone="text-[#9fe878]" />
-          <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#de8aff]" />
-          <Metric label="User packs" value={allUserPacks.length} tone="text-[#fd8565]" />
+        <div className="mb-8 grid rounded-[24px] border border-[#2d211c]/10 bg-[#fff8ea]/65 sm:grid-cols-2 lg:grid-cols-4">
+          <Metric label="Packs indexed" value={allPacks.length} tone="text-[#2d211c]" />
+          <Metric label="Active packs" value={activePacks} tone="text-[#157a4c]" />
+          <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#6a3ea1]" />
+          <Metric label="User packs" value={allUserPacks.length} tone="text-[#a33f2d]" />
         </div>
 
         {allUserPacks.length > 0 && (
@@ -119,11 +119,11 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
                   <Activity size={13} />
                   User-created records
                 </div>
-                <h2 className="mt-3 text-xl font-semibold text-[#f4f0e8]">Local workspace</h2>
+                <h2 className="mt-3 text-xl font-semibold text-[#2d211c]">Local workspace</h2>
               </div>
               <button
                 onClick={handleReset}
-                className="shelby-cut-sm border border-white/12 bg-white/[0.055] px-3 py-2 text-xs font-semibold text-[#9d9a92] transition hover:border-[#fd8565]/50 hover:text-[#ffc2ad]"
+                className="shelby-cut-sm border border-[#2d211c]/12 bg-[#fff8ea] px-3 py-2 text-xs font-semibold text-[#6f6258] transition hover:border-[#ef6f4d]/45 hover:text-[#a33f2d]"
               >
                 {resetConfirm ? 'Click again to reset browser cache' : 'Reset browser cache'}
               </button>
@@ -143,9 +143,9 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
                 <Database size={13} />
                 Built-in corpus
               </div>
-              <h2 className="mt-3 text-xl font-semibold text-[#f4f0e8]">Demo evidence</h2>
+              <h2 className="mt-3 text-xl font-semibold text-[#2d211c]">Demo evidence</h2>
             </div>
-            <div className="hidden items-center gap-2 font-mono text-xs font-semibold uppercase text-[#6f716d] sm:flex">
+            <div className="hidden items-center gap-2 font-mono text-xs font-semibold uppercase text-[#978978] sm:flex">
               <Layers3 size={14} />
               {demoPacks.length} packs
             </div>

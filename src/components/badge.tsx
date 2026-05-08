@@ -4,11 +4,11 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
-  default: 'border-white/12 bg-white/[0.055] text-[#c7c1b8]',
-  success: 'border-[#9fe878]/40 bg-[#9fe878]/12 text-[#9fe878]',
-  warning: 'border-[#fd8565]/45 bg-[#fd8565]/12 text-[#ffc2ad]',
+  default: 'border-[#2d211c]/12 bg-[#fff8ea] text-[#c7c1b8]',
+  success: 'border-[#157a4c]/40 bg-[#dff2c8] text-[#157a4c]',
+  warning: 'border-[#ef6f4d]/45 bg-[#ffe0cf] text-[#a33f2d]',
   error: 'border-[#ff6b7a]/45 bg-[#ff6b7a]/12 text-[#ffadb5]',
-  info: 'border-[#de8aff]/38 bg-[#de8aff]/12 text-[#e7b6ff]',
+  info: 'border-[#6a3ea1]/38 bg-[#efe2ff] text-[#6a3ea1]',
 };
 
 export default function Badge({ label, variant = 'default' }: BadgeProps) {

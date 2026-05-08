@@ -35,7 +35,7 @@ interface ReadReceiptClientProps {
 function ReceiptModeBadge({ mode }: { mode: ReadReceipt['receiptMode'] }) {
   if (mode === 'shelby-testnet') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fd8565]/50 bg-[#ffdcd9] px-3 py-1 text-xs font-semibold text-[#f4f0e8]">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#ef6f4d]/45 bg-[#ffe0cf] px-3 py-1 text-xs font-semibold text-[#a33f2d]">
         <ShieldCheck className="h-3.5 w-3.5" />
         Shelby testnet
       </span>
@@ -43,14 +43,14 @@ function ReceiptModeBadge({ mode }: { mode: ReadReceipt['receiptMode'] }) {
   }
   if (mode === 'local') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#de8aff]/25 bg-[#eee2ff] px-3 py-1 text-xs font-semibold text-[#470b64]">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#6a3ea1]/30 bg-[#efe2ff] px-3 py-1 text-xs font-semibold text-[#6a3ea1]">
         <ShieldCheck className="h-3.5 w-3.5" />
         Local demo upload
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#9d9a92]">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#2d211c]/10 bg-[#fff8ea] px-3 py-1 text-xs font-semibold text-[#6f6258]">
       <Database className="h-3.5 w-3.5" />
       Demo data
     </span>
@@ -60,20 +60,20 @@ function ReceiptModeBadge({ mode }: { mode: ReadReceipt['receiptMode'] }) {
 function BlobDataSourceBadge({ blob }: { blob: BlobRecord }) {
   if (blob.dataSource === 'shelby-testnet') {
     return (
-      <span className="inline-flex items-center gap-1 rounded border border-[#fd8565]/50 bg-[#ffdcd9] px-2 py-0.5 text-xs font-semibold text-[#f4f0e8]">
+      <span className="inline-flex items-center gap-1 rounded border border-[#ef6f4d]/45 bg-[#ffe0cf] px-2 py-0.5 text-xs font-semibold text-[#a33f2d]">
         Shelby testnet
       </span>
     );
   }
   if (blob.dataSource === 'local') {
     return (
-      <span className="inline-flex items-center gap-1 rounded border border-[#de8aff]/25 bg-[#eee2ff] px-2 py-0.5 text-xs font-semibold text-[#470b64]">
+      <span className="inline-flex items-center gap-1 rounded border border-[#6a3ea1]/30 bg-[#efe2ff] px-2 py-0.5 text-xs font-semibold text-[#6a3ea1]">
         Local mock
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs font-semibold text-[#9d9a92]">
+    <span className="inline-flex items-center gap-1 rounded border border-[#2d211c]/10 bg-[#fff8ea] px-2 py-0.5 text-xs font-semibold text-[#6f6258]">
       Demo
     </span>
   );
@@ -90,18 +90,18 @@ function Fact({
 }) {
   return (
     <div className="shelby-cut shelby-surface p-4 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">
-        <Icon className="h-3.5 w-3.5 text-[#de8aff]" />
+      <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase  text-[#6f6258]">
+        <Icon className="h-3.5 w-3.5 text-[#6a3ea1]" />
         {label}
       </div>
-      <div className="break-all text-sm leading-6 text-[#f4f0e8]">{children}</div>
+      <div className="break-all text-sm leading-6 text-[#2d211c]">{children}</div>
     </div>
   );
 }
 
 function MonoBlock({ children }: { children: React.ReactNode }) {
   return (
-    <code className="block break-all rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-xs text-[#f4f0e8]">
+    <code className="block break-all rounded-md border border-[#2d211c]/10 bg-[#fff8ea] px-3 py-2 font-mono text-xs text-[#2d211c]">
       {children}
     </code>
   );
@@ -112,10 +112,10 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
     <div className="shelby-cut shelby-surface p-4 shadow-sm">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Fingerprint className="h-4 w-4 text-[#de8aff]" />
+          <Fingerprint className="h-4 w-4 text-[#6a3ea1]" />
           <Link
             href={`/blob/${blob.id}`}
-            className="font-mono text-xs font-semibold text-[#f4f0e8] transition hover:text-[#de8aff]"
+            className="font-mono text-xs font-semibold text-[#2d211c] transition hover:text-[#6a3ea1]"
           >
             {blob.id}
           </Link>
@@ -125,63 +125,63 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
 
       <div className="space-y-3">
         <div>
-          <p className="mb-1 text-xs font-semibold uppercase  text-[#9d9a92]">
+          <p className="mb-1 text-xs font-semibold uppercase  text-[#6f6258]">
             Shelby ref
           </p>
           <MonoBlock>{blob.shelbyRef}</MonoBlock>
         </div>
 
         <div>
-          <p className="mb-1 text-xs font-semibold uppercase  text-[#9d9a92]">
+          <p className="mb-1 text-xs font-semibold uppercase  text-[#6f6258]">
             SHA-256 hash
           </p>
           <MonoBlock>{blob.hash}</MonoBlock>
         </div>
 
         <div>
-          <p className="mb-1 text-xs font-semibold uppercase  text-[#9d9a92]">
+          <p className="mb-1 text-xs font-semibold uppercase  text-[#6f6258]">
             Source
           </p>
-          <p className="break-all text-xs text-[#f4f0e8]">{blob.source}</p>
+          <p className="break-all text-xs text-[#2d211c]">{blob.source}</p>
         </div>
 
         {/* Real Shelby identity fields — only shown when present */}
         {(blob.accountAddress || blob.blobName || blob.network || blob.storageStatus) && (
-          <div className="mt-3 grid gap-2 rounded-md border border-white/10 bg-white/[0.04] p-3 sm:grid-cols-2">
+          <div className="mt-3 grid gap-2 rounded-md border border-[#2d211c]/10 bg-[#fff8ea] p-3 sm:grid-cols-2">
             {blob.accountAddress && (
               <div>
-                <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+                <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                   Account address
                 </p>
-                <p className="mt-0.5 break-all font-mono text-xs text-[#f4f0e8]">
+                <p className="mt-0.5 break-all font-mono text-xs text-[#2d211c]">
                   {blob.accountAddress}
                 </p>
               </div>
             )}
             {blob.blobName && (
               <div>
-                <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+                <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                   Blob name
                 </p>
-                <p className="mt-0.5 break-all font-mono text-xs text-[#f4f0e8]">{blob.blobName}</p>
+                <p className="mt-0.5 break-all font-mono text-xs text-[#2d211c]">{blob.blobName}</p>
               </div>
             )}
             {blob.network && (
               <div>
-                <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+                <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                   Network
                 </p>
-                <span className="mt-0.5 inline-block rounded border border-[#9fe878]/25 bg-[#dfffcc] px-2 py-0.5 text-xs font-semibold text-[#21351a]">
+                <span className="mt-0.5 inline-block rounded border border-[#157a4c]/35 bg-[#dff2c8] px-2 py-0.5 text-xs font-semibold text-[#157a4c]">
                   {blob.network}
                 </span>
               </div>
             )}
             {blob.storageStatus && (
               <div>
-                <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+                <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                   Storage status
                 </p>
-                <p className="mt-0.5 text-xs font-semibold text-[#f4f0e8]">{blob.storageStatus}</p>
+                <p className="mt-0.5 text-xs font-semibold text-[#2d211c]">{blob.storageStatus}</p>
               </div>
             )}
           </div>
@@ -194,7 +194,7 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
                 href={blob.explorerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#9fe878]/40 bg-[#dfffcc] px-3 py-1 text-xs font-semibold text-[#21351a] transition hover:bg-[#c9f5aa]"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#157a4c]/40 bg-[#dff2c8] px-3 py-1 text-xs font-semibold text-[#157a4c] transition hover:bg-[#9fe878]/15"
               >
                 <ExternalLink className="h-3 w-3" />
                 Explorer
@@ -205,7 +205,7 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
                 href={blob.retrievalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#9d9a92] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#2d211c]/10 bg-[#fff8ea] px-3 py-1 text-xs font-semibold text-[#6f6258] transition hover:border-[#6a3ea1]/35 hover:text-[#6a3ea1]"
               >
                 <ExternalLink className="h-3 w-3" />
                 Retrieval URL
@@ -216,11 +216,11 @@ function ResolvedBlobCard({ blob }: { blob: BlobRecord }) {
 
         {blob.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            <Tag className="h-3.5 w-3.5 flex-none self-center text-[#de8aff]" />
+            <Tag className="h-3.5 w-3.5 flex-none self-center text-[#6a3ea1]" />
             {blob.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-xs text-[#f4f0e8]"
+                className="rounded border border-[#2d211c]/10 bg-[#fff8ea] px-2 py-0.5 font-mono text-xs text-[#2d211c]"
               >
                 {tag}
               </span>
@@ -328,20 +328,20 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
     return (
       <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-16 sm:px-6">
         <div className="mx-auto max-w-2xl shelby-cut shelby-surface p-8 text-center shadow-sm">
-          <div className="mx-auto mb-5 grid h-12 w-12 place-items-center shelby-cut bg-[#111217] text-[#9fe878]">
+          <div className="mx-auto mb-5 grid h-12 w-12 place-items-center shelby-cut bg-[#2d211c] text-[#157a4c]">
             <ReceiptText className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-semibold  text-[#f4f0e8]">
+          <h1 className="text-2xl font-semibold  text-[#2d211c]">
             Read receipt not found
           </h1>
-          <p className="mt-3 text-sm leading-6 text-[#9d9a92]">
+          <p className="mt-3 text-sm leading-6 text-[#6f6258]">
             No read receipt with ID{' '}
-            <code className="rounded bg-white/[0.04] px-1 font-mono">{id}</code> exists in demo
+            <code className="rounded bg-[#fff8ea] px-1 font-mono">{id}</code> exists in demo
             data or local storage.
           </p>
           <Link
             href="/dashboard"
-            className="mt-6 inline-flex items-center gap-2 shelby-cut bg-[#111217] px-4 py-2.5 text-sm font-semibold text-[#f4f0e8] transition hover:bg-[#1c1d25]"
+            className="mt-6 inline-flex items-center gap-2 shelby-cut bg-[#2d211c] px-4 py-2.5 text-sm font-semibold text-[#fff8ea] transition hover:bg-[#157a4c]"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to index
@@ -359,7 +359,7 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
         <div className="mb-8">
           <Link
             href="/dashboard"
-            className="mb-5 inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#9d9a92] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+            className="mb-5 inline-flex items-center gap-1 rounded-full border border-[#2d211c]/10 bg-[#fff8ea] px-3 py-1 text-xs font-semibold text-[#6f6258] transition hover:border-[#6a3ea1]/35 hover:text-[#6a3ea1]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Dashboard
@@ -368,25 +368,25 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
           <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#de8aff]/25 bg-[#eee2ff] px-3 py-1 text-xs font-semibold text-[#470b64]">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#6a3ea1]/30 bg-[#efe2ff] px-3 py-1 text-xs font-semibold text-[#6a3ea1]">
                   <ReceiptText className="h-3.5 w-3.5" />
                   AI read receipt
                 </span>
                 <ReceiptModeBadge mode={receipt.receiptMode} />
               </div>
-              <h1 className="mt-4 max-w-4xl text-4xl font-semibold  text-[#f4f0e8]">
+              <h1 className="mt-4 max-w-4xl text-4xl font-semibold  text-[#2d211c]">
                 Answer provenance and evidence usage.
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#9d9a92]">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
                 A compact receipt for one agent response: prompt, answer summary, run metadata,
                 referenced blobs, and evidence packs.
               </p>
             </div>
             <div className="shelby-cut shelby-surface p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+              <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                 Receipt ID
               </p>
-              <p className="mt-2 truncate font-mono text-sm font-semibold text-[#f4f0e8]">
+              <p className="mt-2 truncate font-mono text-sm font-semibold text-[#2d211c]">
                 {receipt.id}
               </p>
             </div>
@@ -397,39 +397,39 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
           <section className="space-y-6">
             <div className="shelby-cut shelby-surface p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#111217] text-[#9fe878]">
+                <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#2d211c] text-[#dff2c8]">
                   <MessageSquareText className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+                  <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                     Query
                   </p>
-                  <h2 className="text-lg font-semibold text-[#f4f0e8]">User question</h2>
+                  <h2 className="text-lg font-semibold text-[#2d211c]">User question</h2>
                 </div>
               </div>
-              <p className="text-base leading-7 text-[#f4f0e8]">{receipt.query}</p>
+              <p className="text-base leading-7 text-[#2d211c]">{receipt.query}</p>
             </div>
 
             <div className="shelby-cut shelby-surface p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#111217] text-[#ff77c9]">
+                <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#2d211c] text-[#ff77c9]">
                   <Braces className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+                  <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                     Answer summary
                   </p>
-                  <h2 className="text-lg font-semibold text-[#f4f0e8]">Generated response</h2>
+                  <h2 className="text-lg font-semibold text-[#2d211c]">Generated response</h2>
                 </div>
               </div>
-              <p className="text-sm leading-7 text-[#f4f0e8]">{receipt.answerSummary}</p>
+              <p className="text-sm leading-7 text-[#2d211c]">{receipt.answerSummary}</p>
             </div>
 
             <div className="shelby-cut shelby-surface p-5 shadow-sm">
-              <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">
-                <Fingerprint className="h-4 w-4 text-[#de8aff]" />
+              <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase  text-[#6f6258]">
+                <Fingerprint className="h-4 w-4 text-[#6a3ea1]" />
                 Referenced blobs
-                <span className="ml-auto rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs font-semibold text-[#9d9a92]">
+                <span className="ml-auto rounded border border-[#2d211c]/10 bg-[#fff8ea] px-2 py-0.5 text-xs font-semibold text-[#6f6258]">
                   {receipt.referencedBlobIds.length}
                 </span>
               </div>
@@ -447,11 +447,11 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
                         key={bid}
                         className="shelby-cut shelby-surface px-3 py-3"
                       >
-                        <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+                        <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                           Blob
                         </p>
-                        <p className="mt-1 font-mono text-xs text-[#9d9a92]">{bid}</p>
-                        <p className="mt-1 text-xs text-[#9d9a92]">Not found in local storage.</p>
+                        <p className="mt-1 font-mono text-xs text-[#6f6258]">{bid}</p>
+                        <p className="mt-1 text-xs text-[#6f6258]">Not found in local storage.</p>
                       </div>
                     ))}
                 </div>
@@ -461,12 +461,12 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
                     <Link
                       key={blobId}
                       href={`/blob/${blobId}`}
-                      className="group shelby-cut shelby-surface px-3 py-3 transition hover:border-[#de8aff]/40 hover:bg-white/[0.04]"
+                      className="group shelby-cut shelby-surface px-3 py-3 transition hover:border-[#6a3ea1]/35 hover:bg-[#fff8ea]"
                     >
-                      <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
+                      <p className="text-xs font-semibold uppercase  text-[#6f6258]">
                         Blob
                       </p>
-                      <p className="mt-1 truncate font-mono text-xs font-semibold text-[#f4f0e8] group-hover:text-[#de8aff]">
+                      <p className="mt-1 truncate font-mono text-xs font-semibold text-[#2d211c] group-hover:text-[#6a3ea1]">
                         {blobId}
                       </p>
                     </Link>
@@ -490,8 +490,8 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
               <ReceiptModeBadge mode={receipt.receiptMode} />
             </Fact>
             <div className="shelby-cut shelby-surface p-4 shadow-sm">
-              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">
-                <Database className="h-3.5 w-3.5 text-[#de8aff]" />
+              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase  text-[#6f6258]">
+                <Database className="h-3.5 w-3.5 text-[#6a3ea1]" />
                 Evidence packs
               </div>
               <div className="space-y-2">
@@ -500,14 +500,14 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
                     <Link
                       key={pack.id}
                       href={`/dashboard?pack=${pack.id}`}
-                      className="block rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-semibold text-[#f4f0e8] transition hover:border-[#de8aff]/40 hover:bg-white/[0.04] hover:text-[#de8aff]"
+                      className="block rounded-md border border-[#2d211c]/10 bg-[#fff8ea] px-3 py-2 text-sm font-semibold text-[#2d211c] transition hover:border-[#6a3ea1]/35 hover:bg-[#fff8ea] hover:text-[#6a3ea1]"
                     >
                       {pack.title}
                     </Link>
                   ))
                 ) : (
                   receipt.evidencePackIds.map((pid) => (
-                    <p key={pid} className="font-mono text-xs text-[#9d9a92]">
+                    <p key={pid} className="font-mono text-xs text-[#6f6258]">
                       {pid}
                     </p>
                   ))
