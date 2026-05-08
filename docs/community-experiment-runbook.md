@@ -1,8 +1,8 @@
 # Community Experiment Runbook — Shelby AI Evidence Vault
 
-**Stage: C12 — Community release candidate acceptance harness and product QA gate**
+**Stage: X3 — Community experiment candidate / product closeout**
 
-This runbook is written for community testers and reviewers who want to clone the repo, run the zero-credential path, inspect persisted records, and understand what is mock/local/demo vs Shelby testnet.
+This runbook is written for community testers and reviewers who want to clone the repo, run the zero-credential path, inspect persisted records, and understand what is mock/local/demo vs Shelby testnet. The product UI is Chinese-first with an English toggle in the top navigation.
 
 There are no hidden setup steps. Everything documented here is the complete picture.
 
@@ -111,9 +111,9 @@ All IDs are **deterministic and stable** — you will get the same IDs every tim
 
 1. Navigate to `http://localhost:3000/upload`
 2. Enter a title and select any local file
-3. Click **"Save locally (mock Shelby reference)"**
+3. Click **保存到本地** / **Save locally**
 4. The success screen shows blob links and a read receipt link
-5. Navigate to `/dashboard` — your pack appears in "Local workspace" under "User-created records"
+5. Navigate to `/dashboard` — your pack appears in **本地工作区** / **Local workspace** under **用户创建记录** / **User-created records**
 
 User-uploaded packs are persisted to `data/shelby-vault.sqlite` and survive page refresh.
 
@@ -212,6 +212,20 @@ npm run verify-release-candidate
 This is the one-command release-candidate gate (C12). It runs the complete product loop end to end, including all of the above plus a production build and route smoke checks against a live server instance. It is zero-credential and mock-safe by default.
 
 See `docs/release-candidate-checklist.md` for the full list of checks.
+
+### Product UI closeout check
+
+After the release-candidate gate passes, manually inspect the community product surface:
+
+| Route | Product check |
+|-----|-----|
+| `/` | Chinese-first Shelby ecosystem home, evidence-flow board, core capability cards, product preview |
+| `/dashboard` | Evidence registry with search/filter/sort and bilingual labels |
+| `/upload` | Evidence intake flow with clear Mock + SQLite vs Shelby testnet boundary |
+| `/blob/blob-001` | Blob provenance inspector with Shelby ref, hash, source, metadata, pack link |
+| `/read-receipt/rr-001` | Read receipt showing query, answer summary, referenced Blob identity, run metadata |
+
+Use the language toggle in the top navigation to verify both Chinese and English surfaces.
 
 ---
 

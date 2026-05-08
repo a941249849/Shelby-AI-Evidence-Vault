@@ -1,8 +1,10 @@
 # Release-Candidate Checklist — Shelby AI Evidence Vault
 
-**Stage: C12 — Community release candidate acceptance harness and product QA gate**
+**Stage: C12/X3 — Release-candidate gate plus product closeout QA**
 
 This document describes the release-candidate validation gate for the Shelby AI Evidence Vault community experiment. The gate is zero-credential, mock-safe by default, and is designed to verify the complete product loop in a single deterministic command.
+
+The X3 product closeout keeps this command as the hard automated gate, then adds a manual UI/product pass for the Chinese-first bilingual Shelby ecosystem surface.
 
 > **This is a community experiment and demo.** Nothing here implies mainnet or production Shelby storage readiness. Mock/local references (e.g. `shelby://mock/blob/…`) are deterministic local identifiers that demonstrate the data model and UI.
 
@@ -134,6 +136,29 @@ The temp database is deleted when the verifier exits, even on failure.
 - No secrets printed to stdout or the artifact file
 - No browser automation (Playwright, Selenium, etc.)
 - No marketplace, trading, token, or payment features
+
+---
+
+## Manual product QA after the automated gate
+
+After `npm run verify-release-candidate` passes, run the local app and inspect the actual product surface:
+
+```bash
+npm run dev
+# Open http://localhost:3000
+```
+
+Manual checks:
+
+| Area | Expected result |
+|---|---|
+| Language | Default surface is Chinese; top-nav language toggle switches the main product routes to English |
+| Home | Shelby ecosystem positioning, evidence-flow board, core capability cards, product preview |
+| Registry | Evidence packs from demo/local/SQLite are visible; search, filters, sort, and cards remain usable |
+| Upload | Mock + SQLite path is clear; testnet path is gated by wallet and operator prerequisites |
+| Blob detail | Shows provenance, Shelby ref, SHA-256 hash, source, metadata, and pack relationship |
+| Read receipt | Shows query, answer summary, run metadata, referenced Blob identity, and evidence pack links |
+| Boundaries | No UI implies mainnet readiness, token trading, marketplace behavior, or server-side wallet custody |
 
 ---
 
