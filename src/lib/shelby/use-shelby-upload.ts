@@ -6,6 +6,7 @@
  * Wraps @shelby-protocol/react's useUploadBlobs with wallet adapter integration.
  * Handles fail-closed states:
  *   - Wallet not connected    → throws with clear message
+ *   - Wrong wallet network    → throws with clear message before upload
  *   - Config missing          → throws with clear message
  *   - SDK upload fails        → re-throws SDK error
  *
@@ -17,6 +18,8 @@
 
 import { useMemo } from 'react';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
+import type { AdapterWallet, AdapterNotDetectedWallet } from '@aptos-labs/wallet-adapter-react';
+import { Network } from '@aptos-labs/ts-sdk';
 import { useUploadBlobs } from '@shelby-protocol/react';
 import type { WalletAdapterSigner } from '@shelby-protocol/react';
 import {
@@ -61,15 +64,26 @@ export interface UseShelbyUploadReturn {
   walletConnected: boolean;
   /** The connected wallet account address, or null if not connected. */
   walletAddress: string | null;
-  /** Whether the upload path is fully ready (wallet connected + config valid). */
+  /** Network name reported by the connected wallet, or null if not connected. */
+  walletNetwork: Network | null;
+  /** Whether the upload path is fully ready (wallet connected + testnet + config valid). */
   isReady: boolean;
   /** Whether an upload is currently in progress. */
   isPending: boolean;
   /** The last upload error, or null if none. */
   error: Error | null;
+  /** Available wallets detected by the adapter. */
+  wallets: ReadonlyArray<AdapterWallet>;
+  /** Wallets that were detected as installed but not available. */
+  notDetectedWallets: ReadonlyArray<AdapterNotDetectedWallet>;
+  /** Connect to the named wallet. */
+  connect(walletName: string): void;
+  /** Disconnect the current wallet. */
+  disconnect(): void;
   /**
    * Uploads a single blob to Shelby testnet using the connected browser wallet.
-   * Fails closed with a descriptive error if wallet or config requirements are unmet.
+   * Fails closed with a descriptive error if wallet or config requirements are unmet,
+   * or if the wallet is on the wrong network.
    */
   uploadBlob(input: TestnetUploadInput): Promise<TestnetUploadResult>;
 }
@@ -98,12 +112,25 @@ export function useShelbyUpload(): UseShelbyUploadReturn {
     return typeof addr === 'string' ? addr : String(addr);
   }, [wallet.account]);
 
-  const isReady = wallet.connected && !!shelbyClient;
+  const walletNetwork = wallet.network?.name ?? null;
+
+  const isReady =
+    wallet.connected &&
+    !!shelbyClient &&
+    walletNetwork === Network.TESTNET;
 
   async function uploadBlob(input: TestnetUploadInput): Promise<TestnetUploadResult> {
     if (!wallet.connected || !wallet.account) {
       throw new Error(
         'Wallet not connected. Please connect your Aptos wallet to upload to Shelby testnet.'
+      );
+    }
+
+    // Fail closed if the wallet is on the wrong network.
+    if (walletNetwork !== null && walletNetwork !== Network.TESTNET) {
+      throw new Error(
+        `Wrong network: wallet is on "${walletNetwork}", but Shelby upload requires Aptos testnet. ` +
+          'Please switch your wallet to Aptos Testnet and try again.'
       );
     }
 
@@ -153,9 +180,14 @@ export function useShelbyUpload(): UseShelbyUploadReturn {
   return {
     walletConnected: wallet.connected,
     walletAddress,
+    walletNetwork,
     isReady,
     isPending: uploadBlobsMutation.isPending,
     error: uploadBlobsMutation.error,
+    wallets: wallet.wallets,
+    notDetectedWallets: wallet.notDetectedWallets,
+    connect: wallet.connect,
+    disconnect: wallet.disconnect,
     uploadBlob,
   };
 }

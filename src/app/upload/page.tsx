@@ -15,7 +15,9 @@ import {
   Trash2,
   UploadCloud,
   Wallet,
+  WifiOff,
 } from 'lucide-react';
+import { Network } from '@aptos-labs/ts-sdk';
 import { shelbyUploadAction, getShelbyModeAction } from '@/app/actions/upload';
 import { parseTags, buildEvidencePack, buildBlobRecord } from '@/lib/validation';
 import { addLocalPack, addLocalBlob } from '@/lib/store/local-store';
@@ -63,10 +65,12 @@ function ModeIndicator({
   mode,
   walletConnected,
   walletAddress,
+  walletNetwork,
 }: {
   mode: 'mock' | 'testnet' | null;
   walletConnected: boolean;
   walletAddress: string | null;
+  walletNetwork: Network | null;
 }) {
   if (mode === null) return null;
 
@@ -103,6 +107,24 @@ function ModeIndicator({
     );
   }
 
+  // Wallet connected but on the wrong network
+  if (walletNetwork !== null && walletNetwork !== Network.TESTNET) {
+    return (
+      <div className="mb-8 flex gap-3 rounded-lg border border-red-300/60 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <WifiOff className="mt-0.5 h-4 w-4 flex-none" />
+        <div>
+          <p className="font-semibold">Wrong network — switch to Aptos Testnet</p>
+          <p className="mt-1 leading-6">
+            Your wallet is connected to{' '}
+            <span className="font-mono font-semibold">{walletNetwork}</span>. Shelby testnet
+            upload requires <span className="font-semibold">Aptos Testnet</span>. Switch your
+            wallet network and reconnect.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-8 flex gap-3 rounded-lg border border-emerald-300/60 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
       <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none" />
@@ -114,6 +136,115 @@ function ModeIndicator({
           be registered on-chain and uploaded to Shelby testnet RPC.
         </p>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Minimal wallet connection panel shown in testnet mode.
+ * Lists detected wallets, allows connect/disconnect.
+ */
+function WalletConnector({
+  wallets,
+  notDetectedWallets,
+  walletConnected,
+  walletAddress,
+  walletName,
+  connect,
+  disconnect,
+}: {
+  wallets: ReadonlyArray<{ name: string; icon: string; url: string }>;
+  notDetectedWallets: ReadonlyArray<{ name: string; url: string }>;
+  walletConnected: boolean;
+  walletAddress: string | null;
+  walletName: string | null;
+  connect: (name: string) => void;
+  disconnect: () => void;
+}) {
+  if (walletConnected) {
+    return (
+      <div className="mb-6 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="grid h-8 w-8 flex-none place-items-center shelby-cut bg-[#4f192a] text-[#9fe878]">
+              <Wallet className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6f6258]">
+                {walletName ?? 'Wallet'} connected
+              </p>
+              <p className="truncate font-mono text-xs text-[#161008]">
+                {walletAddress ?? 'unknown'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={disconnect}
+            className="flex-none shelby-cut border border-[#161008]/12 px-3 py-1.5 text-xs font-semibold text-[#6f6258] transition hover:border-red-300/60 hover:text-red-700"
+          >
+            Disconnect
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-6 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f6258]">
+        Connect Aptos wallet
+      </p>
+      {wallets.length === 0 && notDetectedWallets.length === 0 && (
+        <p className="text-sm text-[#6f6258]">
+          No Aptos wallets detected. Install{' '}
+          <a
+            href="https://petra.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-[#de8aff]"
+          >
+            Petra
+          </a>{' '}
+          or another Aptos wallet extension and refresh the page.
+        </p>
+      )}
+      {wallets.length > 0 && (
+        <div className="grid gap-2">
+          {wallets.map((w) => (
+            <button
+              key={w.name}
+              type="button"
+              onClick={() => connect(w.name)}
+              className="flex items-center gap-3 shelby-cut border border-[#161008]/12 bg-[#fcfaf8] px-3 py-2.5 text-sm font-semibold text-[#161008] transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+            >
+              {w.icon && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={w.icon} alt={w.name} className="h-5 w-5 flex-none rounded" />
+              )}
+              {w.name}
+            </button>
+          ))}
+        </div>
+      )}
+      {notDetectedWallets.length > 0 && (
+        <div className="mt-3">
+          <p className="mb-2 text-xs text-[#6f6258]">Not installed:</p>
+          <div className="grid gap-1.5">
+            {notDetectedWallets.map((w) => (
+              <a
+                key={w.name}
+                href={w.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs text-[#6f6258] underline hover:text-[#de8aff]"
+              >
+                {w.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -261,6 +392,17 @@ function UploadPageContent() {
     if (mode === 'testnet' && !shelbyUpload.walletConnected) {
       setUploadError(
         'Wallet not connected. Please connect your Aptos wallet to upload to Shelby testnet.'
+      );
+      return;
+    }
+
+    if (
+      mode === 'testnet' &&
+      shelbyUpload.walletNetwork !== null &&
+      shelbyUpload.walletNetwork !== Network.TESTNET
+    ) {
+      setUploadError(
+        `Wrong network: wallet is on "${shelbyUpload.walletNetwork}". Switch to Aptos Testnet and reconnect.`
       );
       return;
     }
@@ -446,15 +588,22 @@ function UploadPageContent() {
   }
 
   const isTestnet = mode === 'testnet';
-  const testnetRequiresWallet = isTestnet && !shelbyUpload.walletConnected;
+  const wrongNetwork =
+    isTestnet &&
+    shelbyUpload.walletConnected &&
+    shelbyUpload.walletNetwork !== null &&
+    shelbyUpload.walletNetwork !== Network.TESTNET;
+  const testnetRequiresWallet = isTestnet && (!shelbyUpload.walletConnected || wrongNetwork);
   const submitLabel = uploading
     ? isTestnet
       ? 'Uploading to testnet'
       : 'Saving locally'
     : isTestnet
-      ? shelbyUpload.walletConnected
+      ? shelbyUpload.walletConnected && !wrongNetwork
         ? 'Upload to Shelby testnet'
-        : 'Connect wallet to upload'
+        : wrongNetwork
+          ? 'Wrong network — switch wallet'
+          : 'Connect wallet to upload'
       : 'Save locally';
 
   return (
@@ -496,7 +645,20 @@ function UploadPageContent() {
           mode={mode}
           walletConnected={shelbyUpload.walletConnected}
           walletAddress={shelbyUpload.walletAddress}
+          walletNetwork={shelbyUpload.walletNetwork}
         />
+
+        {isTestnet && (
+          <WalletConnector
+            wallets={shelbyUpload.wallets as ReadonlyArray<{ name: string; icon: string; url: string }>}
+            notDetectedWallets={shelbyUpload.notDetectedWallets as ReadonlyArray<{ name: string; url: string }>}
+            walletConnected={shelbyUpload.walletConnected}
+            walletAddress={shelbyUpload.walletAddress}
+            walletName={null}
+            connect={shelbyUpload.connect}
+            disconnect={shelbyUpload.disconnect}
+          />
+        )}
 
         {uploadError && (
           <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -700,9 +862,14 @@ function UploadPageContent() {
                 {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {submitLabel}
               </button>
-              {testnetRequiresWallet && (
+              {testnetRequiresWallet && !wrongNetwork && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
                   Connect an Aptos wallet to enable testnet upload.
+                </p>
+              )}
+              {wrongNetwork && (
+                <p className="mt-3 text-xs leading-5 text-[#8793AA]">
+                  Switch your wallet to Aptos Testnet to enable upload.
                 </p>
               )}
               {!isTestnet && (
