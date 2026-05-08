@@ -32,18 +32,18 @@ function DataSourceBadge({ blob }: { blob: BlobRecord }) {
       <span
         className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
           isTestnet
-            ? 'border-[#fd8565]/50 bg-[#ffdcd9] text-[#4f192a]'
-            : 'border-[#de8aff]/25 bg-[#eee2ff] text-[#470b64]'
+            ? 'border-[#9fe878]/40 bg-[#9fe878]/10 text-[#9fe878]'
+            : 'border-[#de8aff]/30 bg-[#de8aff]/10 text-[#e7b6ff]'
         }`}
       >
         <ShieldCheck className="h-3.5 w-3.5" />
-        {isTestnet ? 'Real Shelby blocked until M2' : 'Local demo upload'}
+        {isTestnet ? 'Shelby testnet upload' : 'Local demo upload'}
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#161008]/15 bg-[#fcfaf8] px-3 py-1 text-xs font-semibold text-[#6f6258]">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-[#9d9a92]">
       <Database className="h-3.5 w-3.5" />
       Demo data
     </span>
@@ -60,19 +60,19 @@ function Fact({
   children: React.ReactNode;
 }) {
   return (
-    <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f6258]">
+    <div className="shelby-cut shelby-surface p-4 shadow-sm">
+      <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">
         <Icon className="h-3.5 w-3.5 text-[#de8aff]" />
         {label}
       </div>
-      <div className="text-sm leading-6 text-[#161008]">{children}</div>
+      <div className="text-sm leading-6 text-[#f4f0e8]">{children}</div>
     </div>
   );
 }
 
 function MonoBlock({ children }: { children: React.ReactNode }) {
   return (
-    <code className="block break-all rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-3 py-2 font-mono text-xs text-[#161008]">
+    <code className="block break-all rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-xs text-[#f4f0e8]">
       {children}
     </code>
   );
@@ -127,19 +127,19 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
 
   if (blob === null) {
     return (
-      <div className="ledger-line min-h-[calc(100vh-4rem)] bg-[#fcfaf8] px-4 py-16 sm:px-6">
-        <div className="mx-auto max-w-2xl shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-8 text-center shadow-sm">
-          <div className="mx-auto mb-5 grid h-12 w-12 place-items-center shelby-cut bg-[#4f192a] text-[#9fe878]">
+      <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-2xl shelby-cut shelby-surface p-8 text-center shadow-sm">
+          <div className="mx-auto mb-5 grid h-12 w-12 place-items-center shelby-cut bg-[#111217] text-[#9fe878]">
             <Fingerprint className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#4f192a]">Blob not found</h1>
-          <p className="mt-3 text-sm leading-6 text-[#6f6258]">
-            No blob with ID <code className="rounded bg-[#fcfaf8] px-1 font-mono">{id}</code>{' '}
+          <h1 className="text-2xl font-semibold  text-[#f4f0e8]">Blob not found</h1>
+          <p className="mt-3 text-sm leading-6 text-[#9d9a92]">
+            No blob with ID <code className="rounded bg-white/[0.04] px-1 font-mono">{id}</code>{' '}
             exists in demo data or local uploads.
           </p>
           <Link
             href="/dashboard"
-            className="mt-6 inline-flex items-center gap-2 shelby-cut bg-[#4f192a] px-4 py-2.5 text-sm font-semibold text-[#fcfaf8] transition hover:bg-[#322312]"
+            className="mt-6 inline-flex items-center gap-2 shelby-cut bg-[#111217] px-4 py-2.5 text-sm font-semibold text-[#f4f0e8] transition hover:bg-[#1c1d25]"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to index
@@ -152,13 +152,13 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
   const referenceLabel = blob.dataSource === 'local' ? 'Mock Reference' : 'Demo Reference';
 
   return (
-    <div className="ledger-line min-h-[calc(100vh-4rem)] bg-[#fcfaf8] px-4 py-10 sm:px-6 lg:px-8">
+    <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8">
-          <div className="mb-5 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#6f6258]">
+          <div className="mb-5 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#9d9a92]">
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1 rounded-full border border-[#161008]/15 bg-[#fcfaf8] px-3 py-1 transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+              className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Dashboard
@@ -166,7 +166,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
             {pack && (
               <Link
                 href={`/dashboard?pack=${pack.id}`}
-                className="rounded-full border border-[#161008]/15 bg-[#fcfaf8] px-3 py-1 transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
+                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 transition hover:border-[#de8aff]/40 hover:text-[#de8aff]"
               >
                 {pack.title}
               </Link>
@@ -176,19 +176,19 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
           <div className="grid gap-6 lg:grid-cols-[1fr_340px] lg:items-end">
             <div>
               <DataSourceBadge blob={blob} />
-              <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-tight text-[#4f192a]">
+              <h1 className="mt-4 max-w-4xl text-4xl font-semibold  text-[#f4f0e8]">
                 Blob provenance inspector
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#9d9a92]">
                 Inspect the local proof surface for one stored evidence object: identity,
                 reference, hash, file metadata, and pack membership.
               </p>
             </div>
-            <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+            <div className="shelby-cut shelby-surface p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
                 Blob ID
               </p>
-              <p className="mt-2 truncate font-mono text-sm font-semibold text-[#161008]">
+              <p className="mt-2 truncate font-mono text-sm font-semibold text-[#f4f0e8]">
                 {blob.id}
               </p>
             </div>
@@ -196,24 +196,24 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <section className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-sm">
+          <section className="shelby-cut shelby-surface p-5 shadow-sm">
             <div className="mb-5 flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#4f192a] text-[#9fe878]">
+              <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#111217] text-[#9fe878]">
                 <Fingerprint className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+                <p className="text-xs font-semibold uppercase  text-[#9d9a92]">
                   Reference boundary
                 </p>
-                <h2 className="text-lg font-semibold text-[#4f192a]">{referenceLabel}</h2>
+                <h2 className="text-lg font-semibold text-[#f4f0e8]">{referenceLabel}</h2>
               </div>
             </div>
 
             <MonoBlock>{blob.shelbyRef}</MonoBlock>
-            <p className="mt-3 text-xs leading-5 text-[#6f6258]">
+            <p className="mt-3 text-xs leading-5 text-[#9d9a92]">
               {blob.dataSource === 'local'
-                ? 'Local demo reference only. Real Shelby identity uses account namespace plus blob name and requires M2 integration.'
-                : 'Illustrative demo reference only. Real Shelby blob identity is not represented by these M1B sample references.'}
+                ? 'Local demo reference. Testnet records additionally carry account namespace, blob name, network, and explorer metadata.'
+                : 'Illustrative demo reference. Real Shelby blob identity is represented by account namespace plus blob name when using testnet mode.'}
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -245,14 +245,14 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
                   {pack.title}
                 </Link>
               ) : (
-                <span className="text-[#6f6258]">Unknown pack</span>
+                <span className="text-[#9d9a92]">Unknown pack</span>
               )}
             </Fact>
           </aside>
         </div>
 
-        <section className="mt-6 shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#6f6258]">
+        <section className="mt-6 shelby-cut shelby-surface p-5 shadow-sm">
+          <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">
             <Tag className="h-4 w-4 text-[#de8aff]" />
             Tags and adapter metadata
           </div>
@@ -260,7 +260,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
             {blob.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-2.5 py-1 font-mono text-xs text-[#161008]"
+                className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 font-mono text-xs text-[#f4f0e8]"
               >
                 {tag}
               </span>
@@ -276,7 +276,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
               </span>
             )}
             {blob.blobName && (
-              <span className="rounded-md border border-[#161008]/15 bg-[#fcfaf8] px-2.5 py-1 font-mono text-xs text-[#161008]">
+              <span className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 font-mono text-xs text-[#f4f0e8]">
                 blobName: {blob.blobName}
               </span>
             )}

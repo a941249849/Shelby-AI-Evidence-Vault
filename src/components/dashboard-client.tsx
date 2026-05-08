@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Database, FilePlus2, HardDrive, ShieldCheck } from 'lucide-react';
+import { Activity, Database, FilePlus2, HardDrive, Layers3, ShieldCheck } from 'lucide-react';
 import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import EvidencePackCard from '@/components/evidence-pack-card';
@@ -14,11 +14,19 @@ interface DashboardClientProps {
   demoBlobs: BlobRecord[];
 }
 
-function Metric({ label, value, tone }: { label: string; value: string | number; tone: string }) {
+function Metric({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string | number;
+  tone: string;
+}) {
   return (
-    <div className="border-l border-[#161008]/12 px-4 py-2 first:border-l-0">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#6f6258]">{label}</p>
-      <p className={`mt-3 text-4xl font-semibold tracking-tight ${tone}`}>{value}</p>
+    <div className="border-l border-white/10 px-4 py-3 first:border-l-0">
+      <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">{label}</p>
+      <p className={`mt-2 text-3xl font-semibold ${tone}`}>{value}</p>
     </div>
   );
 }
@@ -36,7 +44,6 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
         setPersistedPacks(packs);
       })
       .catch((err) => {
-        // SQLite unavailable — silently degrade to localStorage only
         console.error('[DashboardClient] getPersistedPacksAction failed', err);
       });
   }, []);
@@ -51,85 +58,74 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
     setResetConfirm(false);
   }
 
-  // Merge: localStorage packs first (newest), then SQLite packs (dedup by id),
-  // then built-in demo packs.
   const localIds = new Set(localPacks.map((p) => p.id));
   const dedupedPersisted = persistedPacks.filter((p) => !localIds.has(p.id));
   const allUserPacks = [...localPacks, ...dedupedPersisted];
   const allPacks = [...allUserPacks, ...demoPacks];
-
   const localBlobs = localPacks.flatMap((p) => getLocalBlobsByPackId(p.id));
-  // Count blobs from SQLite-only packs (not in localStorage) using their stored blobCount.
   const persistedBlobCount = dedupedPersisted.reduce((sum, p) => sum + p.blobCount, 0);
   const totalBlobs = localBlobs.length + persistedBlobCount + demoBlobs.length;
   const activePacks = allPacks.filter((p) => p.status === 'active').length;
 
   return (
-    <main className="relative min-h-[calc(100vh-64px)] overflow-hidden bg-[#fcfaf8] px-4 py-10 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 ledger-line opacity-75" />
-      <div className="absolute right-[-8rem] top-6 h-72 w-72 rotate-[60deg] rounded-[34px] bg-[#ffdfef]" />
-      <div className="absolute bottom-20 left-[-12rem] h-80 w-80 rotate-[60deg] rounded-[34px] bg-[#dfffcc]" />
-      <div className="relative mx-auto max-w-7xl">
-        <div className="mb-9 grid gap-8 lg:grid-cols-[1fr_420px] lg:items-end">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded border border-[#ff77c9]/30 bg-[#ffdfef] px-3 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[#4f192a]">
-              <ShieldCheck size={14} />
-              Evidence index - M1B local mode
+    <main className="kinetic-grid min-h-[calc(100vh-64px)] px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 grid gap-5 lg:grid-cols-[1fr_390px] lg:items-stretch">
+          <section className="shelby-surface shelby-cut p-6">
+            <div className="ui-chip">
+              <ShieldCheck size={13} />
+              Evidence index
             </div>
-            <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[0.96] tracking-tight text-[#161008] sm:text-6xl">
-              Evidence index for inspectable AI memory.
+            <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1] text-[#f4f0e8] sm:text-5xl">
+              Inspectable storage state for AI evidence.
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f6258]">
-              Browse demo and locally uploaded evidence packs. Each pack groups blobs, hashes,
-              provenance, and read receipt references.
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-[#9d9a92]">
+              Demo corpus, browser-local records, and SQLite-persisted uploads resolve through one
+              evidence index.
             </p>
-          </div>
-          <div className="shelby-cut border border-[#161008]/12 bg-[#fcfaf8]/90 p-5 shadow-[0_26px_90px_rgba(22,16,8,0.1)] backdrop-blur">
-            <div className="mb-5 flex items-start justify-between gap-4">
+          </section>
+
+          <aside className="shelby-surface shelby-cut p-5">
+            <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#6f6258]">
-                  Workspace state
+                <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">
+                  Runtime boundary
                 </p>
-                <p className="mt-2 text-lg font-semibold text-[#161008]">Local proof surface</p>
+                <p className="mt-2 text-lg font-semibold text-[#f4f0e8]">Local + SQLite</p>
               </div>
-              <div className="shelby-hex grid h-12 w-12 place-items-center bg-[#4f192a] text-[#dfffcc]">
+              <div className="grid h-11 w-11 place-items-center border border-[#9fe878]/30 bg-[#9fe878]/10 text-[#9fe878]">
                 <HardDrive size={19} />
               </div>
             </div>
-            <Link
-              href="/upload"
-              className="shelby-cut-sm inline-flex w-full items-center justify-center gap-2 bg-[#161008] px-4 py-3 text-sm font-semibold text-[#fcfaf8] transition hover:bg-[#4f192a]"
-            >
+            <Link href="/upload" className="ui-button shelby-cut-sm w-full">
               <FilePlus2 size={16} />
-              New local pack
+              New evidence pack
             </Link>
-          </div>
+          </aside>
         </div>
 
-        <div className="mb-10 grid gap-5 border-y border-[#161008]/12 bg-[#fcfaf8]/70 py-5 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Packs indexed" value={allPacks.length} tone="text-[#161008]" />
-          <Metric label="Active packs" value={activePacks} tone="text-[#21351a]" />
-          <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#21351a]" />
-          <Metric label="Storage mode" value="Local" tone="text-[#470b64]" />
+        <div className="mb-8 grid border-y border-white/10 bg-white/[0.035] sm:grid-cols-2 lg:grid-cols-4">
+          <Metric label="Packs indexed" value={allPacks.length} tone="text-[#f4f0e8]" />
+          <Metric label="Active packs" value={activePacks} tone="text-[#9fe878]" />
+          <Metric label="Blobs tracked" value={totalBlobs} tone="text-[#de8aff]" />
+          <Metric label="User packs" value={allUserPacks.length} tone="text-[#fd8565]" />
         </div>
 
         {allUserPacks.length > 0 && (
           <section className="mb-10">
-            <div className="mb-4 flex items-end justify-between gap-4">
+            <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
-                <h2 className="flex items-center gap-2 text-lg font-semibold text-[#161008]">
-                  <HardDrive size={18} className="text-[#ff77c9]" />
-                  Local demo uploads
-                </h2>
-                <p className="mt-1 text-sm text-[#6f6258]">
-                  Stored locally. Mock references are not real Shelby blobs.
-                </p>
+                <div className="ui-chip">
+                  <Activity size={13} />
+                  User-created records
+                </div>
+                <h2 className="mt-3 text-xl font-semibold text-[#f4f0e8]">Local workspace</h2>
               </div>
               <button
                 onClick={handleReset}
-                className="shelby-cut-sm border border-[#161008]/12 bg-[#fcfaf8] px-3 py-2 text-xs font-semibold text-[#6f6258] transition hover:border-red-300 hover:text-red-600"
+                className="shelby-cut-sm border border-white/12 bg-white/[0.055] px-3 py-2 text-xs font-semibold text-[#9d9a92] transition hover:border-[#fd8565]/50 hover:text-[#ffc2ad]"
               >
-                {resetConfirm ? 'Click again to reset' : 'Reset local data'}
+                {resetConfirm ? 'Click again to reset browser cache' : 'Reset browser cache'}
               </button>
             </div>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -141,14 +137,18 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
         )}
 
         <section>
-          <div className="mb-4">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#161008]">
-              <Database size={18} className="text-[#de8aff]" />
-              Built-in demo evidence
-            </h2>
-            <p className="mt-1 text-sm text-[#6f6258]">
-              Illustrative evidence packs with demo references for product walkthroughs.
-            </p>
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div>
+              <div className="ui-chip">
+                <Database size={13} />
+                Built-in corpus
+              </div>
+              <h2 className="mt-3 text-xl font-semibold text-[#f4f0e8]">Demo evidence</h2>
+            </div>
+            <div className="hidden items-center gap-2 font-mono text-xs font-semibold uppercase text-[#6f716d] sm:flex">
+              <Layers3 size={14} />
+              {demoPacks.length} packs
+            </div>
           </div>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {demoPacks.map((pack) => (

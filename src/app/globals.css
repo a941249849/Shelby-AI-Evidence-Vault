@@ -1,45 +1,75 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fcfaf8;
-  --foreground: #161008;
-  --shelby-ink: #161008;
-  --shelby-plum: #4f192a;
-  --shelby-violet-dark: #470b64;
-  --shelby-green-dark: #21351a;
-  --paper: #fcfaf8;
-  --paper-2: #ffdcd9;
-  --slate-text: #161008;
-  --muted: #6f6258;
-  --violet: #de8aff;
-  --violet-soft: #eee2ff;
-  --green: #9fe878;
-  --green-soft: #dfffcc;
-  --pink: #ff77c9;
-  --pink-soft: #ffdfef;
-  --coral: #fd8565;
-  --coral-soft: #ffdcd9;
+  --background: #090a0d;
+  --foreground: #f4f0e8;
+  --shelby-void: #090a0d;
+  --shelby-ink: #111217;
+  --shelby-panel: #15161c;
+  --shelby-panel-2: #1c1d25;
+  --shelby-line: rgba(244, 240, 232, 0.13);
+  --shelby-line-strong: rgba(244, 240, 232, 0.22);
+  --shelby-text: #f4f0e8;
+  --shelby-muted: #9d9a92;
+  --shelby-dim: #6f716d;
+  --shelby-violet: #de8aff;
+  --shelby-green: #9fe878;
+  --shelby-pink: #ff77c9;
+  --shelby-coral: #fd8565;
+  --shelby-paper: #f3efe7;
+  --shelby-paper-2: #d8d0c4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans-ui);
+  --font-mono: var(--font-mono-ui);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--shelby-void);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background: var(--shelby-void);
+  color: var(--shelby-text);
+  font-family:
+    "Inter", "SF Pro Display", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
   text-rendering: geometricPrecision;
 }
 
 code,
 pre,
 kbd,
-samp {
-  font-family: var(--font-geist-mono), 'Courier New', monospace;
+samp,
+.font-mono {
+  font-family:
+    "IBM Plex Mono", "SF Mono", "Roboto Mono", "Cascadia Code", monospace;
+}
+
+::selection {
+  background: rgba(222, 138, 255, 0.34);
+  color: var(--shelby-text);
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  letter-spacing: 0;
+}
+
+input,
+select,
+textarea {
+  color: var(--shelby-text);
 }
 
 /* Utility: line clamp for 2 lines */
@@ -50,42 +80,42 @@ samp {
   -webkit-line-clamp: 2;
 }
 
-::selection {
-  background: rgba(222, 138, 255, 0.34);
+.kinetic-grid {
+  background:
+    linear-gradient(90deg, rgba(244, 240, 232, 0.055) 1px, transparent 1px),
+    linear-gradient(rgba(244, 240, 232, 0.055) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(159, 232, 120, 0.08) 0 1px, transparent 1px 28px),
+    var(--shelby-void);
+  background-size:
+    72px 72px,
+    72px 72px,
+    36px 36px,
+    auto;
+}
+
+.kinetic-grid-light {
+  background:
+    linear-gradient(90deg, rgba(17, 18, 23, 0.06) 1px, transparent 1px),
+    linear-gradient(rgba(17, 18, 23, 0.06) 1px, transparent 1px),
+    var(--shelby-paper);
+  background-size: 64px 64px, 64px 64px, auto;
+}
+
+.shelby-surface {
+  background:
+    linear-gradient(180deg, rgba(244, 240, 232, 0.07), rgba(244, 240, 232, 0.025)),
+    var(--shelby-panel);
+  border: 1px solid var(--shelby-line);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+}
+
+.shelby-surface-soft {
+  background:
+    linear-gradient(180deg, rgba(244, 240, 232, 0.9), rgba(216, 208, 196, 0.86)),
+    var(--shelby-paper);
+  border: 1px solid rgba(17, 18, 23, 0.16);
   color: var(--shelby-ink);
-}
-
-.paper-surface {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(252, 250, 248, 0.92)),
-    var(--paper);
-  border: 1px solid rgba(22, 16, 8, 0.14);
-}
-
-.ledger-line {
-  background-image:
-    linear-gradient(rgba(22, 16, 8, 0.055) 1px, transparent 1px),
-    linear-gradient(60deg, rgba(222, 138, 255, 0.09) 1px, transparent 1px);
-  background-size: 100% 36px, 72px 72px;
-}
-
-.proof-glow {
-  box-shadow:
-    0 0 0 1px rgba(159, 232, 120, 0.28),
-    0 18px 60px rgba(222, 138, 255, 0.12);
-}
-
-.ink-panel {
-  background:
-    linear-gradient(60deg, rgba(252, 250, 248, 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 12% 18%, rgba(222, 138, 255, 0.25), transparent 30%),
-    radial-gradient(circle at 82% 20%, rgba(159, 232, 120, 0.18), transparent 28%),
-    linear-gradient(135deg, #4f192a 0%, #470b64 52%, #21351a 100%);
-  background-size: 64px 64px, auto, auto, auto;
-}
-
-.shelby-hex {
-  clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0 50%);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.2);
 }
 
 .shelby-cut {
@@ -96,8 +126,130 @@ samp {
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
 }
 
-input,
-select,
-textarea {
-  color: var(--slate-text);
+.shelby-mark {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(244, 240, 232, 0.18);
+  background: #111217;
+}
+
+.shelby-mark::before,
+.shelby-mark::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border: 2px solid var(--shelby-green);
+  transform: skewX(-18deg);
+}
+
+.shelby-mark::after {
+  inset: 28%;
+  border-color: var(--shelby-violet);
+  transform: skewX(-18deg) translateX(10%);
+}
+
+.shelby-mark span {
+  position: relative;
+  z-index: 1;
+  width: 9px;
+  height: 44%;
+  background: var(--shelby-coral);
+  transform: skewX(-18deg);
+}
+
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--shelby-line);
+  background: rgba(244, 240, 232, 0.055);
+  color: var(--shelby-muted);
+  padding: 0.42rem 0.62rem;
+  font-family: "IBM Plex Mono", "SF Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.ui-chip-light {
+  border-color: rgba(17, 18, 23, 0.14);
+  background: rgba(17, 18, 23, 0.055);
+  color: #56544f;
+}
+
+.ui-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(244, 240, 232, 0.16);
+  background: var(--shelby-text);
+  color: var(--shelby-ink);
+  padding: 0.72rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 750;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.ui-button:hover {
+  transform: translateY(-1px);
+  background: var(--shelby-green);
+}
+
+.ui-button-secondary {
+  background: rgba(244, 240, 232, 0.06);
+  color: var(--shelby-text);
+}
+
+.ui-button-secondary:hover {
+  border-color: rgba(222, 138, 255, 0.5);
+  background: rgba(222, 138, 255, 0.16);
+  color: var(--shelby-text);
+}
+
+.data-rail {
+  position: relative;
+  overflow: hidden;
+}
+
+.data-rail::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(159, 232, 120, 0.14), transparent),
+    repeating-linear-gradient(
+      90deg,
+      rgba(244, 240, 232, 0.16) 0 1px,
+      transparent 1px 18px
+    );
+  opacity: 0.7;
+}
+
+.trace-line {
+  position: relative;
+}
+
+.trace-line::before {
+  content: "";
+  position: absolute;
+  left: 1.15rem;
+  top: 2.7rem;
+  bottom: -0.55rem;
+  width: 1px;
+  background: linear-gradient(var(--shelby-green), rgba(159, 232, 120, 0));
+}
+
+@media (max-width: 640px) {
+  .shelby-cut {
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  }
 }
