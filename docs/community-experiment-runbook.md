@@ -324,7 +324,7 @@ Four dropdown controls are available next to the search box:
 | Category | All categories / dataset / agent-run / document / manifest |
 | Source type | All source types / web-scrape / api-export / agent-output / manual-upload |
 | Status | All statuses / active / archived / pending |
-| Data source | All sources / Local / uploaded / Demo corpus |
+| Data source | All sources / "Local / uploaded" / "Demo corpus" |
 
 ### Sort
 
