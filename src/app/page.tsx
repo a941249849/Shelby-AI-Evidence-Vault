@@ -198,12 +198,11 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#fcfaf8] text-[#322312]">
-      <div className="brand-pattern-hero brand-pattern-brown -right-28 top-28 h-[31rem] w-[24rem] rotate-90 opacity-95 md:-right-16" />
-      <div className="brand-pattern-hero -right-44 top-32 h-[31rem] w-[24rem] rotate-90 opacity-90 md:-right-28" />
-      <div className="brand-pattern-hero -bottom-32 -left-48 h-[24rem] w-[24rem] rotate-[60deg] opacity-70" />
+    <div className="shelby-home-bg relative min-h-screen overflow-hidden bg-[#fcfaf8] text-[#322312]">
+      <div className="shelby-brand-frame shelby-brand-frame-right" />
+      <div className="shelby-brand-frame shelby-brand-frame-left" />
 
-      <section className="relative px-4 pb-10 pt-16 sm:px-6 lg:px-8 lg:pb-12 lg:pt-24">
+      <section className="relative px-4 pb-10 pt-14 sm:px-6 lg:px-8 lg:pb-12 lg:pt-20">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
           <div className="relative z-10 min-w-0">
             <p className="font-mono text-sm font-semibold uppercase text-[#ff77c9]">
