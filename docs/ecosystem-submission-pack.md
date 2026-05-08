@@ -1,18 +1,18 @@
 # Ecosystem Submission Pack — Shelby AI Evidence Vault
 
 Date: 2026-05-08
-Milestone: M5 — Public Ecosystem Package
+Milestone: C12 — Release Candidate / Product QA Gate
 
 ---
 
 ## English Positioning
 
-**Shelby AI Evidence Vault** is a verifiable evidence storage and read-receipt demo for AI agents, with a browser-wallet Shelby testnet upload path. It demonstrates how AI pipelines can store datasets, agent run outputs, and documents with cryptographic provenance — and produce auditable receipts that trace every query back to the evidence that informed it.
+**Shelby AI Evidence Vault** is an AI evidence and read-receipt layer built for Shelby. It demonstrates how AI pipelines can turn datasets, agent run outputs, and documents into verifiable evidence records with Shelby Blob identity — then produce auditable receipts that trace every answer back to the evidence that informed it.
 
-It ships as a complete, runnable open-source demo. Local mock mode works with zero configuration. A browser-wallet Shelby testnet upload path is available for operators with funded wallets. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet.
+It ships as a complete, runnable open-source release candidate. Local mock mode works with zero configuration as a community preview and development fallback. A browser-wallet Shelby testnet upload path is available for operators with funded wallets. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet, and the C12 verifier provides a one-command acceptance gate.
 
 **What it is:**
-- A public demo of AI evidence storage using Shelby blob references and on-chain registration
+- A Shelby ecosystem application layer for AI evidence storage using Shelby blob references and on-chain registration
 - An evidence pack model: grouped blobs with metadata, tags, provenance, and status
 - An audit trail: read receipts that bind to real BlobRecord identity (hash, shelbyRef, accountAddress, blobName, network, storageStatus)
 - A practical reference for teams integrating Shelby testnet into AI workflows
@@ -29,12 +29,12 @@ It ships as a complete, runnable open-source demo. Local mock mode works with ze
 
 ## 中文定位（Chinese Positioning）
 
-**Shelby AI 证据库（Shelby AI Evidence Vault）** 是一个面向 AI 智能体的可验证证据存储与读取收据演示项目，构建于 Shelby 测试网之上。它展示了 AI 流水线如何通过密码学证明来存储数据集、智能体运行产出及文档，并生成可审计的收据，将每一次查询与所依据的证据关联起来。
+**Shelby AI 证据库（Shelby AI Evidence Vault）** 是一个构建在 Shelby 之上的 AI 证据与读取回执应用层。它展示了 AI 流水线如何把数据集、智能体运行产出及文档转化为带有 Shelby Blob 身份的可验证证据记录，并生成可审计的回执，将每一次回答与所依据的证据关联起来。
 
-该项目作为完整的、可运行的开源演示发布。本地模拟模式无需任何配置即可使用。对于拥有充值钱包的运营方，也提供了通过浏览器钱包上传至 Shelby 测试网的路径。此外还提供了一个可选的冒烟测试工具，用于验证 RPC 连通性和 Blob 检索。
+该项目作为完整、可运行的开源 release candidate 发布。本地模拟模式无需任何配置即可使用，但它只是社区预览与开发 fallback；真实协议证明路径是通过浏览器钱包上传至 Shelby 测试网。此外还提供可选冒烟测试工具和 C12 一键验收命令，用于验证 RPC 连通性、Blob 检索和社区实验链路。
 
 **产品定位：**
-- 使用 Shelby Blob 引用和链上注册的 AI 证据存储公开演示
+- 使用 Shelby Blob 引用和链上注册的 AI 证据应用层
 - 证据包模型：包含元数据、标签、来源及状态的 Blob 集合
 - 审计追踪：读取收据绑定真实 BlobRecord 身份（哈希值、shelbyRef、账户地址、Blob 名称、网络、存储状态）
 - 为将 Shelby 测试网集成到 AI 工作流的团队提供实践参考
@@ -51,7 +51,7 @@ It ships as a complete, runnable open-source demo. Local mock mode works with ze
 
 ## 30-Second Elevator Pitch
 
-AI agents make decisions based on data — but how do you prove which data they used, and that it hasn't been tampered with? Shelby AI Evidence Vault gives every dataset and agent output a cryptographic identity on Shelby testnet, and produces auditable read receipts that trace every answer back to its evidence. Local mock mode works in under a minute with no setup. A browser-wallet Shelby testnet upload path is available for operators with a funded Aptos testnet wallet — real testnet upload requires operator prerequisites and manual verification.
+AI agents make decisions based on data — but how do you prove which data they used, and that it hasn't been tampered with? Shelby AI Evidence Vault gives every dataset and agent output a Shelby Blob identity, then produces auditable read receipts that trace every answer back to its evidence. Local mock mode works in under a minute as a preview path. Operators with a funded Aptos testnet wallet can use the browser-wallet Shelby testnet path for real protocol proof.
 
 ---
 
@@ -93,7 +93,13 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | M3 | Merged | Browser-wallet Shelby testnet upload path: use-shelby-upload, browser-client, providers |
 | C3 smoke | Merged | Opt-in smoke harness (npm run smoke), status-map.ts, c3-smoke-test-guide.md |
 | M4 | Merged | Read receipt binding to BlobRecord identity, ReadReceiptClient, localStorage receipt persistence |
-| M5 | Current | Public ecosystem package: README rewrite, demo script update, architecture update, this document, production queue update |
+| M5 | Merged | Public ecosystem package: README rewrite, demo script update, architecture update, this document, production queue update |
+| C7 | Merged | SQLite persistence for EvidencePack, BlobRecord, and ReadReceipt records |
+| C8 | Merged | Deterministic agent-run evidence-pack example |
+| C9 | Merged | Zero-credential community verification harness |
+| C10 | Merged | Evidence registry search, filter, sort, and operator workflow hardening |
+| C11 | Merged | Shelby testnet readiness doctor and operator runbook |
+| C12 | Current | Release-candidate acceptance harness and product QA gate |
 
 ---
 
@@ -118,14 +124,14 @@ CI does not run real uploads. All real-upload paths are operator-dependent. See 
 
 - **No trading or marketplace.** No dataset trading, no NFT minting, no exchange integration.
 - **No token speculation.** No tokenomics modeling, no price data, no yield strategies.
-- **No production database.** localStorage only. A real backend is a future operator decision.
+- **No hosted production database or auth.** The project uses local SQLite plus browser localStorage fallback for demo/operator workflows.
 - **No authentication system.** No user accounts, no session management, no OAuth.
 - **No real LLM/AI calls.** Read receipt answer summaries are deterministic placeholders — no API calls to any AI provider.
 - **No private key custody.** No server signer, no seed phrase handling, no mnemonic anywhere in the codebase.
 - **No wallet payment UX.** No token purchase flow, no APT/SHEL purchase UI.
 - **No social posting.** No automated posting to Twitter/X, Discord, or any other platform.
 - **No production deployment.** This is a local demo. Production hosting is an operator decision.
-- **No UI redesign in this milestone.** UI improvements are a Codex task (X2) deferred until protocol boundaries stabilize.
+- **No UI redesign in C12.** UI and final product presentation are a Codex-owned closeout pass after the release-candidate gate.
 
 ---
 
@@ -137,6 +143,7 @@ CI does not run real uploads. All real-upload paths are operator-dependent. See 
 | Architecture | `docs/architecture.md` |
 | Demo script | `docs/demo-script.md` |
 | Production queue | `docs/production-queue.md` |
+| Release-candidate checklist | `docs/release-candidate-checklist.md` |
 | Smoke test guide | `docs/c3-smoke-test-guide.md` |
 | M4 read receipt binding | `docs/m4-read-receipt-binding.md` |
 | M2–M4 architecture plan | `docs/m2-m4-product-architecture-plan.md` |
