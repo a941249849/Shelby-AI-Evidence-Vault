@@ -1,7 +1,7 @@
 # Ecosystem Submission Pack — Shelby AI Evidence Vault
 
 Date: 2026-05-08
-Milestone: C12 — Release Candidate / Product QA Gate
+Milestone: X3 — Product Closeout / Community Experiment Candidate
 
 ---
 
@@ -9,7 +9,7 @@ Milestone: C12 — Release Candidate / Product QA Gate
 
 **Shelby AI Evidence Vault** is an AI evidence and read-receipt layer built for Shelby. It demonstrates how AI pipelines can turn datasets, agent run outputs, and documents into verifiable evidence records with Shelby Blob identity — then produce auditable receipts that trace every answer back to the evidence that informed it.
 
-It ships as a complete, runnable open-source release candidate. Local mock mode works with zero configuration as a community preview and development fallback. A browser-wallet Shelby testnet upload path is available for operators with funded wallets. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet, and the C12 verifier provides a one-command acceptance gate.
+It ships as a complete, runnable open-source community experiment candidate. Local mock mode works with zero configuration as a community preview and development fallback. A browser-wallet Shelby testnet upload path is available for operators with funded wallets. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
 
 **What it is:**
 - A Shelby ecosystem application layer for AI evidence storage using Shelby blob references and on-chain registration
@@ -31,7 +31,7 @@ It ships as a complete, runnable open-source release candidate. Local mock mode 
 
 **Shelby AI 证据库（Shelby AI Evidence Vault）** 是一个构建在 Shelby 之上的 AI 证据与读取回执应用层。它展示了 AI 流水线如何把数据集、智能体运行产出及文档转化为带有 Shelby Blob 身份的可验证证据记录，并生成可审计的回执，将每一次回答与所依据的证据关联起来。
 
-该项目作为完整、可运行的开源 release candidate 发布。本地模拟模式无需任何配置即可使用，但它只是社区预览与开发 fallback；真实协议证明路径是通过浏览器钱包上传至 Shelby 测试网。此外还提供可选冒烟测试工具和 C12 一键验收命令，用于验证 RPC 连通性、Blob 检索和社区实验链路。
+该项目作为完整、可运行的开源社区实验候选版本发布。本地模拟模式无需任何配置即可使用，但它只是社区预览与开发 fallback；真实协议证明路径是通过浏览器钱包上传至 Shelby 测试网。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和社区实验链路。产品界面默认中文，并提供英文切换，面向社区实验展示。
 
 **产品定位：**
 - 使用 Shelby Blob 引用和链上注册的 AI 证据应用层
@@ -99,7 +99,9 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | C9 | Merged | Zero-credential community verification harness |
 | C10 | Merged | Evidence registry search, filter, sort, and operator workflow hardening |
 | C11 | Merged | Shelby testnet readiness doctor and operator runbook |
-| C12 | Current | Release-candidate acceptance harness and product QA gate |
+| C12 | Merged | Release-candidate acceptance harness and product QA gate |
+| X2 | Merged | Shelby-first bilingual product UI: home, registry, upload, Blob detail, read receipt, footer |
+| X3 | Current | Product closeout docs, community experiment framing, final QA package |
 
 ---
 
@@ -130,8 +132,8 @@ CI does not run real uploads. All real-upload paths are operator-dependent. See 
 - **No private key custody.** No server signer, no seed phrase handling, no mnemonic anywhere in the codebase.
 - **No wallet payment UX.** No token purchase flow, no APT/SHEL purchase UI.
 - **No social posting.** No automated posting to Twitter/X, Discord, or any other platform.
-- **No production deployment.** This is a local demo. Production hosting is an operator decision.
-- **No UI redesign in C12.** UI and final product presentation are a Codex-owned closeout pass after the release-candidate gate.
+- **No production deployment.** This is a local community experiment candidate. Production hosting is an operator decision.
+- **No hidden mainnet claim.** The default path is Mock + SQLite. Shelby testnet proof requires operator wallet/funding prerequisites and explicit configuration.
 
 ---
 

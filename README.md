@@ -1,6 +1,6 @@
 # Shelby AI Evidence Vault
 
-![Milestone](https://img.shields.io/badge/milestone-C12%20Release%20Candidate-violet?style=flat-square)
+![Milestone](https://img.shields.io/badge/milestone-X3%20Product%20Closeout-violet?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
@@ -19,6 +19,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 - **Browser-wallet Shelby testnet path** — a testnet upload path is available behind a `SHELBY_MODE=testnet` gate using `@shelby-protocol/react`; requires operator prerequisites (funded Aptos testnet wallet, Shelby storage credits) and manual verification — no automated CI upload
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 - **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
+- **Shelby-first product UI** — Chinese-first, English-toggleable product surface across landing, registry, upload, Blob detail, and read receipt pages
 
 ---
 
@@ -135,11 +136,11 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 
 | Route | Description |
 |---|---|
-| `/` | Landing page — hero, problem/solution, demo objects, quickstart |
+| `/` | Product home — Chinese-first Shelby ecosystem narrative, evidence flow, core capabilities, preview cards |
 | `/dashboard` | Evidence registry: browse, search, and filter built-in, local, SQLite, and testnet records |
-| `/upload` | Create Evidence Pack: SHA-256, file drop, mode indicator, wallet connect (testnet mode) |
-| `/blob/[id]` | Blob detail: Shelby ref, hash, source, metadata, data-source badge |
-| `/read-receipt/[id]` | Read receipt: run ID, query, answer, resolved blob identity and pack links |
+| `/upload` | Evidence intake: create Evidence Packs, compute SHA-256, drop files, show mode boundary and wallet connect in testnet mode |
+| `/blob/[id]` | Blob provenance inspector: Shelby ref, hash, source, metadata, data-source badge |
+| `/read-receipt/[id]` | Read receipt: run ID, query, answer, resolved Blob identity and pack links |
 
 ---
 
@@ -205,9 +206,11 @@ Built-in demo data lives in `src/lib/demo-data/`:
 
 ---
 
-## Current features (C12 release candidate)
+## Current features (X3 product closeout)
 
 - Shelby-first evidence model: EvidencePack, BlobRecord identity, and ReadReceipt lineage
+- Chinese-first / English-toggleable product UI across the main routes
+- Shelby brand-aligned visual system for the home page, evidence registry, upload flow, Blob detail, read receipt, and footer
 - Working local preview upload: SHA-256 in-browser, mock Shelby refs, local persistence
 - Browser-wallet Shelby testnet upload path via `useShelbyUpload` hook (operator-funded wallets only)
 - Dual-mode adapter: mock (default) / testnet (browser-wallet)
@@ -221,6 +224,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Dashboard shows built-in demo data + locally uploaded packs; reset button clears all local data
 - Mode indicator and wallet connect UI on upload page
 - C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
+- X3 product closeout status: release-candidate gate remains green after the UI/product pass
 
 ---
 
