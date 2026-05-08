@@ -99,7 +99,7 @@ const result = {
     checked: false,
     probeUrl: '',
     httpStatus: /** @type {number | null} */ (null),
-    /** true = 2xx confirmed; false = network error; null = inconclusive (4xx/5xx response) */
+    /** true = 2xx confirmed; false = network error; null = inconclusive (any non-2xx HTTP response: 3xx, 4xx, 5xx) */
     ok: /** @type {boolean | null} */ (null),
     detail: '',
   },
