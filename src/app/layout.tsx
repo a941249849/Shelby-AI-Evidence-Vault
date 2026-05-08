@@ -6,7 +6,7 @@ import SiteFooter from "@/components/site-footer";
 export const metadata: Metadata = {
   title: "Shelby AI Evidence Vault",
   description:
-    "A verifiable evidence storage and read-receipt demo for AI agents on Shelby.",
+    "A Shelby ecosystem interface for verifiable AI evidence packs, Blob identity, and read receipts.",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
       lang="zh-CN"
       className="h-full antialiased"
     >
-      <body className="min-h-full flex flex-col bg-[#090a0d] text-[#f4f0e8]">
+      <body className="min-h-full flex flex-col bg-[#fffaf4] text-[#2b1b10]">
         <Nav />
         <main className="flex-1">{children}</main>
         <SiteFooter />
