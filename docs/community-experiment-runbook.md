@@ -100,7 +100,7 @@ All IDs are **deterministic and stable** — you will get the same IDs every tim
 | `http://localhost:3000/read-receipt/c8-rr-agent-sentinel-v1` | Read receipt: query, answer summary, referenced blobs, run ID |
 | `http://localhost:3000/blob/c8-blob-input-v1` | Input blob: Shelby mock ref, SHA-256 hash, source, pack link |
 | `http://localhost:3000/blob/c8-blob-output-v1` | Output blob: Shelby mock ref, SHA-256 hash, source, pack link |
-| `http://localhost:3000/dashboard` | Dashboard: C8 pack appears in the "Locally uploaded" section |
+| `http://localhost:3000/dashboard` | Dashboard: C8 pack appears in "Local workspace" under "User-created records" |
 
 ### Step 3 — Upload your own file (optional)
 
@@ -108,7 +108,7 @@ All IDs are **deterministic and stable** — you will get the same IDs every tim
 2. Enter a title and select any local file
 3. Click **"Save locally (mock Shelby reference)"**
 4. The success screen shows blob links and a read receipt link
-5. Navigate to `/dashboard` — your pack appears under "Locally uploaded"
+5. Navigate to `/dashboard` — your pack appears in "Local workspace" under "User-created records"
 
 User-uploaded packs are persisted to `data/shelby-vault.sqlite` and survive page refresh.
 
@@ -300,9 +300,9 @@ The file will be recreated on the next `npm run generate-agent-run` or `npm run 
 
 ### Browser localStorage
 
-Navigate to `http://localhost:3000/dashboard` and click **"Reset local data"** (top right of the "Locally uploaded" section). This clears browser-local packs, blobs, and receipts.
+Navigate to `http://localhost:3000/dashboard` and click **"Reset browser cache"** (top right of the "Local workspace" section). This clears browser-cached local packs, blobs, and receipts.
 
-The button asks for confirmation (click once → "Click again to confirm reset" → click again to proceed). Built-in demo data is not affected.
+The button asks for confirmation (click once → "Click again to reset browser cache" → click again to proceed). Built-in demo data is not affected. SQLite-persisted records are not deleted by this browser-cache reset.
 
 ---
 

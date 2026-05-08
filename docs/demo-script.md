@@ -49,7 +49,7 @@ Click "Launch Demo" or navigate to `/dashboard`.
 - Five packs: dataset (Common Crawl), agent-run (GPT-4o legal extractor), manifest (arXiv), document (policy), dataset (synthetic QA benchmark)
 - The "View blobs →" link on each card
 
-After you upload a pack (Step 5), come back here to see the **"Locally uploaded"** section appear at the top with a green dot indicator.
+After you upload a pack (Step 5), come back here to see the **"Local workspace"** section appear under the **"User-created records"** chip.
 
 ---
 
@@ -123,7 +123,7 @@ The success screen shows a **Read receipt** link. Click it (or navigate to `/rea
 - **Referenced blobs** section: shows the blob's Shelby ref, SHA-256 hash, source, and a "Local mock" data-source badge
 - **Run ID**: `upload-{packId}` — tied to the upload that created this receipt
 
-**Refresh the page** — the receipt must still resolve (persisted in localStorage). This demonstrates that read receipts survive browser refresh.
+**Refresh the page** — the receipt must still resolve from SQLite, with browser cache as a local fallback. This demonstrates that read receipts survive browser refresh.
 
 ---
 
@@ -132,12 +132,12 @@ The success screen shows a **Read receipt** link. Click it (or navigate to `/rea
 Navigate back to `/dashboard`.
 
 **Point out:**
-- A new **"Locally uploaded (1)"** section at the top with a green indicator dot
+- A new **"Local workspace"** section under the **"User-created records"** chip
 - Your uploaded pack appears as a card
 - Stats bar now shows updated counts
-- The **"Reset local data"** button (top-right of local section)
-  - Click once → "Click again to confirm reset"
-  - Click again → local packs disappear; demo data remains; local receipts also cleared
+- The **"Reset browser cache"** button (top-right of the local workspace section)
+  - Click once → "Click again to reset browser cache"
+  - Click again → browser-cached local records disappear; SQLite-persisted records remain; demo data remains
 
 ---
 
@@ -178,7 +178,7 @@ http://localhost:3000/read-receipt/c8-rr-agent-sentinel-v1
 
 **Refresh the page** — the receipt resolves from SQLite (not localStorage), so it survives browser refresh and localStorage resets.
 
-**Navigate to `/dashboard`** — the C8 pack appears in the "Locally uploaded" section.
+**Navigate to `/dashboard`** — the C8 pack appears in the "Local workspace" section under "User-created records".
 
 The script is idempotent — running it again produces the same IDs via `INSERT OR REPLACE`.
 
@@ -205,7 +205,7 @@ Open the repo in your editor.
 5. **`src/app/upload/providers.tsx`** — QueryClient + AptosWalletAdapterProvider (testnet path)
 6. **`src/lib/validation.ts`** — `buildEvidencePack()`, `buildBlobRecord()`, `parseTags()`
 7. **`src/lib/store/local-store.ts`** — localStorage read/write helpers for packs, blobs, and receipts
-8. **`src/components/dashboard-client.tsx`** — merges demo + localStorage packs
+8. **`src/components/dashboard-client.tsx`** — merges demo + browser cache + SQLite packs
 9. **`src/components/read-receipt-client.tsx`** — resolves receipts from demo data or localStorage
 
 Key message: "Mock mode is the default and requires zero configuration. The browser-wallet testnet path is isolated behind the adapter and hook boundary — operators can activate it with wallet + testnet config."
@@ -217,7 +217,7 @@ Key message: "Mock mode is the default and requires zero configuration. The brow
 - **Why evidence packs?** Grouping related blobs into packs gives you a unit of provenance — one pack = one dataset or one agent run.
 - **Why Shelby refs?** In local mode, `shelby://mock/blob/{id}` is a deterministic demo identifier. In testnet mode, `shelby://testnet/{account}/{blobName}` is a real Shelby blob identity registered on-chain.
 - **Why read receipts?** AI outputs are only as trustworthy as their inputs. Read receipts make the input-output chain inspectable — and now they bind to real BlobRecord identity.
-- **Why localStorage?** For demo purposes, localStorage is sufficient — uploads survive refresh, no server needed. A real backend is a future operator decision.
+- **Why SQLite plus browser cache?** SQLite is the local durable store for generated and uploaded records. Browser cache keeps the UI responsive and preserves older demo behavior, but it is no longer the only persistence path.
 - **Why mock mode by default?** Zero setup. Any developer can clone, run, and upload in under a minute with no accounts or API keys.
 
 ---

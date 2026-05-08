@@ -86,7 +86,7 @@ src/
 │   ├── status-badge.tsx        Evidence pack status badge
 │   ├── evidence-pack-card.tsx  Card for an evidence pack
 │   ├── page-header.tsx         Page title + subtitle
-│   ├── dashboard-client.tsx    Client: merges demo + localStorage + SQLite packs
+│   ├── dashboard-client.tsx    Client: merges demo + browser cache + SQLite packs
 │   ├── blob-detail-client.tsx  Client: resolves demo / localStorage / SQLite blobs
 │   └── read-receipt-client.tsx Client: resolves receipts from demo / localStorage / SQLite
 └── lib/
@@ -201,7 +201,7 @@ All three data types are persisted to browser localStorage as a compatibility/fa
 | `shelby_vault_blobs` | `BlobRecord[]` — local uploads |
 | `shelby_vault_receipts` | `ReadReceipt[]` — created automatically on upload (M4) |
 
-`resetLocalData()` clears all three keys atomically. This is called by the "Reset local data" button on the dashboard.
+`resetLocalData()` clears the browser-cache keys atomically. This is called by the "Reset browser cache" button on the dashboard. SQLite-persisted records remain until the local database files are removed.
 
 Existing localStorage records continue to work unchanged. The SQLite layer (C7) is the primary cross-session persistence path; localStorage is retained as a low-latency in-browser fallback.
 
@@ -330,7 +330,7 @@ npm run generate-agent-run
   → ReadReceipt built     (id: c8-rr-agent-sentinel-v1, receiptMode: 'local')
   → All three persisted to SQLite via INSERT OR REPLACE (idempotent)
   → /read-receipt/c8-rr-agent-sentinel-v1 resolves via SQLite path in ReadReceiptClient
-  → /dashboard shows c8-pack-agent-sentinel-v1 in the locally-uploaded section
+  → /dashboard shows c8-pack-agent-sentinel-v1 in Local workspace under User-created records
 ```
 
 ### Verification flow (C9 harness)
@@ -354,7 +354,7 @@ npm run verify-community-demo
 - **Server Actions for mock upload.** `SHELBY_API_KEY` stays server-side. The browser never sees it.
 - **Browser-wallet for testnet upload.** No server signer — the user's wallet extension signs transactions. No private key custody anywhere in the app.
 - **Adapter isolation.** All Shelby-specific code is behind the `ShelbyAdapter` interface or the `useShelbyUpload` hook. Neither path touches the other's internals.
-- **localStorage for demo persistence.** No server database is needed. Uploads, receipts, and blob records survive page refresh but are browser-specific.
+- **SQLite plus browser cache for local persistence.** The local SQLite store is the durable source for generated and uploaded records. Browser localStorage remains a client-side cache/fallback for demo ergonomics and resettable browser state.
 - **Tailwind v4.** Uses CSS-first configuration (`@import "tailwindcss"` in globals.css). No `tailwind.config.js` needed.
 - **Conservative status mapping.** `status-map.ts` defines `registered → ready → failed → unknown`. The React SDK hook returns `void` on success, so `storageStatus` is `registered` until a retrieval check confirms `ready`.
 - **C8 deterministic script.** `scripts/generate-agent-run.mjs` is the canonical agent-run example — runs with zero credentials, uses `better-sqlite3` directly (same schema as `lib/server/db.ts`), and is idempotent via `INSERT OR REPLACE`. Stable IDs (`c8-*`) ensure the generated receipt URL is predictable.
