@@ -26,7 +26,6 @@ import { parseTags, buildEvidencePack, buildBlobRecord } from '@/lib/validation'
 import { addLocalPack, addLocalBlob, addLocalReadReceipt } from '@/lib/store/local-store';
 import { formatBytes } from '@/lib/utils';
 import { useShelbyUpload } from '@/lib/shelby/use-shelby-upload';
-import UploadProviders from './providers';
 import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import { useLanguage } from '@/components/language-state';
@@ -1122,6 +1121,7 @@ function UploadPageContent() {
               <input
                 ref={fileInputRef}
                 type="file"
+                accept="image/*,.pdf,.json,.csv,.txt,.md,application/pdf,application/json,text/*"
                 multiple
                 className="hidden"
                 onChange={handleFileInput}
@@ -1213,9 +1213,5 @@ function UploadPageContent() {
 }
 
 export default function UploadPage() {
-  return (
-    <UploadProviders>
-      <UploadPageContent />
-    </UploadProviders>
-  );
+  return <UploadPageContent />;
 }
