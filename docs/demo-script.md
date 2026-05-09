@@ -1,6 +1,6 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **X13 community testnet session candidate** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **X14 persistent testnet session ledger candidate** to stakeholders or the community.
 
 > **Current scope:**
 > - The product UI is Chinese-first with a top-nav English toggle.
@@ -10,7 +10,7 @@ A step-by-step walkthrough for demonstrating the **X13 community testnet session
 > - Local uploads get `shelby://mock/blob/{id}` references.
 > - Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require a participant wallet with testnet APT and ShelbyUSD.
 > - Real testnet read receipts include a receipt-level verification panel that aggregates every referenced Shelby testnet Blob.
-> - `/testnet` now aggregates the latest testnet receipt and Blob records into a copyable community test session summary.
+> - `/testnet` now aggregates the latest testnet receipt and Blob records from browser cache plus SQLite into a copyable community test session summary.
 > - The C8 agent-run script (`npm run generate-agent-run`) produces a deterministic evidence pack, blobs, and read receipt with zero credentials.
 
 ## Prerequisites
@@ -50,7 +50,7 @@ Click **测试网 / Testnet** or navigate to `/testnet`.
 - This is the public entry point for community testnet participation.
 - The runtime card shows whether the current deployment is still `mock` or has `SHELBY_MODE=testnet` enabled.
 - The wallet readiness panel detects Aptos wallets, supports connect/disconnect, and shows account plus network status.
-- The community test session panel remains empty until a real Shelby testnet upload exists; after upload it shows the latest receipt, referenced Blobs, and a copyable session summary.
+- The community test session panel remains empty until a real Shelby testnet upload exists; after upload it reads browser cache plus SQLite, shows the latest receipt, referenced Blobs, and a copyable session summary.
 - The four participant steps are explicit: connect wallet, prepare test assets, upload evidence, inspect receipt.
 - The product boundary section is honest: no mainnet claim, no private-key custody, no server signer, no token purchase flow.
 

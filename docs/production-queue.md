@@ -47,7 +47,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X10 public testnet readiness is merged: wallet detection/connect readiness on `/testnet`, account/network status, docs alignment, and launch QA.
 - X11 testnet proof verification is merged: in-app Blob proof panel, safe Shelby retrieval probe, and docs/acceptance alignment.
 - X12 receipt audit closure is merged: read receipts aggregate all referenced Shelby testnet Blob verification checks into one audit panel.
-- X13 community testnet session is the active Codex-owned stage: `/testnet` aggregates the latest testnet receipt/blob records and provides a copyable participant summary.
+- X13 community testnet session is merged: `/testnet` aggregates the latest testnet receipt/blob records and provides a copyable participant summary.
+- X14 persistent testnet session ledger is the active Codex-owned stage: `/testnet` merges browser-cache and SQLite testnet receipts/blobs so participant summaries survive incomplete browser cache state.
 
 ## Stage Gate
 

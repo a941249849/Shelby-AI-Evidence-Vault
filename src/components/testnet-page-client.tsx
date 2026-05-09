@@ -25,6 +25,7 @@ import { useLanguage, type Language } from '@/components/language-state';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 import { getLocalBlobs, getLocalReadReceipts } from '@/lib/store/local-store';
+import { getPersistedBlobsAction, getPersistedReceiptsAction } from '@/app/actions/persist';
 import { formatDateTime } from '@/lib/utils';
 
 const copy = {
@@ -67,7 +68,7 @@ const copy = {
     acceptanceTitle: '发布验收',
     sessionTitle: '社区测试会话',
     sessionBody:
-      '完成真实测试网上传后，这里会聚合最近的 shelby-testnet 回执、引用 Blob 与可提交的测试摘要。社区用户可以把它作为参与回执提交。',
+      '完成真实测试网上传后，这里会从浏览器缓存和 SQLite 账本聚合最近的 shelby-testnet 回执、引用 Blob 与可提交的测试摘要。',
     sessionEmptyTitle: '尚未形成测试网会话',
     sessionEmptyBody:
       '当前浏览器还没有 shelby-testnet 回执。先连接钱包并完成一次测试网上传，再回到这里检查会话。',
@@ -79,6 +80,8 @@ const copy = {
     copySession: '复制会话摘要',
     copied: '已复制',
     refreshSession: '刷新会话',
+    ledgerSource: '数据来源',
+    ledgerSourceValue: '浏览器缓存 + SQLite',
     sessionMode: '会话模式',
     generatedAt: '生成时间',
     proofPath: '证明链路',
@@ -137,7 +140,7 @@ const copy = {
     acceptanceTitle: 'Launch acceptance',
     sessionTitle: 'Community test session',
     sessionBody:
-      'After a real testnet upload, this panel aggregates the latest shelby-testnet receipt, referenced Blobs, and a shareable test summary for community participation.',
+      'After a real testnet upload, this panel aggregates the latest shelby-testnet receipt, referenced Blobs, and a shareable test summary from browser cache plus the SQLite ledger.',
     sessionEmptyTitle: 'No testnet session yet',
     sessionEmptyBody:
       'This browser has no shelby-testnet receipt yet. Connect a wallet, complete one testnet upload, then return here to inspect the session.',
@@ -149,6 +152,8 @@ const copy = {
     copySession: 'Copy session summary',
     copied: 'Copied',
     refreshSession: 'Refresh session',
+    ledgerSource: 'Data source',
+    ledgerSourceValue: 'browser cache + SQLite',
     sessionMode: 'Session mode',
     generatedAt: 'Generated at',
     proofPath: 'Proof path',
@@ -210,6 +215,8 @@ const copy = {
     copySession: string;
     copied: string;
     refreshSession: string;
+    ledgerSource: string;
+    ledgerSourceValue: string;
     sessionMode: string;
     generatedAt: string;
     proofPath: string;
@@ -576,30 +583,72 @@ interface CommunitySession {
   blobs: BlobRecord[];
   latestReceipt: ReadReceipt | null;
   latestReceiptBlobs: BlobRecord[];
+  source: 'browser' | 'sqlite' | 'mixed';
 }
 
-function loadCommunitySession(): CommunitySession {
-  if (typeof window === 'undefined') {
-    return { receipts: [], blobs: [], latestReceipt: null, latestReceiptBlobs: [] };
-  }
+function emptyCommunitySession(): CommunitySession {
+  return { receipts: [], blobs: [], latestReceipt: null, latestReceiptBlobs: [], source: 'browser' };
+}
 
-  const receipts = getLocalReadReceipts()
+function isTestnetBlobRecord(blob: BlobRecord): boolean {
+  return blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet' || blob.network === 'testnet';
+}
+
+function dedupeById<T extends { id: string }>(records: T[]): T[] {
+  const seen = new Set<string>();
+  const deduped: T[] = [];
+  for (const record of records) {
+    if (seen.has(record.id)) continue;
+    seen.add(record.id);
+    deduped.push(record);
+  }
+  return deduped;
+}
+
+function buildCommunitySession(
+  receiptsInput: ReadReceipt[],
+  blobsInput: BlobRecord[],
+  source: CommunitySession['source']
+): CommunitySession {
+  const receipts = dedupeById(receiptsInput)
     .filter((receipt) => receipt.receiptMode === 'shelby-testnet')
     .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp));
-  const blobs = getLocalBlobs()
-    .filter(
-      (blob) =>
-        blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet' || blob.network === 'testnet'
-    )
+  const blobs = dedupeById(blobsInput)
+    .filter(isTestnetBlobRecord)
     .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const latestReceipt = receipts[0] ?? null;
   const latestReceiptBlobs = latestReceipt
-    ? latestReceipt.referencedBlobIds
+    ? (latestReceipt.referencedBlobIds
         .map((blobId) => blobs.find((blob) => blob.id === blobId))
-        .filter(Boolean) as BlobRecord[]
+        .filter(Boolean) as BlobRecord[])
     : [];
 
-  return { receipts, blobs, latestReceipt, latestReceiptBlobs };
+  return { receipts, blobs, latestReceipt, latestReceiptBlobs, source };
+}
+
+function loadBrowserCommunitySession(): CommunitySession {
+  if (typeof window === 'undefined') {
+    return emptyCommunitySession();
+  }
+
+  return buildCommunitySession(getLocalReadReceipts(), getLocalBlobs(), 'browser');
+}
+
+async function loadLedgerCommunitySession(): Promise<CommunitySession> {
+  const browserSession = loadBrowserCommunitySession();
+  try {
+    const [persistedReceipts, persistedBlobs] = await Promise.all([
+      getPersistedReceiptsAction(),
+      getPersistedBlobsAction(),
+    ]);
+    return buildCommunitySession(
+      [...browserSession.receipts, ...persistedReceipts],
+      [...browserSession.blobs, ...persistedBlobs],
+      browserSession.receipts.length > 0 || browserSession.blobs.length > 0 ? 'mixed' : 'sqlite'
+    );
+  } catch {
+    return browserSession;
+  }
 }
 
 function buildSessionSummary({
@@ -619,9 +668,10 @@ function buildSessionSummary({
 
   return {
     product: 'Shelby AI Evidence Vault',
-    milestone: 'X13 community testnet session',
+    milestone: 'X14 persistent testnet session ledger',
     generatedAt: new Date().toISOString(),
     runtimeMode: mode,
+    ledgerSource: session.source,
     wallet: {
       ready: walletReady,
       accountAddress,
@@ -671,20 +721,36 @@ function TestnetSessionPanel({
   language: Language;
 }) {
   const t = copy[language];
-  const [session, setSession] = useState<CommunitySession>(loadCommunitySession);
+  const [session, setSession] = useState<CommunitySession>(loadBrowserCommunitySession);
   const [copied, setCopied] = useState(false);
   const proofBlobs = session.latestReceiptBlobs.length > 0 ? session.latestReceiptBlobs : session.blobs;
   const hasSession = Boolean(session.latestReceipt || session.blobs.length > 0);
 
-  const refreshSession = () => {
-    setSession(loadCommunitySession());
+  const refreshSession = async () => {
+    const nextSession = await loadLedgerCommunitySession();
+    setSession(nextSession);
     setCopied(false);
   };
 
   useEffect(() => {
-    const onFocus = () => refreshSession();
+    let cancelled = false;
+    loadLedgerCommunitySession()
+      .then((nextSession) => {
+        if (cancelled) return;
+        setSession(nextSession);
+      })
+      .catch(() => {
+        if (!cancelled) setSession(loadBrowserCommunitySession());
+      });
+
+    const onFocus = () => {
+      void refreshSession();
+    };
     window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   const copySummary = async () => {
@@ -732,10 +798,11 @@ function TestnetSessionPanel({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
+      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <SessionMetric label={t.sessionMode} value={mode} ok={mode === 'testnet'} />
         <SessionMetric label={t.latestReceipt} value={session.latestReceipt?.id ?? t.noReceipt} ok={Boolean(session.latestReceipt)} />
         <SessionMetric label={t.linkedBlobs} value={String(proofBlobs.length)} ok={proofBlobs.length > 0} />
+        <SessionMetric label={t.ledgerSource} value={t.ledgerSourceValue} ok={session.source !== 'browser' || hasSession} />
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">

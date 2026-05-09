@@ -183,7 +183,8 @@ testnet/page.tsx
   → TestnetPageClient wallet readiness panel
       → useWallet() [@aptos-labs/wallet-adapter-react]
       → shows detected wallets, connected account, and Aptos Testnet status
-      → Community test session panel reads local shelby-testnet receipts/blobs
+      → Community test session panel reads browser-cache + SQLite shelby-testnet receipts/blobs
+      → getPersistedReceiptsAction() + getPersistedBlobsAction()
       → Copyable session summary for participant submission
 
 upload/page.tsx (client component)
@@ -253,6 +254,7 @@ The `payload` column stores the complete typed object as JSON so future model-fi
 | Dashboard | demo data (server) + localStorage (client) + SQLite via `getPersistedPacksAction` |
 | Blob detail | demo data → localStorage → SQLite via `getPersistedBlobAction` |
 | Read receipt | demo data → localStorage → SQLite via `getPersistedReceiptAction` (blobs resolved similarly) |
+| Testnet session | localStorage + SQLite via `getPersistedReceiptsAction` and `getPersistedBlobsAction`; dedupes by ID |
 
 SQLite failures are non-fatal — the app degrades gracefully to localStorage-only mode.
 
