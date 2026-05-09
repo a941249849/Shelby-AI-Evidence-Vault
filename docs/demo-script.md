@@ -1,8 +1,9 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **C12 release-candidate evidence vault** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **X3 community experiment candidate** to stakeholders or the community.
 
 > **Current scope:**
+> - The product UI is Chinese-first with a top-nav English toggle.
 > - Local mock upload works with zero configuration (the default).
 > - Browser-wallet Shelby testnet upload path exists for operators with funded wallets.
 > - Built-in demo data uses illustrative `shelby://demo/blob/` references.
@@ -28,28 +29,30 @@ npm run dev
 Open `http://localhost:3000`.
 
 **Point out:**
-- The hero section: "AI agents need verifiable data memory."
-- The three CTA buttons: Launch Demo, View GitHub, Read Docs
-- Scroll down to the **Problem** section — explain why data provenance matters for AI
-- Scroll to **Solution** — evidence packs, Shelby blob references, read receipts
-- Scroll to **How it Works** — the 4-step flow
-- Scroll to **Sample evidence packs** — show 3 live cards from demo data
-- Scroll to **Developer Quickstart** — show the git clone snippet
+- The Chinese-first Shelby ecosystem positioning: **面向 AI Agent 的可验证记忆**
+- The dark **证据如何流动** board: 证据包 → Shelby Blob → 读取回执 → 可验证记忆
+- The three primary actions: **上传证据**, **打开证据索引**, **查看回执**
+- The stats cards: Evidence Pack count, Shelby Blob count, receipt count, SQLite storage boundary
+- The **核心能力** cards: structured evidence packs, Blob identity, receipt proof, verifiable audit
+- The **产品预览** cards: registry, upload, read receipt
+- Toggle English in the top nav and confirm the product surface switches language
 
 ---
 
 ## Step 2 — Dashboard (`/dashboard`)
 
-Click "Launch Demo" or navigate to `/dashboard`.
+Click **索引** or navigate to `/dashboard`.
 
 **Point out:**
-- Stats bar: 5 total packs, 3 active, 6 total blobs (demo data only on first visit)
-- The 3-column responsive grid of evidence pack cards
+- The page is an **evidence registry**, not a file manager.
+- Stats bar: indexed packs, active packs, tracked blobs, user packs
+- Search/filter/sort controls for narrowing the evidence index
+- The responsive grid of evidence pack cards
 - Each card shows: title, status badge (green/gray/yellow), category badge, source type, tags, blob count, created date
 - Five packs: dataset (Common Crawl), agent-run (GPT-4o legal extractor), manifest (arXiv), document (policy), dataset (synthetic QA benchmark)
-- The "View blobs →" link on each card
+- The **检查证据** link on each card
 
-After you upload a pack (Step 5), come back here to see the **"Local workspace"** section appear under the **"User-created records"** chip.
+After you upload a pack (Step 5), come back here to see the local/SQLite records appear in the user-created area. In Chinese this is surfaced as the local workspace / user-created evidence section; in English the labels switch through the top-nav language toggle.
 
 ---
 
@@ -58,14 +61,14 @@ After you upload a pack (Step 5), come back here to see the **"Local workspace"*
 Navigate to `/blob/blob-001`.
 
 **Point out:**
-- The full blob metadata table
-- **Demo Reference** row: `shelby://demo/blob/a1b2c3d4...` — an illustrative demo reference, not a real Shelby blob identity
-- **SHA-256 Hash** row: the content fingerprint
-- **Source** row: the original URL from Common Crawl S3
-- **MIME Type**: `application/warc`
-- **Size**: 50 MB
-- **Evidence Pack** link: clicking it goes back to the dashboard for that pack
-- **Demo data** badge (top right of detail block): shows this is built-in demo data
+- The page title: **Blob 来源证明检查器**
+- **Demo 引用** row: `shelby://demo/blob/a1b2c3d4...` — an illustrative demo reference, not a real Shelby blob identity
+- **SHA-256 哈希** row: the content fingerprint
+- **来源** row: the original URL from Common Crawl S3
+- **MIME 类型**: `application/warc`
+- **大小**: 50 MB
+- **证据包** link: clicking it goes back to the dashboard for that pack
+- **Demo 数据** badge: shows this is built-in demo data
 - Try `/blob/blob-003` — shows the GPT-4o agent output blob
 
 ---
@@ -75,12 +78,13 @@ Navigate to `/blob/blob-001`.
 Navigate to `/read-receipt/rr-001`.
 
 **Point out:**
-- The **Query** block (large, prominent): the agent's question
-- The **Answer Summary** block: what the agent found
-- **Run ID** (monospace): the unique agent run identifier
-- **Referenced Blobs**: clickable links to `/blob/blob-003` — trace from answer back to source; shows Shelby ref, SHA-256 hash, and data-source badge
-- **Evidence Packs**: link to the pack that was consulted
-- **Agent Version**: `shelby-agent/0.3.0 gpt-4o-2024-01-25`
+- The page title: **回答来源与证据使用情况**
+- The **用户问题** block: the agent's question
+- The **生成结果** block: what the agent found
+- **运行 ID**: the unique agent run identifier
+- **引用 Blob**: clickable links to `/blob/blob-003` — trace from answer back to source; shows Shelby ref, SHA-256 hash, and data-source badge
+- **证据包**: link to the pack that was consulted
+- **Agent 版本**: `shelby-agent/0.3.0 gpt-4o-2024-01-25`
 
 Explain: "Every time an agent runs, we can produce this receipt. It's a full audit trail — query in, evidence consumed, answer out."
 
@@ -91,8 +95,9 @@ Explain: "Every time an agent runs, we can produce this receipt. It's a full aud
 Navigate to `/upload`.
 
 **Point out:**
-- The **mode indicator** at the top — shows "Local demo upload active" (mock mode) — no wallet required
-- "Files are saved to browser localStorage with deterministic mock Shelby references. No wallet signing, no network calls, and no real Shelby upload."
+- The top copy says this is a **证据入口**, not a generic local file manager.
+- The mode indicator shows **本地 Demo 上传已启用** (mock mode) — no wallet required.
+- "Files are saved to SQLite/browser fallback with deterministic mock Shelby references. No wallet signing, no network calls, and no real Shelby upload."
 - The working form: title, category, source type, tags, description
 - The **file drop area**: drag & drop or click to browse
 - File size limit: 5 MB per file
@@ -101,7 +106,7 @@ Navigate to `/upload`.
 1. Enter a title: "My Test Evidence Pack"
 2. Select a small local file (e.g. a text file or image)
 3. Watch the **SHA-256** hash appear under the file name as it computes
-4. Click **"Save locally (mock Shelby reference)"**
+4. Click **保存到本地**
 5. See the **success screen** with:
    - Pack name
    - Number of blobs saved
@@ -109,44 +114,44 @@ Navigate to `/upload`.
    - Links to blob detail pages
    - **A read receipt link** — click it to see the auto-generated receipt
 
-**Click a blob link** — it opens `/blob/local-blob-...` and shows the full detail with a **"Local demo upload"** badge and a **Mock Reference** row that says `shelby://mock/blob/{id}` — a local demo identifier, not a real Shelby blob.
+**Click a blob link** — it opens `/blob/local-blob-...` and shows the full detail with a **本地 Demo 上传** badge and a **Mock 引用** row that says `shelby://mock/blob/{id}` — a local demo identifier, not a real Shelby blob.
 
 ---
 
 ## Step 6 — Verify the read receipt
 
-The success screen shows a **Read receipt** link. Click it (or navigate to `/read-receipt/local-rr-{uuid}`).
+The success screen shows a **读取回执 / Read receipt** link. Click it (or navigate to `/read-receipt/local-rr-{uuid}`).
 
 **Point out:**
-- The **Receipt mode** badge: "Local demo upload"
-- The **Query** block: the upload description you entered
-- **Referenced blobs** section: shows the blob's Shelby ref, SHA-256 hash, source, and a "Local mock" data-source badge
+- The **回执模式 / Receipt mode** badge: local demo upload
+- The **用户问题 / Query** block: the upload description you entered
+- **引用 Blob / Referenced blobs** section: shows the blob's Shelby ref, SHA-256 hash, source, and local mock data-source badge
 - **Run ID**: `upload-{packId}` — tied to the upload that created this receipt
 
 **Refresh the page** — the receipt must still resolve from SQLite, with browser cache as a local fallback. This demonstrates that read receipts survive browser refresh.
 
 ---
 
-## Step 7 — Return to Dashboard
+## Step 7 — Return to Dashboard (`/dashboard`)
 
 Navigate back to `/dashboard`.
 
 **Point out:**
-- A new **"Local workspace"** section under the **"User-created records"** chip
+- A local/SQLite user-created evidence section appears after upload
 - Your uploaded pack appears as a card
 - Stats bar now shows updated counts
-- The **"Reset browser cache"** button (top-right of the local workspace section)
-  - Click once → "Click again to reset browser cache"
+- The **重置浏览器缓存 / Reset browser cache** button in the local records area
+  - Click once → the confirmation label appears
   - Click again → browser-cached local records disappear; SQLite-persisted records remain; demo data remains
 
 ---
 
-## Step 7.5 — Dashboard search, filter, and sort (C10 operator flow)
+## Step 7.5 — Evidence registry search, filter, and sort
 
 The dashboard toolbar lets reviewers quickly narrow the full evidence index without leaving the page.
 
 **Search:**
-- Type into the **Search title, tags, category…** input box above the sections.
+- Type into the **搜索标题、标签、类别... / Search title, tags, category...** input box above the sections.
 - The search covers pack title, description, category, source type, status, tags, and data source label.
 - Example queries to try:
   - `C8` — finds the C8 agent-run pack
@@ -156,28 +161,28 @@ The dashboard toolbar lets reviewers quickly narrow the full evidence index with
   - `local` — narrows to user-created/local records only
 
 **Filters (dropdown controls next to the search box):**
-- **All categories** — filter to `dataset`, `agent-run`, `document`, or `manifest`
-- **All source types** — filter to `web-scrape`, `api-export`, `agent-output`, or `manual-upload`
-- **All statuses** — filter to `active`, `archived`, or `pending`
-- **All sources** — filter to `Local / uploaded` (your records) or `Demo corpus` (built-in)
+- **全部类别 / All categories** — filter to `dataset`, `agent-run`, `document`, or `manifest`
+- **全部来源类型 / All source types** — filter to `web-scrape`, `api-export`, `agent-output`, or `manual-upload`
+- **全部状态 / All statuses** — filter to `active`, `archived`, or `pending`
+- **全部来源 / All sources** — filter to local/uploaded records or built-in demo corpus
 
 **Sort:**
-- **Newest first** (default) — most recently created packs appear first
-- **Oldest first** — chronological order
-- **Title A–Z** — alphabetical sort
-- **Most blobs** — packs with the most blobs at the top
+- **最新优先 / Newest first** (default) — most recently created packs appear first
+- **最早优先 / Oldest first** — chronological order
+- **标题 A-Z / Title A-Z** — alphabetical sort
+- **Blob 最多 / Most blobs** — packs with the most blobs at the top
 
 **Counts:**
 - The **"Packs indexed"** metric shows `N / total` when a filter is active (e.g. `3 / 6`).
 - Section headers show `N / total shown` for the filtered subset.
 
 **Clear/reset:**
-- When any filter or search is active, a **"Clear filters"** button (violet, top-right of the toolbar) resets all controls back to defaults.
+- When any filter or search is active, a **清除筛选 / Clear filters** button resets all controls back to defaults.
 
 **Empty state:**
-- If no packs match the current filters, a **"No packs match your filters"** message appears with a **"Reset filters"** button.
+- If no packs match the current filters, a bilingual empty state appears with a **重置筛选 / Reset filters** button.
 
-**Important:** Filters and sort are client-side — they do not modify any stored data. The **"Reset browser cache"** button in the Local workspace section still only clears browser-cached local records; SQLite-persisted packs remain.
+**Important:** Filters and sort are client-side — they do not modify any stored data. The browser-cache reset button still only clears browser-cached local records; SQLite-persisted packs remain.
 
 ---
 
@@ -207,10 +212,10 @@ http://localhost:3000/read-receipt/c8-rr-agent-sentinel-v1
 ```
 
 **Point out:**
-- **Receipt mode** badge: "Local demo upload"
-- **Query** block: the agent's task description
-- **Answer summary**: deterministic benchmark analysis — top models per task, average accuracy scores
-- **Referenced blobs**: two blob cards showing Shelby refs, SHA-256 hashes, and sources
+- **回执模式 / Receipt mode** badge: local demo upload
+- **用户问题 / Query** block: the agent's task description
+- **生成结果 / Answer summary**: deterministic benchmark analysis — top models per task, average accuracy scores
+- **引用 Blob / Referenced blobs**: two blob cards showing Shelby refs, SHA-256 hashes, and sources
   - `c8-blob-input-v1`: source `fixture://fixtures/c8-agent-input.json`
   - `c8-blob-output-v1`: source `agent://shelby-vault/c8/sentinel-v1/output.json`
 - **Run ID**: `run-c8-agent-sentinel-v1`
@@ -218,7 +223,7 @@ http://localhost:3000/read-receipt/c8-rr-agent-sentinel-v1
 
 **Refresh the page** — the receipt resolves from SQLite (not localStorage), so it survives browser refresh and localStorage resets.
 
-**Navigate to `/dashboard`** — the C8 pack appears in the "Local workspace" section under "User-created records".
+**Navigate to `/dashboard`** — the C8 pack appears in the local/SQLite user-created evidence section.
 
 The script is idempotent — running it again produces the same IDs via `INSERT OR REPLACE`.
 
