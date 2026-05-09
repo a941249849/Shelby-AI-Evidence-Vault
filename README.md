@@ -4,19 +4,19 @@
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
-**An AI evidence and read-receipt layer built for Shelby: evidence packs, Shelby Blob identity, and auditable receipts for agent workflows. Local mock is a zero-credential preview path; Shelby testnet is the real protocol proof path.**
+**A builder demo for AI evidence and read receipts on Shelby testnet: evidence packs, Shelby Blob identity, and auditable receipts for agent workflows. Local mock is a zero-credential preview path; Shelby testnet is the real protocol proof path.**
 
 ---
 
 ## What is this?
 
-Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenance. It shows how datasets, agent outputs, and documents can become verifiable evidence records instead of loose files:
+Shelby AI Evidence Vault is a developer-built Shelby testnet demo for AI provenance. It shows how datasets, agent outputs, and documents can become verifiable evidence records instead of loose files:
 
 - **Cryptographic blob references** — every file gets a SHA-256 hash and a Shelby reference (`shelby://mock/blob/{id}` in local mode, `shelby://testnet/{account}/{blobName}` in testnet mode)
 - **Evidence packs** — structured groups of related blobs with metadata, tags, provenance, and status
 - **Read receipts** — auditable records of agent activity: what was uploaded, what evidence was consulted, and what was answered; bound to real `BlobRecord` identity
 - **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a development and review fallback, not the protocol endpoint
-- **Public Shelby testnet participation path** — when deployed with `SHELBY_MODE=testnet`, community users can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
+- **Shelby testnet builder path** — when deployed with `SHELBY_MODE=testnet`, reviewers can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
 - **Testnet launch console** — `/testnet` gives community users a direct launch surface for mode status, wallet readiness, funding prerequisites, upload entry, and receipt verification
 - **Public testnet handoff artifact** — `/testnet` aggregates the latest testnet receipt, referenced Blobs, wallet status, full route URLs, smoke commands, and a copyable session summary from browser cache plus SQLite after a real upload
 - **In-app proof verification** — testnet Blob detail and read receipt pages expose account/blobName/status/explorer/retrieval identity and can run safe server-side retrieval probes
@@ -34,7 +34,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 | **Public testnet browser-wallet** | `SHELBY_MODE=testnet` + `NEXT_PUBLIC_SHELBY_NETWORK=testnet` + funded Aptos wallet | Real Shelby testnet upload via `@shelby-protocol/react` hook + browser wallet signing; requires testnet APT and ShelbyUSD |
 | **Smoke harness** | `SHELBY_SMOKE=true` + `SHELBY_RPC_URL` + optional prior-upload address/blobName | Validates config, checks RPC connectivity, and verifies retrieval of a previously uploaded blob |
 
-> **Security boundary:** No private keys, no server signer, no real LLM calls, no production database, no trading or marketplace features. `SHELBY_API_KEY` stays server-side only. Browser wallet signing is handled by the user's wallet extension — the app never has custody of signing material.
+> **Boundary:** This is a builder demo, not an official Shelby product or production storage service. No private keys, no server signer, no real LLM calls, no trading or marketplace features. `SHELBY_API_KEY` stays server-side only. Browser wallet signing is handled by the user's wallet extension — the app never has custody of signing material.
 
 ---
 
@@ -50,7 +50,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 | Upload adapter | Mock (default) / Shelby testnet browser-wallet path |
 | Shelby SDK | `@shelby-protocol/sdk` + `@shelby-protocol/react` |
 | Wallet adapter | `@aptos-labs/wallet-adapter-react` |
-| Persistence | Local SQLite (server-side records) + browser localStorage fallback/cache |
+| Persistence | Local SQLite for development, Neon/Postgres for Vercel, browser localStorage fallback/cache |
 
 ---
 
@@ -79,6 +79,7 @@ npm run verify-testnet-handoff -- path/to/handoff.json # Validate copied /testne
 npm run verify-release-candidate # C12: full release-candidate gate (build + routes + doctor)
 npm run final-readiness        # X18: write final readiness artifact after the RC gate
 npm run public-testnet-release-pack # X19: write the operator package for the real testnet run
+npm run verify-vercel-builder-demo # X21: Vercel + Neon deployment preflight
 npm run smoke                   # Opt-in Shelby testnet smoke harness (requires SHELBY_SMOKE=true)
 ```
 
@@ -127,6 +128,13 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | `NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS` | `24` | Blob lifetime in hours for browser wallet uploads |
 | `NEXT_PUBLIC_TESTNET_API_KEY` | — | Shelby/Geomi frontend client key for browser DApp testnet access |
 
+**Persistence**
+
+| Variable | Default | Description |
+|---|---|---|
+| `EVIDENCE_STORE` | auto | `postgres` for Vercel/Neon, `sqlite` for local development; auto uses Postgres when `DATABASE_URL` exists |
+| `DATABASE_URL` | — | Server-side Neon/Postgres connection string. Never expose as `NEXT_PUBLIC_DATABASE_URL` |
+
 **Smoke harness (opt-in)**
 
 | Variable | Default | Description |
@@ -136,6 +144,39 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | `SHELBY_SMOKE_BLOB_NAME` | — | Shelby blob name from a prior manual upload |
 
 > **Public testnet prerequisites:** Real Shelby testnet upload requires a connected Aptos browser wallet (e.g. Petra) on Aptos Testnet, testnet APT for gas fees, and ShelbyUSD for Shelby storage operations. CI does not perform real uploads — the browser-wallet path requires an interactive browser session. See `docs/public-testnet-participation.md` for the participant path and `docs/c3-smoke-test-guide.md` for retrieval smoke checks.
+
+---
+
+## Vercel Builder Demo
+
+The recommended hosted shape is:
+
+```txt
+Vercel website + Neon Postgres evidence records + Shelby testnet Blob storage
+```
+
+Minimum Vercel env:
+
+```bash
+SHELBY_MODE=testnet
+NEXT_PUBLIC_SHELBY_NETWORK=testnet
+NEXT_PUBLIC_TESTNET_API_KEY=<Shelby/Geomi frontend client key>
+DATABASE_URL=<Neon Postgres connection string>
+```
+
+Before sharing the URL:
+
+```bash
+npm run verify-vercel-builder-demo
+```
+
+Health check:
+
+```txt
+/api/health
+```
+
+See `docs/vercel-builder-demo.md`.
 
 ---
 
@@ -280,6 +321,8 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
 | `docs/public-testnet-participation.md` | X8 public Shelby testnet participant and deployment path |
+| `docs/vercel-builder-demo.md` | X21 Vercel + Neon builder demo deployment |
+| `docs/builder-demo-presentation.md` | Builder-demo pitch, demo path, and feedback request |
 | `docs/final-product-acceptance.md` | X15 public testnet candidate acceptance package |
 | `docs/final-copilot-review-brief.md` | X16 final Copilot review and merge-readiness handoff |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |

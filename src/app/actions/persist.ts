@@ -1,10 +1,10 @@
 'use server';
 
 /**
- * Server Actions for SQLite persistence of upload results.
+ * Server Actions for persistence of upload results.
  *
  * These actions form the bridge between the client-side upload flow and the
- * server-side SQLite evidence store.  They are intentionally thin — validation
+ * server-side evidence store. They are intentionally thin — validation
  * and record construction happen on the client; these actions only receive
  * already-built, serialisable typed records and persist them.
  *
@@ -32,7 +32,7 @@ import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 
 /**
  * Persist a completed upload atomically: one EvidencePack, its BlobRecord(s),
- * and the generated ReadReceipt — all in a single SQLite transaction.
+ * and the generated ReadReceipt.
  * Called from the upload page after a successful mock or testnet upload.
  */
 export async function persistUploadAction(
@@ -41,7 +41,7 @@ export async function persistUploadAction(
   receipt: ReadReceipt
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    insertUploadTransaction(pack, blobs, receipt);
+    await insertUploadTransaction(pack, blobs, receipt);
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown persistence error';
@@ -54,47 +54,47 @@ export async function persistUploadAction(
 // ---------------------------------------------------------------------------
 
 /**
- * Returns all user-uploaded EvidencePack records from SQLite (newest first).
+ * Returns all user-uploaded EvidencePack records from the configured store.
  * Does NOT include built-in demo data — those are served from static arrays.
  */
 export async function getPersistedPacksAction(): Promise<EvidencePack[]> {
   try {
-    return getPacks();
+    return await getPacks();
   } catch {
     return [];
   }
 }
 
 /**
- * Looks up a single EvidencePack by ID in SQLite.
+ * Looks up a single EvidencePack by ID in the configured store.
  * Returns null if not found — demo data is NOT included.
  */
 export async function getPersistedPackAction(id: string): Promise<EvidencePack | null> {
   try {
-    return dbGetPackById(id) ?? null;
+    return (await dbGetPackById(id)) ?? null;
   } catch {
     return null;
   }
 }
 
 /**
- * Looks up a BlobRecord by ID in SQLite.
+ * Looks up a BlobRecord by ID in the configured store.
  * Returns null if not found — demo data is NOT included.
  */
 export async function getPersistedBlobAction(id: string): Promise<BlobRecord | null> {
   try {
-    return dbGetBlobById(id) ?? null;
+    return (await dbGetBlobById(id)) ?? null;
   } catch {
     return null;
   }
 }
 
 /**
- * Returns all BlobRecord rows from SQLite (newest first).
+ * Returns all BlobRecord rows from the configured store.
  */
 export async function getPersistedBlobsAction(): Promise<BlobRecord[]> {
   try {
-    return getBlobs();
+    return await getBlobs();
   } catch {
     return [];
   }
@@ -105,30 +105,30 @@ export async function getPersistedBlobsAction(): Promise<BlobRecord[]> {
  */
 export async function getPersistedBlobsByPackAction(packId: string): Promise<BlobRecord[]> {
   try {
-    return dbGetBlobsByPackId(packId);
+    return await dbGetBlobsByPackId(packId);
   } catch {
     return [];
   }
 }
 
 /**
- * Looks up a ReadReceipt by ID in SQLite.
+ * Looks up a ReadReceipt by ID in the configured store.
  * Returns null if not found — demo data is NOT included.
  */
 export async function getPersistedReceiptAction(id: string): Promise<ReadReceipt | null> {
   try {
-    return dbGetReceiptById(id) ?? null;
+    return (await dbGetReceiptById(id)) ?? null;
   } catch {
     return null;
   }
 }
 
 /**
- * Returns all ReadReceipt rows from SQLite (newest first).
+ * Returns all ReadReceipt rows from the configured store.
  */
 export async function getPersistedReceiptsAction(): Promise<ReadReceipt[]> {
   try {
-    return getReceipts();
+    return await getReceipts();
   } catch {
     return [];
   }

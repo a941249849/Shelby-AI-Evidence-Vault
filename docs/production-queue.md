@@ -53,7 +53,9 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X16 final Copilot review package is merged: `docs/final-copilot-review-brief.md` defines the final review scope, gates, real-testnet acceptance path, security boundaries, and expected review output.
 - X17 testnet handoff validator is merged: `scripts/verify-testnet-handoff.mjs` validates copied `/testnet` handoff JSON after a real Shelby testnet upload.
 - X18 final readiness artifact is merged: `scripts/final-readiness.mjs` writes `artifacts/final-readiness/latest.json` and separates code-candidate readiness from manual real-testnet/Copilot gates.
-- X19 public testnet release operator package is the active stage: `scripts/public-testnet-release-pack.mjs` writes `artifacts/public-testnet-release/latest.json` and gives the human operator one packet for wallet upload, handoff validation, and final Copilot review.
+- X19 public testnet release operator package is merged: `scripts/public-testnet-release-pack.mjs` writes `artifacts/public-testnet-release/latest.json` and gives the human operator one packet for wallet upload, handoff validation, and final Copilot review.
+- X20 Docker/Render style deployment package was reviewed but superseded before merge.
+- X21 Vercel Builder Demo is the active stage: Vercel hosts the website/API, Neon/Postgres stores evidence records, Shelby testnet stores real Blobs, and the product positioning is developer builder demo rather than official ecosystem launch.
 
 ## Stage Gate
 
