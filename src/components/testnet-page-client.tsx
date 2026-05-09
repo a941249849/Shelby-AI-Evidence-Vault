@@ -25,7 +25,10 @@ import { useLanguage, type Language } from '@/components/language-state';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 import { getLocalBlobs, getLocalReadReceipts } from '@/lib/store/local-store';
+import { getPersistedBlobsAction, getPersistedReceiptsAction } from '@/app/actions/persist';
 import { formatDateTime } from '@/lib/utils';
+import { buildTestnetHandoffSummary } from '@/lib/testnet/handoff.mjs';
+import TestnetProofSummary from '@/components/testnet-proof-summary';
 
 const copy = {
   zh: {
@@ -67,7 +70,7 @@ const copy = {
     acceptanceTitle: '发布验收',
     sessionTitle: '社区测试会话',
     sessionBody:
-      '完成真实测试网上传后，这里会聚合最近的 shelby-testnet 回执、引用 Blob 与可提交的测试摘要。社区用户可以把它作为参与回执提交。',
+      '完成真实测试网上传后，这里会从浏览器缓存和 SQLite 账本聚合最近的 shelby-testnet 回执、引用 Blob 与可提交的测试摘要。',
     sessionEmptyTitle: '尚未形成测试网会话',
     sessionEmptyBody:
       '当前浏览器还没有 shelby-testnet 回执。先连接钱包并完成一次测试网上传，再回到这里检查会话。',
@@ -79,10 +82,18 @@ const copy = {
     copySession: '复制会话摘要',
     copied: '已复制',
     refreshSession: '刷新会话',
+    ledgerSource: '数据来源',
     sessionMode: '会话模式',
     generatedAt: '生成时间',
     proofPath: '证明链路',
     proofPathValue: '钱包 → 上传 → Blob 证明 → 回执聚合 → smoke 可选验证',
+    storageStatus: '存储状态',
+    explorer: 'Explorer',
+    retrieval: '检索端点',
+    smokeCommand: 'Smoke 命令',
+    sourceBrowser: '浏览器缓存',
+    sourceSqlite: 'SQLite 账本',
+    sourceMixed: '浏览器缓存 + SQLite',
     acceptance: [
       '自动门禁：lint、build、release-candidate verifier 必须全绿。',
       '真实测试：连接 Aptos Testnet 钱包，完成一次小文件上传。',
@@ -137,7 +148,7 @@ const copy = {
     acceptanceTitle: 'Launch acceptance',
     sessionTitle: 'Community test session',
     sessionBody:
-      'After a real testnet upload, this panel aggregates the latest shelby-testnet receipt, referenced Blobs, and a shareable test summary for community participation.',
+      'After a real testnet upload, this panel aggregates the latest shelby-testnet receipt, referenced Blobs, and a shareable test summary from browser cache plus the SQLite ledger.',
     sessionEmptyTitle: 'No testnet session yet',
     sessionEmptyBody:
       'This browser has no shelby-testnet receipt yet. Connect a wallet, complete one testnet upload, then return here to inspect the session.',
@@ -149,10 +160,18 @@ const copy = {
     copySession: 'Copy session summary',
     copied: 'Copied',
     refreshSession: 'Refresh session',
+    ledgerSource: 'Data source',
     sessionMode: 'Session mode',
     generatedAt: 'Generated at',
     proofPath: 'Proof path',
     proofPathValue: 'wallet → upload → Blob proof → receipt aggregation → optional smoke check',
+    storageStatus: 'Storage status',
+    explorer: 'Explorer',
+    retrieval: 'Retrieval endpoint',
+    smokeCommand: 'Smoke command',
+    sourceBrowser: 'browser cache',
+    sourceSqlite: 'SQLite ledger',
+    sourceMixed: 'browser cache + SQLite',
     acceptance: [
       'Automated gate: lint, build, and release-candidate verifier must stay green.',
       'Real test: connect an Aptos Testnet wallet and upload one small file.',
@@ -210,10 +229,18 @@ const copy = {
     copySession: string;
     copied: string;
     refreshSession: string;
+    ledgerSource: string;
     sessionMode: string;
     generatedAt: string;
     proofPath: string;
     proofPathValue: string;
+    storageStatus: string;
+    explorer: string;
+    retrieval: string;
+    smokeCommand: string;
+    sourceBrowser: string;
+    sourceSqlite: string;
+    sourceMixed: string;
     acceptance: string[];
     boundaryTitle: string;
     boundaries: string[];
@@ -336,6 +363,10 @@ export default function TestnetPageClient({ mode }: { mode: 'mock' | 'testnet' }
             </div>
           </aside>
         </section>
+
+        <div className="mt-8">
+          <TestnetProofSummary compact />
+        </div>
 
         <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {t.steps.map(([title, body, link], index) => {
@@ -576,85 +607,72 @@ interface CommunitySession {
   blobs: BlobRecord[];
   latestReceipt: ReadReceipt | null;
   latestReceiptBlobs: BlobRecord[];
+  source: 'browser' | 'sqlite' | 'mixed';
 }
 
-function loadCommunitySession(): CommunitySession {
-  if (typeof window === 'undefined') {
-    return { receipts: [], blobs: [], latestReceipt: null, latestReceiptBlobs: [] };
-  }
+function emptyCommunitySession(): CommunitySession {
+  return { receipts: [], blobs: [], latestReceipt: null, latestReceiptBlobs: [], source: 'browser' };
+}
 
-  const receipts = getLocalReadReceipts()
+function isTestnetBlobRecord(blob: BlobRecord): boolean {
+  return blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet' || blob.network === 'testnet';
+}
+
+function dedupeById<T extends { id: string }>(records: T[]): T[] {
+  const seen = new Set<string>();
+  const deduped: T[] = [];
+  for (const record of records) {
+    if (seen.has(record.id)) continue;
+    seen.add(record.id);
+    deduped.push(record);
+  }
+  return deduped;
+}
+
+function buildCommunitySession(
+  receiptsInput: ReadReceipt[],
+  blobsInput: BlobRecord[],
+  source: CommunitySession['source']
+): CommunitySession {
+  const receipts = dedupeById(receiptsInput)
     .filter((receipt) => receipt.receiptMode === 'shelby-testnet')
     .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp));
-  const blobs = getLocalBlobs()
-    .filter(
-      (blob) =>
-        blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet' || blob.network === 'testnet'
-    )
+  const blobs = dedupeById(blobsInput)
+    .filter(isTestnetBlobRecord)
     .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const latestReceipt = receipts[0] ?? null;
   const latestReceiptBlobs = latestReceipt
-    ? latestReceipt.referencedBlobIds
+    ? (latestReceipt.referencedBlobIds
         .map((blobId) => blobs.find((blob) => blob.id === blobId))
-        .filter(Boolean) as BlobRecord[]
+        .filter(Boolean) as BlobRecord[])
     : [];
 
-  return { receipts, blobs, latestReceipt, latestReceiptBlobs };
+  return { receipts, blobs, latestReceipt, latestReceiptBlobs, source };
 }
 
-function buildSessionSummary({
-  mode,
-  walletReady,
-  accountAddress,
-  walletNetwork,
-  session,
-}: {
-  mode: 'mock' | 'testnet';
-  walletReady: boolean;
-  accountAddress: string | null;
-  walletNetwork: string | null;
-  session: CommunitySession;
-}) {
-  const proofBlobs = session.latestReceiptBlobs.length > 0 ? session.latestReceiptBlobs : session.blobs;
+function loadBrowserCommunitySession(): CommunitySession {
+  if (typeof window === 'undefined') {
+    return emptyCommunitySession();
+  }
 
-  return {
-    product: 'Shelby AI Evidence Vault',
-    milestone: 'X13 community testnet session',
-    generatedAt: new Date().toISOString(),
-    runtimeMode: mode,
-    wallet: {
-      ready: walletReady,
-      accountAddress,
-      network: walletNetwork,
-    },
-    latestReceipt: session.latestReceipt
-      ? {
-          id: session.latestReceipt.id,
-          runId: session.latestReceipt.runId,
-          timestamp: session.latestReceipt.timestamp,
-          receiptMode: session.latestReceipt.receiptMode,
-          url: `/read-receipt/${session.latestReceipt.id}`,
-        }
-      : null,
-    blobs: proofBlobs.map((blob) => ({
-      id: blob.id,
-      shelbyRef: blob.shelbyRef,
-      accountAddress: blob.accountAddress,
-      blobName: blob.blobName,
-      network: blob.network,
-      storageStatus: blob.storageStatus,
-      explorerUrl: blob.explorerUrl,
-      retrievalUrl: blob.retrievalUrl,
-      url: `/blob/${blob.id}`,
-    })),
-    acceptancePath: [
-      'connect Aptos Testnet wallet',
-      'upload evidence through Shelby browser-wallet flow',
-      'verify Blob detail proof panel',
-      'verify receipt-level testnet audit panel',
-      'optionally run npm run smoke with accountAddress/blobName',
-    ],
-  };
+  return buildCommunitySession(getLocalReadReceipts(), getLocalBlobs(), 'browser');
+}
+
+async function loadLedgerCommunitySession(): Promise<CommunitySession> {
+  const browserSession = loadBrowserCommunitySession();
+  try {
+    const [persistedReceipts, persistedBlobs] = await Promise.all([
+      getPersistedReceiptsAction(),
+      getPersistedBlobsAction(),
+    ]);
+    return buildCommunitySession(
+      [...browserSession.receipts, ...persistedReceipts],
+      [...browserSession.blobs, ...persistedBlobs],
+      browserSession.receipts.length > 0 || browserSession.blobs.length > 0 ? 'mixed' : 'sqlite'
+    );
+  } catch {
+    return browserSession;
+  }
 }
 
 function TestnetSessionPanel({
@@ -671,29 +689,56 @@ function TestnetSessionPanel({
   language: Language;
 }) {
   const t = copy[language];
-  const [session, setSession] = useState<CommunitySession>(loadCommunitySession);
+  const [session, setSession] = useState<CommunitySession>(loadBrowserCommunitySession);
   const [copied, setCopied] = useState(false);
   const proofBlobs = session.latestReceiptBlobs.length > 0 ? session.latestReceiptBlobs : session.blobs;
+  const smokeBlob = proofBlobs.find((blob) => blob.accountAddress && blob.blobName);
+  const smokeCommand = smokeBlob
+    ? `SHELBY_SMOKE=true SHELBY_SMOKE_ACCOUNT_ADDRESS=${smokeBlob.accountAddress} SHELBY_SMOKE_BLOB_NAME=${smokeBlob.blobName} npm run smoke`
+    : null;
   const hasSession = Boolean(session.latestReceipt || session.blobs.length > 0);
+  const sourceLabel =
+    session.source === 'mixed'
+      ? t.sourceMixed
+      : session.source === 'sqlite'
+        ? t.sourceSqlite
+        : t.sourceBrowser;
 
-  const refreshSession = () => {
-    setSession(loadCommunitySession());
+  const refreshSession = async () => {
+    const nextSession = await loadLedgerCommunitySession();
+    setSession(nextSession);
     setCopied(false);
   };
 
   useEffect(() => {
-    const onFocus = () => refreshSession();
+    let cancelled = false;
+    loadLedgerCommunitySession()
+      .then((nextSession) => {
+        if (cancelled) return;
+        setSession(nextSession);
+      })
+      .catch(() => {
+        if (!cancelled) setSession(loadBrowserCommunitySession());
+      });
+
+    const onFocus = () => {
+      void refreshSession();
+    };
     window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   const copySummary = async () => {
-    const summary = buildSessionSummary({
+    const summary = buildTestnetHandoffSummary({
       mode,
       walletReady,
       accountAddress,
       walletNetwork,
       session,
+      origin: typeof window === 'undefined' ? '' : window.location.origin,
     });
     await navigator.clipboard.writeText(JSON.stringify(summary, null, 2));
     setCopied(true);
@@ -732,10 +777,11 @@ function TestnetSessionPanel({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
+      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <SessionMetric label={t.sessionMode} value={mode} ok={mode === 'testnet'} />
         <SessionMetric label={t.latestReceipt} value={session.latestReceipt?.id ?? t.noReceipt} ok={Boolean(session.latestReceipt)} />
         <SessionMetric label={t.linkedBlobs} value={String(proofBlobs.length)} ok={proofBlobs.length > 0} />
+        <SessionMetric label={t.ledgerSource} value={sourceLabel} ok={session.source !== 'browser' || hasSession} />
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -761,6 +807,32 @@ function TestnetSessionPanel({
                   <div className="mt-2 grid gap-2 text-xs text-[#6d5f55] sm:grid-cols-2">
                     <span className="break-all">account: {blob.accountAddress ?? '-'}</span>
                     <span className="break-all">blobName: {blob.blobName ?? '-'}</span>
+                    <span className="break-all">
+                      {t.storageStatus}: {blob.storageStatus ?? '-'}
+                    </span>
+                    <span className="break-all">network: {blob.network ?? '-'}</span>
+                  </div>
+                  <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+                    {blob.explorerUrl ? (
+                      <a
+                        href={blob.explorerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 font-bold text-[#de5cff]"
+                      >
+                        {t.explorer}
+                        <ExternalLink size={13} />
+                      </a>
+                    ) : (
+                      <span className="text-[#b29e92]">{t.explorer}: -</span>
+                    )}
+                    {blob.retrievalUrl ? (
+                      <span className="break-all font-mono text-[#6d5f55]">
+                        {t.retrieval}: {blob.retrievalUrl}
+                      </span>
+                    ) : (
+                      <span className="text-[#b29e92]">{t.retrieval}: -</span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -789,6 +861,14 @@ function TestnetSessionPanel({
               {t.openReceipt}
               <ArrowRight size={15} />
             </Link>
+          )}
+          {smokeCommand && (
+            <div className="mt-4 border border-[#eadfd6] bg-white/55 p-3">
+              <p className="font-mono text-xs font-bold uppercase text-[#7b695d]">{t.smokeCommand}</p>
+              <p className="mt-2 break-all font-mono text-xs leading-5 text-[#6d5f55]">
+                {smokeCommand}
+              </p>
+            </div>
           )}
         </aside>
       </div>

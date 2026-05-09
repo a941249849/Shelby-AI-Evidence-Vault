@@ -158,7 +158,7 @@ function ReceiptModeBadge({ mode }: { mode: ReadReceipt['receiptMode'] }) {
 
 function BlobDataSourceBadge({ blob }: { blob: BlobRecord }) {
   const { language } = useLanguage();
-  if (blob.dataSource === 'shelby-testnet') {
+  if (isTestnetBlob(blob)) {
     return (
       <span className="inline-flex items-center gap-1 rounded border border-[#fd8565]/50 bg-[#ffdcd9] px-2 py-0.5 text-xs font-semibold text-[#4b2419]">
         Shelby testnet

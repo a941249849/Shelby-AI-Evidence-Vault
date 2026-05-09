@@ -55,6 +55,7 @@ export interface BuildPackInput {
   tags: string[];
   description: string;
   blobCount: number;
+  dataSource?: NonNullable<EvidencePack['dataSource']>;
 }
 
 /**
@@ -75,7 +76,7 @@ export function buildEvidencePack(input: BuildPackInput): EvidencePack {
     blobCount: input.blobCount,
     status: 'active',
     createdAt: new Date().toISOString(),
-    dataSource: 'local',
+    dataSource: input.dataSource ?? 'local',
   };
 }
 

@@ -5,13 +5,14 @@
  * Server-only variables (SHELBY_API_KEY, SHELBY_MODE, etc.) must never be accessed here.
  *
  * Testnet mode requires wallet signing. No private keys or server secrets are used.
- * If configuration is missing, `isReady` is false and upload fails closed with a
- * clear error message.
+ * If the frontend client API key is missing, `isReady` is false and upload
+ * fails closed with a clear error message.
  *
  * Public env vars consumed (safe — no secrets):
  *   NEXT_PUBLIC_SHELBY_NETWORK           testnet | shelbynet (default: testnet)
  *   NEXT_PUBLIC_SHELBY_RPC_URL           optional override for Shelby RPC base URL
  *   NEXT_PUBLIC_SHELBY_INDEXER_URL       optional override for Shelby indexer URL
+ *   NEXT_PUBLIC_TESTNET_API_KEY          Shelby/Geomi client API key for browser DApp use
  *   NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS  blob lifetime in hours (default: 24)
  */
 
@@ -28,6 +29,8 @@ export interface BrowserShelbyConfig {
   rpcUrl?: string;
   /** Optional indexer URL override. Falls back to SDK default for the network. */
   indexerUrl?: string;
+  /** Browser-safe Shelby/Geomi client API key for public testnet DApp usage. */
+  apiKey?: string;
   /** Blob expiration offset in hours (defaults to 24). */
   expirationHours: number;
 }
@@ -49,35 +52,40 @@ export function getBrowserShelbyConfig(): BrowserShelbyConfig {
 
   const rpcUrl = process.env.NEXT_PUBLIC_SHELBY_RPC_URL || undefined;
   const indexerUrl = process.env.NEXT_PUBLIC_SHELBY_INDEXER_URL || undefined;
+  const apiKey = process.env.NEXT_PUBLIC_TESTNET_API_KEY || undefined;
 
   const rawHours = process.env.NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS;
   const expirationHours = rawHours ? Math.max(1, parseInt(rawHours, 10)) : 24;
 
   return {
-    isReady: true,
+    isReady: Boolean(apiKey),
     network,
     rpcUrl,
     indexerUrl,
+    apiKey,
     expirationHours,
   };
 }
 
 /**
  * Creates a browser-side ShelbyClient instance configured for the selected network.
- * Returns null if configuration is not ready.
+ * Returns a Shelby client instance. Callers should still check `config.isReady`
+ * before allowing a real upload.
  *
- * The client is constructed with wallet-auth signer support (no API key needed
- * for browser wallet path — the wallet signs on-chain transactions directly).
+ * The client is constructed with wallet-auth signer support. The wallet signs
+ * on-chain transactions, while the frontend client API key authorizes public
+ * Shelby RPC/indexer access.
  */
 export function createBrowserShelbyClient(
   config: BrowserShelbyConfig
 ): ShelbyClient | null {
-  if (!config.isReady) return null;
-
   return new ShelbyClient({
     network: config.network,
+    apiKey: config.apiKey,
     rpc: config.rpcUrl ? { baseUrl: config.rpcUrl } : undefined,
-    indexer: config.indexerUrl ? { baseUrl: config.indexerUrl } : undefined,
+    indexer: config.indexerUrl
+      ? { baseUrl: config.indexerUrl, apiKey: config.apiKey }
+      : undefined,
   });
 }
 

@@ -15,6 +15,8 @@
 import {
   insertUploadTransaction,
   getPacks,
+  getBlobs,
+  getReceipts,
   getPackById as dbGetPackById,
   getBlobById as dbGetBlobById,
   getBlobsByPackId as dbGetBlobsByPackId,
@@ -88,6 +90,17 @@ export async function getPersistedBlobAction(id: string): Promise<BlobRecord | n
 }
 
 /**
+ * Returns all BlobRecord rows from SQLite (newest first).
+ */
+export async function getPersistedBlobsAction(): Promise<BlobRecord[]> {
+  try {
+    return getBlobs();
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Returns all blob records for a given evidence pack from SQLite.
  */
 export async function getPersistedBlobsByPackAction(packId: string): Promise<BlobRecord[]> {
@@ -107,5 +120,16 @@ export async function getPersistedReceiptAction(id: string): Promise<ReadReceipt
     return dbGetReceiptById(id) ?? null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Returns all ReadReceipt rows from SQLite (newest first).
+ */
+export async function getPersistedReceiptsAction(): Promise<ReadReceipt[]> {
+  try {
+    return getReceipts();
+  } catch {
+    return [];
   }
 }

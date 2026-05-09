@@ -1,7 +1,7 @@
 # Ecosystem Submission Pack — Shelby AI Evidence Vault
 
 Date: 2026-05-09
-Milestone: X13 — Community Testnet Session Candidate
+Milestone: X15 — Public Testnet Handoff Candidate
 
 ---
 
@@ -9,7 +9,7 @@ Milestone: X13 — Community Testnet Session Candidate
 
 **Shelby AI Evidence Vault** is an AI evidence and read-receipt layer built for Shelby. It demonstrates how AI pipelines can turn datasets, agent run outputs, and documents into verifiable evidence records with Shelby Blob identity — then produce auditable receipts that trace every answer back to the evidence that informed it.
 
-It ships as a complete, runnable open-source community testnet session candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, inspect Blob identity, run an in-app retrieval verification probe, verify the generated read receipt as an aggregate audit bundle, and copy a session summary for community participation. An opt-in smoke harness still provides CLI-level RPC connectivity and blob retrieval verification, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
+It ships as a complete, runnable open-source public testnet handoff candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, inspect Blob identity, run an in-app retrieval verification probe, verify the generated read receipt as an aggregate audit bundle, and copy a durable session handoff for community participation. The session ledger reads both browser cache and SQLite records, and the handoff JSON includes route URLs, receipt/blob proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags. An opt-in smoke harness still provides CLI-level RPC connectivity and blob retrieval verification, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
 
 **What it is:**
 - A Shelby ecosystem application layer for AI evidence storage using Shelby blob references and on-chain registration
@@ -31,7 +31,7 @@ It ships as a complete, runnable open-source community testnet session candidate
 
 **Shelby AI 证据库（Shelby AI Evidence Vault）** 是一个构建在 Shelby 之上的 AI 证据与读取回执应用层。它展示了 AI 流水线如何把数据集、智能体运行产出及文档转化为带有 Shelby Blob 身份的可验证证据记录，并生成可审计的回执，将每一次回答与所依据的证据关联起来。
 
-该项目作为完整、可运行的社区测试网会话候选版本发布。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径从 `/testnet` 开始，社区用户可以检测并连接 Aptos 钱包、确认 Aptos Testnet 状态，再通过浏览器钱包签名上传至 Shelby 测试网，检查 Blob 身份，运行产品内检索验证，在读取回执页面聚合验证所有引用的测试网 Blob，并复制一份可提交的测试会话摘要。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
+该项目作为完整、可运行的持久化测试网会话账本候选版本发布。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径从 `/testnet` 开始，社区用户可以检测并连接 Aptos 钱包、确认 Aptos Testnet 状态，再通过浏览器钱包签名上传至 Shelby 测试网，检查 Blob 身份，运行产品内检索验证，在读取回执页面聚合验证所有引用的测试网 Blob，并复制一份可提交的持久化测试会话摘要。测试会话账本同时读取浏览器缓存与 SQLite 记录。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
 
 **产品定位：**
 - 使用 Shelby Blob 引用和链上注册的 AI 证据应用层
@@ -107,7 +107,13 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | X10 | Merged | Wallet readiness panel on `/testnet`: detect/connect wallet, show account and Aptos Testnet status |
 | X11 | Merged | In-app testnet Blob proof verification: explorer/retrieval identity and server-side retrieval probe |
 | X12 | Merged | Receipt-level testnet audit aggregation: verify all referenced Shelby testnet blobs from the read receipt |
-| X13 | Current | Community testnet session: `/testnet` aggregates latest testnet receipt/blob records and copies a participant summary |
+| X13 | Merged | Community testnet session: `/testnet` aggregates latest testnet receipt/blob records and copies a participant summary |
+| X14 | Merged | Persistent testnet session ledger: `/testnet` merges browser-cache and SQLite testnet receipts/blobs; `/dashboard` indexes Shelby testnet packs as first-class records |
+| X15 | Merged | Public testnet handoff artifact: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags |
+| X16 | Merged | Final Copilot review brief: fixed merge-readiness scope, gates, real-testnet path, and security boundaries |
+| X17 | Merged | Copied handoff validator: `npm run verify-testnet-handoff -- path/to/handoff.json` validates real-upload handoff JSON |
+| X18 | Merged | Final readiness artifact: `npm run final-readiness` separates code-candidate readiness from real testnet and review gates |
+| X19 | Current | Public testnet release operator package: `npm run public-testnet-release-pack` writes the wallet-upload and final-review packet |
 
 ---
 
@@ -153,6 +159,7 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | Production queue | `docs/production-queue.md` |
 | Release-candidate checklist | `docs/release-candidate-checklist.md` |
 | Public testnet participation | `docs/public-testnet-participation.md` |
+| Public testnet release playbook | `docs/public-testnet-release-playbook.md` |
 | Smoke test guide | `docs/c3-smoke-test-guide.md` |
 | M4 read receipt binding | `docs/m4-read-receipt-binding.md` |
 | M2–M4 architecture plan | `docs/m2-m4-product-architecture-plan.md` |

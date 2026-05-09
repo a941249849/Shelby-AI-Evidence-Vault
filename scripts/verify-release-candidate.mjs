@@ -21,11 +21,13 @@
  *      requires fail-closed exit 1.
  *   4. verify-community-demo: zero-credential DB-level harness; requires success.
  *   5. generate-agent-run: runs against isolated temp DB; verifies C8 IDs.
- *   6. npm run build: production Next.js build; requires exit 0.
- *   7. Start built app (next start) on available local port with isolated DB
+ *   6. testnet handoff summary contract: verifies copied JSON structure.
+ *   7. verify-testnet-handoff: validates a handoff JSON file.
+ *   8. npm run build: production Next.js build; requires exit 0.
+ *   9. Start built app (next start) on available local port with isolated DB
  *      and SHELBY_MODE=mock; smoke-fetch key routes.
- *   8. Shut server down cleanly.
- *   9. Write JSON artifact to artifacts/release-candidate/latest.json.
+ *   10. Shut server down cleanly.
+ *   11. Write JSON artifact to artifacts/release-candidate/latest.json.
  *
  * WHAT THIS SCRIPT DOES NOT DO:
  *   - Make any real Shelby network calls.
@@ -60,6 +62,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { createServer } from 'node:net';
+import { buildTestnetHandoffSummary } from '../src/lib/testnet/handoff.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -280,6 +283,61 @@ async function smokeRoute(route, baseUrl, marker) {
   }
 }
 
+function verifyHandoffSummaryContract() {
+  const summary = buildTestnetHandoffSummary({
+    mode: 'testnet',
+    walletReady: true,
+    accountAddress: '0xabc123',
+    walletNetwork: 'testnet',
+    origin: 'http://127.0.0.1:3000',
+    session: {
+      source: 'mixed',
+      latestReceipt: {
+        id: 'rr-testnet-fixture',
+        runId: 'upload-pack-testnet-fixture',
+        timestamp: '2026-05-09T00:00:00.000Z',
+        receiptMode: 'shelby-testnet',
+      },
+      latestReceiptBlobs: [
+        {
+          id: 'blob-testnet-fixture',
+          shelbyRef: 'shelby://testnet/0xabc123/evidence/fixture.txt',
+          accountAddress: '0xabc123',
+          blobName: 'evidence/fixture.txt',
+          network: 'testnet',
+          storageStatus: 'registered',
+          explorerUrl: 'https://explorer.shelby.xyz/testnet/blob/evidence/fixture.txt',
+          retrievalUrl: 'https://api.testnet.shelby.xyz/shelby/0xabc123/evidence/fixture.txt',
+        },
+      ],
+      blobs: [],
+    },
+  });
+
+  const failures = [];
+  if (summary.milestone !== 'X15 public testnet handoff artifact') failures.push('milestone');
+  if (summary.routes.testnetConsole !== 'http://127.0.0.1:3000/testnet') failures.push('testnet route');
+  if (summary.routes.upload !== 'http://127.0.0.1:3000/upload') failures.push('upload route');
+  if (summary.latestReceipt?.url !== 'http://127.0.0.1:3000/read-receipt/rr-testnet-fixture') failures.push('receipt url');
+  if (summary.blobs[0]?.url !== 'http://127.0.0.1:3000/blob/blob-testnet-fixture') failures.push('blob url');
+  if (summary.blobs[0]?.explorerUrl !== 'https://explorer.shelby.xyz/testnet/blob/evidence/fixture.txt') failures.push('explorer url');
+  if (!summary.smokeCommands[0]?.command.includes('SHELBY_SMOKE_ACCOUNT_ADDRESS=0xabc123')) failures.push('smoke account');
+  if (!summary.smokeCommands[0]?.command.includes('SHELBY_SMOKE_BLOB_NAME=evidence/fixture.txt')) failures.push('smoke blob');
+  if (!summary.acceptanceStatus.runtimeModeReady) failures.push('runtimeModeReady');
+  if (!summary.acceptanceStatus.walletReady) failures.push('walletReady');
+  if (!summary.acceptanceStatus.testnetReceiptPresent) failures.push('testnetReceiptPresent');
+  if (!summary.acceptanceStatus.testnetBlobPresent) failures.push('testnetBlobPresent');
+  if (!summary.acceptanceStatus.smokeCommandReady) failures.push('smokeCommandReady');
+
+  if (failures.length === 0) {
+    pass('testnet-handoff-contract', 'testnet handoff summary contract');
+  } else {
+    fail('testnet-handoff-contract', 'testnet handoff summary contract', `failed fields: ${failures.join(', ')}`);
+  }
+
+  return summary;
+}
+
 // ── Write artifact ────────────────────────────────────────────────────────────
 function writeArtifact(overallStatus) {
   try {
@@ -354,6 +412,7 @@ runCheck(
       NEXT_PUBLIC_SHELBY_RPC_URL: '',
       NEXT_PUBLIC_SHELBY_INDEXER_URL: '',
       NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS: '',
+      NEXT_PUBLIC_TESTNET_API_KEY: '',
     },
     expectedExit: 1,
   }
@@ -469,8 +528,25 @@ if (!generatorFailed) {
   skip('c8-idempotency', `C8 idempotency check (skipped — generator failed)`);
 }
 
-// ── Check 6: npm run build ────────────────────────────────────────────────────
-section('6. npm run build');
+// ── Check 6: Testnet handoff summary contract ────────────────────────────────
+section('6. testnet handoff summary contract');
+
+const handoffFixture = verifyHandoffSummaryContract();
+
+// ── Check 7: verify-testnet-handoff ──────────────────────────────────────────
+section('7. verify-testnet-handoff');
+
+const handoffFixturePath = join(tmpDir, 'handoff-fixture.json');
+writeFileSync(handoffFixturePath, JSON.stringify(handoffFixture, null, 2) + '\n', 'utf-8');
+runCheck(
+  'verify-testnet-handoff',
+  'npm run verify-testnet-handoff',
+  [NPM, 'run', 'verify-testnet-handoff', '--', handoffFixturePath],
+  { env: {}, expectedExit: 0 }
+);
+
+// ── Check 8: npm run build ────────────────────────────────────────────────────
+section('8. npm run build');
 
 const buildResult = runCheck(
   'build',
@@ -480,8 +556,8 @@ const buildResult = runCheck(
 );
 const buildSucceeded = buildResult.exitCode === 0;
 
-// ── Check 7: Start server + route smoke ───────────────────────────────────────
-section('7. Start built app + route smoke checks');
+// ── Check 9: Start server + route smoke ───────────────────────────────────────
+section('9. Start built app + route smoke checks');
 
 if (!buildSucceeded) {
   skip('server-start', 'Server start (skipped — build failed)');
@@ -529,7 +605,7 @@ if (!buildSucceeded) {
       pass('server-start', `Server started and ready at :${port}`);
 
       // Route smoke checks
-      section('7a. Route smoke checks');
+      section('9a. Route smoke checks');
 
       await smokeRoute('/', baseUrl, 'Evidence Vault');
       await smokeRoute('/dashboard', baseUrl, 'Evidence index');
@@ -574,6 +650,8 @@ if (failCount > 0) {
   console.log('    shelby-doctor  : mock PASS, testnet fail-closed, public-key guard');
   console.log('    community-demo : zero-credential DB harness');
   console.log('    generate-agent-run: C8 IDs persisted, idempotent');
+  console.log('    testnet handoff: copied JSON contract verified');
+  console.log('    handoff validator: copied JSON file accepted');
   console.log('    npm run build  : production build succeeded');
   console.log('    route smoke    : /, /dashboard, /testnet, /upload, /blob, /read-receipt');
   console.log('');

@@ -46,8 +46,11 @@ const blobCopy = {
     refBoundary: '引用边界',
     mockRef: 'Mock 引用',
     demoRef: 'Demo 引用',
+    testnetRef: 'Shelby 测试网身份',
     localHint: '本地 Demo 引用。测试网记录还会包含账号命名空间、blobName、网络与 explorer 元数据。',
     demoHint: '示例 Demo 引用。使用测试网模式时，真实 Shelby Blob 身份由账号命名空间与 blobName 表示。',
+    testnetHint:
+      '真实测试网记录。Shelby Blob 身份由账号命名空间、blobName、网络、explorer 与检索端点共同构成。',
     hash: 'SHA-256 哈希',
     source: '来源',
     size: '大小',
@@ -88,10 +91,13 @@ const blobCopy = {
     refBoundary: 'Reference boundary',
     mockRef: 'Mock Reference',
     demoRef: 'Demo Reference',
+    testnetRef: 'Shelby testnet identity',
     localHint:
       'Local demo reference. Testnet records additionally carry account namespace, blob name, network, and explorer metadata.',
     demoHint:
       'Illustrative demo reference. Real Shelby blob identity is represented by account namespace plus blob name when using testnet mode.',
+    testnetHint:
+      'Real testnet record. Shelby blob identity is composed of account namespace, blobName, network, explorer, and retrieval endpoint.',
     hash: 'SHA-256 hash',
     source: 'Source',
     size: 'Size',
@@ -126,8 +132,10 @@ const blobCopy = {
 
 function DataSourceBadge({ blob }: { blob: BlobRecord }) {
   const { language } = useLanguage();
-  if (blob.dataSource === 'local') {
-    const isTestnet = blob.uploadMode === 'testnet';
+  const isTestnet =
+    blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet' || blob.network === 'testnet';
+
+  if (isTestnet || blob.dataSource === 'local') {
     return (
       <span
         className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
@@ -396,7 +404,10 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
     );
   }
 
-  const referenceLabel = blob.dataSource === 'local' ? t.mockRef : t.demoRef;
+  const isTestnetBlob =
+    blob.uploadMode === 'testnet' || blob.network === 'testnet' || blob.dataSource === 'shelby-testnet';
+  const referenceLabel = isTestnetBlob ? t.testnetRef : blob.dataSource === 'local' ? t.mockRef : t.demoRef;
+  const referenceHint = isTestnetBlob ? t.testnetHint : blob.dataSource === 'local' ? t.localHint : t.demoHint;
 
   return (
     <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
@@ -457,7 +468,7 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
 
             <MonoBlock>{blob.shelbyRef}</MonoBlock>
             <p className="mt-3 text-xs leading-5 text-[#9d9a92]">
-              {blob.dataSource === 'local' ? t.localHint : t.demoHint}
+              {referenceHint}
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">

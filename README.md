@@ -1,6 +1,6 @@
 # Shelby AI Evidence Vault
 
-![Milestone](https://img.shields.io/badge/milestone-X13%20Community%20Testnet%20Session-violet?style=flat-square)
+![Milestone](https://img.shields.io/badge/milestone-X15%20Public%20Testnet%20Handoff-violet?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
@@ -18,7 +18,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 - **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a development and review fallback, not the protocol endpoint
 - **Public Shelby testnet participation path** — when deployed with `SHELBY_MODE=testnet`, community users can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
 - **Testnet launch console** — `/testnet` gives community users a direct launch surface for mode status, wallet readiness, funding prerequisites, upload entry, and receipt verification
-- **Community test session** — `/testnet` aggregates the latest testnet receipt, referenced Blobs, wallet status, and a copyable session summary after a real upload
+- **Public testnet handoff artifact** — `/testnet` aggregates the latest testnet receipt, referenced Blobs, wallet status, full route URLs, smoke commands, and a copyable session summary from browser cache plus SQLite after a real upload
 - **In-app proof verification** — testnet Blob detail and read receipt pages expose account/blobName/status/explorer/retrieval identity and can run safe server-side retrieval probes
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 - **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
@@ -75,7 +75,10 @@ npm run lint                    # ESLint check — must pass before any PR
 npm run build                   # Next.js production build — must pass
 npm run shelby-doctor           # C11: mock-mode readiness check (zero credentials, always passes)
 npm run verify-community-demo   # C9: 35 DB-level assertions, zero credentials
+npm run verify-testnet-handoff -- path/to/handoff.json # Validate copied /testnet handoff after real upload
 npm run verify-release-candidate # C12: full release-candidate gate (build + routes + doctor)
+npm run final-readiness        # X18: write final readiness artifact after the RC gate
+npm run public-testnet-release-pack # X19: write the operator package for the real testnet run
 npm run smoke                   # Opt-in Shelby testnet smoke harness (requires SHELBY_SMOKE=true)
 ```
 
@@ -122,6 +125,7 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | `NEXT_PUBLIC_SHELBY_RPC_URL` | — | Optional RPC override for browser SDK |
 | `NEXT_PUBLIC_SHELBY_INDEXER_URL` | — | Optional indexer override for browser SDK |
 | `NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS` | `24` | Blob lifetime in hours for browser wallet uploads |
+| `NEXT_PUBLIC_TESTNET_API_KEY` | — | Shelby/Geomi frontend client key for browser DApp testnet access |
 
 **Smoke harness (opt-in)**
 
@@ -178,6 +182,8 @@ src/
     │   ├── use-shelby-upload.ts  # React hook: browser wallet + useUploadBlobs
     │   ├── status-map.ts         # Conservative evidence storage status utilities
     │   └── index.ts              # getAdapter() factory
+    ├── testnet/
+    │   └── handoff.mjs           # Public testnet handoff JSON builder
     ├── store/
     │   └── local-store.ts        # localStorage: packs, blobs, and receipts
     ├── server/
@@ -190,7 +196,7 @@ src/
 
 ## Validation utilities (`src/lib/validation.ts`)
 
-No test framework is installed. Validation logic lives in `src/lib/validation.ts` and can be imported anywhere, including in Node.js test runners if added later.
+No test framework is installed. Validation logic lives in `src/lib/validation.ts`, and the public testnet handoff contract lives in `src/lib/testnet/handoff.mjs`; both can be imported by Node.js verification scripts.
 
 | Utility | What it validates / builds |
 |---|---|
@@ -211,7 +217,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 
 ---
 
-## Current features (X13 community testnet session)
+## Current features (X15 public testnet handoff)
 
 - Shelby-first evidence model: EvidencePack, BlobRecord identity, and ReadReceipt lineage
 - Chinese-first / English-toggleable product UI across the main routes
@@ -228,12 +234,16 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Data-source badge on blob/receipt detail (Demo / Local mock / Shelby testnet)
 - Opt-in Node.js smoke harness (`npm run smoke`) for RPC connectivity and retrieval verification
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
-- Dashboard shows built-in demo data + locally uploaded packs; reset button clears browser cache only while SQLite records remain durable
+- Dashboard shows built-in demo data, locally uploaded packs, SQLite records, and Shelby testnet uploads as first-class data sources; reset button clears browser cache only while SQLite records remain durable
 - Mode indicator, wallet connect UI, and public testnet participation guide on upload page
-- Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, Aptos Testnet network status, and a community test session summary
-- C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
+- Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, Aptos Testnet network status, and a persistent community test session summary
+- Testnet session ledger reads browser cache plus SQLite records, dedupes receipts/blobs, and preserves the participant summary even when browser cache is incomplete
+- Public handoff JSON includes full app routes, receipt/blob proof URLs, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review
+- C12 release-candidate verifier: doctor checks, isolated SQLite, public handoff JSON contract, copied-handoff validator, production build, and route smoke checks
+- X18 final readiness artifact separates code-candidate readiness from the remaining manual real-testnet upload and Copilot final review gates
+- X19 public testnet release package turns the final readiness state into a single operator packet for wallet upload, handoff validation, and final review
 - X3 product closeout status: release-candidate gate remained green after the UI/product pass
-- X13 community testnet session: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, copyable session summary, and optional smoke retrieval
+- X15 public testnet handoff: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, durable session summary, and optional smoke retrieval
 
 ---
 
@@ -270,7 +280,8 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
 | `docs/public-testnet-participation.md` | X8 public Shelby testnet participant and deployment path |
-| `docs/final-product-acceptance.md` | X4 manual acceptance snapshot for the earlier community experiment review |
+| `docs/final-product-acceptance.md` | X15 public testnet candidate acceptance package |
+| `docs/final-copilot-review-brief.md` | X16 final Copilot review and merge-readiness handoff |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |
 | `docs/release-candidate-checklist.md` | C12 release-candidate verification gate |
 | `docs/c3-smoke-test-guide.md` | Smoke harness setup and manual testnet verification |

@@ -47,6 +47,8 @@ next-env.d.ts
 
 # Release-candidate verifier output (gitignored — runtime artifacts, never commit)
 /artifacts/release-candidate/
+/artifacts/final-readiness/
+/artifacts/public-testnet-release/
 
 # SQLite database (runtime artifact — never commit)
 /data/*.sqlite

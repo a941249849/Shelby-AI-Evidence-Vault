@@ -1,10 +1,10 @@
 # Release-Candidate Checklist — Shelby AI Evidence Vault
 
-**Stage: C12/X13 — Release-candidate gate plus community testnet session QA**
+**Stage: C12/X19 — Release-candidate gate plus public testnet release package**
 
 This document describes the release-candidate validation gate for Shelby AI Evidence Vault. The gate is zero-credential, mock-safe by default, and is designed to verify the complete product loop in a single deterministic command.
 
-X13 keeps this command as the hard automated gate, then adds a manual public-testnet pass for wallet readiness, upload, Blob proof verification, receipt-level proof aggregation, and copyable community session output.
+X19 keeps this command as the hard automated gate, then adds final-readiness and public-release package commands so the operator has one packet for wallet readiness, upload, Blob proof verification, receipt-level proof aggregation, copied handoff validation, and final Copilot review.
 
 > **This is a public testnet candidate, not a mainnet claim.** Mock/local references (e.g. `shelby://mock/blob/…`) are deterministic local identifiers used for review; Shelby proof requires `SHELBY_MODE=testnet`, a wallet, testnet APT, ShelbyUSD, and manual signing.
 
@@ -14,9 +14,13 @@ X13 keeps this command as the hard automated gate, then adds a manual public-tes
 
 ```bash
 npm run verify-release-candidate
+npm run final-readiness
+npm run public-testnet-release-pack
 ```
 
 This command runs the complete acceptance harness from a clean checkout with zero Shelby credentials. It is safe to run on any machine and does not modify the operator's normal local database.
+
+`final-readiness` reads the release-candidate artifact and confirms the code candidate is ready. `public-testnet-release-pack` reads that final readiness artifact and writes the operator packet for the real wallet upload and review pass.
 
 ---
 
@@ -73,7 +77,25 @@ SHELBY_DB_PATH=<isolated-temp-db> npm run generate-agent-run
   - Receipt: `c8-rr-agent-sentinel-v1`
 - **Why:** Confirms the generation script works and that INSERT OR REPLACE is truly idempotent.
 
-### 6. Production build
+### 6. Testnet handoff summary contract
+
+```bash
+npm run verify-release-candidate
+```
+
+- **Expect:** copied handoff JSON includes X15 milestone, full route URLs, receipt/blob proof URLs, explorer/retrieval identity, smoke command, and acceptance-status flags.
+- **Why:** Confirms the public testnet handoff is a stable product contract, not only UI copy.
+
+### 7. Handoff file validator
+
+```bash
+npm run verify-testnet-handoff -- path/to/handoff.json
+```
+
+- **Expect:** exit 0 for a real copied `/testnet` handoff with testnet mode, wallet readiness, receipt/blob proof URLs, smoke command, and acceptance-status flags.
+- **Why:** Gives operators and reviewers a direct post-upload validation command for the copied community handoff.
+
+### 8. Production build
 
 ```bash
 npm run build
@@ -82,7 +104,7 @@ npm run build
 - **Expect:** exit 0
 - **Why:** Confirms the full Next.js production build succeeds. This is the artefact that is served in the route smoke checks.
 
-### 7. Route smoke checks
+### 9. Route smoke checks
 
 The verifier starts the built Next.js app (`next start`) on an available local port with `SHELBY_MODE=mock` and the isolated temp database, then fetches the following routes:
 
@@ -90,6 +112,7 @@ The verifier starts the built Next.js app (`next start`) on an available local p
 |---|---|---|
 | `/` | 200 | `Evidence Vault` |
 | `/dashboard` | 200 | `Evidence index` |
+| `/testnet` | 200 | `公开测试网参与控制台` |
 | `/upload` | 200 | `Package files into a verifiable` |
 | `/blob/blob-001` | 200 | `Shelby AI Evidence Vault` |
 | `/read-receipt/rr-001` | 200 | `Shelby AI Evidence Vault` |
@@ -116,6 +139,14 @@ This file is gitignored and never committed. It contains:
 - `localServerPort` — port the Next.js server ran on
 - `routes` — route smoke results (status code, marker found, errors)
 - `overallStatus` — `"pass"` or `"fail"`
+
+The final release package command writes:
+
+```
+artifacts/public-testnet-release/latest.json
+```
+
+This file is also gitignored. It contains the local gate commands, required and forbidden environment variables, public routes to inspect, manual testnet run sequence, final review pointer, and hard product boundaries.
 
 ---
 
@@ -154,8 +185,8 @@ Manual checks:
 |---|---|
 | Language | Default surface is Chinese; top-nav language toggle switches the main product routes to English |
 | Home | Shelby ecosystem positioning, evidence-flow board, core capability cards, product preview, testnet entry |
-| Registry | Evidence packs from demo/local/SQLite are visible; search, filters, sort, and cards remain usable |
-| Testnet | `/testnet` launch console shows mode status, wallet detection/connect readiness, funding prerequisites, community test session, upload entry, and product boundaries |
+| Registry | Evidence packs from demo/local/SQLite/Shelby testnet are visible; search, filters, sort, data-source badges, and cards remain usable |
+| Testnet | `/testnet` launch console shows mode status, wallet detection/connect readiness, funding prerequisites, persistent community test session, copyable handoff JSON, upload entry, and product boundaries |
 | Upload | Mock + SQLite path is clear; public testnet path is gated by wallet, Aptos Testnet, testnet APT, and ShelbyUSD |
 | Blob detail | Shows provenance, Shelby ref, SHA-256 hash, source, metadata, pack relationship, and testnet proof verification panel |
 | Read receipt | Shows query, answer summary, run metadata, referenced Blob identity, evidence pack links, and a receipt-level testnet audit panel |
@@ -235,24 +266,31 @@ npm run dev
   ✓  C8 receipt id "c8-rr-agent-sentinel-v1" persisted
   ✓  generate-agent-run is idempotent (no duplicate rows)
 
-[rc] ── 6. npm run build ─────────────────────────────────────────────────
+[rc] ── 6. testnet handoff summary contract ──────────────────────────────
+  ✓  testnet handoff summary contract
+
+[rc] ── 7. verify-testnet-handoff ────────────────────────────────────────
+  ✓  npm run verify-testnet-handoff: exit 0
+
+[rc] ── 8. npm run build ─────────────────────────────────────────────────
   ✓  npm run build: exit 0
 
-[rc] ── 7. Start built app + route smoke checks ─────────────────────────
+[rc] ── 9. Start built app + route smoke checks ─────────────────────────
   → Using port 34821
   → Waiting for server at http://127.0.0.1:34821/…
   ✓  Server started and ready at :34821
 
-[rc] ── 7a. Route smoke checks ───────────────────────────────────────────
+[rc] ── 9a. Route smoke checks ───────────────────────────────────────────
   ✓  GET /: HTTP 200 + marker found
   ✓  GET /dashboard: HTTP 200 + marker found
+  ✓  GET /testnet: HTTP 200 + marker found
   ✓  GET /upload: HTTP 200 + marker found
   ✓  GET /blob/blob-001: HTTP 200 + marker found
   ✓  GET /read-receipt/rr-001: HTTP 200 + marker found
   ✓  GET /read-receipt/c8-rr-agent-sentinel-v1: HTTP 200 + marker found
 
 [rc] ── Summary ──────────────────────────────────────────────────────────
-  Passed  : 18
+  Passed  : 23
   Failed  : 0
   Skipped : 0
 

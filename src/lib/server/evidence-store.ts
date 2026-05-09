@@ -61,6 +61,14 @@ export function getBlobById(id: string): BlobRecord | undefined {
   return row ? (JSON.parse(row.payload) as BlobRecord) : undefined;
 }
 
+export function getBlobs(): BlobRecord[] {
+  const db = getDb();
+  const rows = db
+    .prepare(`SELECT payload FROM blob_records ORDER BY created_at DESC`)
+    .all() as { payload: string }[];
+  return rows.map((r) => JSON.parse(r.payload) as BlobRecord);
+}
+
 export function getBlobsByPackId(packId: string): BlobRecord[] {
   const db = getDb();
   const rows = db

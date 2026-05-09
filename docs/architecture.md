@@ -110,6 +110,8 @@ src/
     │   ├── use-shelby-upload.ts React hook: browser wallet + useUploadBlobs (testnet path)
     │   ├── status-map.ts       Conservative evidence storage status mapping utilities
     │   └── index.ts            getAdapter() factory + re-exports
+    ├── testnet/
+    │   └── handoff.mjs         Pure JSON builder for the public testnet handoff artifact
     ├── store/
     │   └── local-store.ts      Browser localStorage: packs, blobs, and receipts (fallback)
     ├── validation.ts           parseTags, isValidSHA256, buildEvidencePack, buildBlobRecord
@@ -127,7 +129,7 @@ scripts/
 ├── generate-agent-run.mjs          C8: deterministic agent-run example script
 ├── verify-community-demo.mjs       C9: zero-credential verification harness (35 assertions)
 ├── shelby-doctor.mjs               C11: zero-secret readiness doctor (mock + testnet config validation)
-└── verify-release-candidate.mjs    C12: release-candidate acceptance harness (build + routes + doctor)
+└── verify-release-candidate.mjs    C12/X15: release-candidate acceptance harness (handoff + build + routes + doctor)
 
 artifacts/
 └── release-candidate/
@@ -183,7 +185,8 @@ testnet/page.tsx
   → TestnetPageClient wallet readiness panel
       → useWallet() [@aptos-labs/wallet-adapter-react]
       → shows detected wallets, connected account, and Aptos Testnet status
-      → Community test session panel reads local shelby-testnet receipts/blobs
+      → Community test session panel reads browser-cache + SQLite shelby-testnet receipts/blobs
+      → getPersistedReceiptsAction() + getPersistedBlobsAction()
       → Copyable session summary for participant submission
 
 upload/page.tsx (client component)
@@ -253,6 +256,7 @@ The `payload` column stores the complete typed object as JSON so future model-fi
 | Dashboard | demo data (server) + localStorage (client) + SQLite via `getPersistedPacksAction` |
 | Blob detail | demo data → localStorage → SQLite via `getPersistedBlobAction` |
 | Read receipt | demo data → localStorage → SQLite via `getPersistedReceiptAction` (blobs resolved similarly) |
+| Testnet session | localStorage + SQLite via `getPersistedReceiptsAction` and `getPersistedBlobsAction`; dedupes by ID |
 
 SQLite failures are non-fatal — the app degrades gracefully to localStorage-only mode.
 
@@ -382,6 +386,7 @@ npm run verify-community-demo
   → search state: searchQuery, filterCategory, filterSourceType, filterStatus, filterDataSource, sortBy
   → applyFilters(packs): text search across title/description/category/sourceType/status/tags/dataSource
                           then category/sourceType/status/dataSource dropdown filters
+                          dataSource includes demo, local, and shelby-testnet records
                           then sortPacks() by selected sort key
   → filteredUserPacks = applyFilters(allUserPacks)
   → filteredDemoPacks = applyFilters(demoPacks)
@@ -406,4 +411,4 @@ npm run verify-community-demo
 - **Tailwind v4.** Uses CSS-first configuration (`@import "tailwindcss"` in globals.css). No `tailwind.config.js` needed.
 - **Conservative status mapping.** `status-map.ts` defines `registered → ready → failed → unknown`. The React SDK hook returns `void` on success, so `storageStatus` is `registered` until a retrieval check confirms `ready`.
 - **C8 deterministic script.** `scripts/generate-agent-run.mjs` is the canonical agent-run example — runs with zero credentials, uses `better-sqlite3` directly (same schema as `lib/server/db.ts`), and is idempotent via `INSERT OR REPLACE`. Stable IDs (`c8-*`) ensure the generated receipt URL is predictable.
-- **C10/X6 client-side search/filter/sort and evidence-card deep links.** Search, filter, and sort logic in `DashboardClient` is pure client-side state. `useMemo` wraps filter/sort computation and Blob deep-link lookup so it only recomputes when inputs change. Sorting uses `localeCompare` for deterministic, locale-aware ordering. The local/SQLite user-created evidence and built-in corpus section split is preserved; sections become invisible only when their filtered result set is empty. Evidence cards use localized category/source/status labels and open the first Blob provenance page when a BlobRecord is available.
+- **C10/X14 client-side search/filter/sort and evidence-card deep links.** Search, filter, and sort logic in `DashboardClient` is pure client-side state. `useMemo` wraps filter/sort computation and Blob deep-link lookup so it only recomputes when inputs change. Sorting uses `localeCompare` for deterministic, locale-aware ordering. The user/testnet evidence and built-in corpus section split is preserved; sections become invisible only when their filtered result set is empty. Evidence cards use localized category/source/status/data-source labels and open the first Blob provenance page when a BlobRecord is available.

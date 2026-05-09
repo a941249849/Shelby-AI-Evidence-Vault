@@ -11,7 +11,10 @@
     "smoke": "node scripts/shelby-smoke.mjs",
     "generate-agent-run": "node scripts/generate-agent-run.mjs",
     "verify-community-demo": "node scripts/verify-community-demo.mjs",
-    "verify-release-candidate": "node scripts/verify-release-candidate.mjs"
+    "verify-testnet-handoff": "node scripts/verify-testnet-handoff.mjs",
+    "verify-release-candidate": "node scripts/verify-release-candidate.mjs",
+    "final-readiness": "node scripts/final-readiness.mjs",
+    "public-testnet-release-pack": "node scripts/public-testnet-release-pack.mjs"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^6.3.1",

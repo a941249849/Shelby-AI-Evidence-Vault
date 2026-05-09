@@ -5,6 +5,15 @@ import { useLanguage } from '@/components/language-state';
 
 export default function SiteFooter() {
   const { language } = useLanguage();
+  const network = process.env.NEXT_PUBLIC_SHELBY_NETWORK;
+  const statusLabel =
+    network === 'testnet'
+      ? language === 'zh'
+        ? 'Testnet 模式'
+        : 'Testnet mode'
+      : language === 'zh'
+        ? 'Mock 模式'
+        : 'Mock mode';
 
   return (
     <footer className="border-t border-[#eadfd6] bg-[#fffaf4] py-6 text-[#2f1f12]">
@@ -41,7 +50,7 @@ export default function SiteFooter() {
         </div>
         <div className="flex items-center gap-4">
           <span className="rounded-full bg-[#dff5d7] px-3 py-1 text-xs font-bold text-[#317c24]">
-            {language === 'zh' ? 'Mock 模式' : 'Mock mode'}
+            {statusLabel}
           </span>
           <span className="font-mono text-xs text-[#7b695d]">v0.1.0</span>
         </div>

@@ -78,11 +78,29 @@ const sourceLabels: Record<EvidencePack['sourceType'], { zh: string; en: string 
   'manual-upload': { zh: '手动上传', en: 'Manual upload' },
 };
 
+const dataSourceStyles: Record<
+  NonNullable<EvidencePack['dataSource']>,
+  { label: { zh: string; en: string }; color: string }
+> = {
+  demo: {
+    label: { zh: 'Demo 语料', en: 'Demo corpus' },
+    color: 'border-white/12 bg-white/[0.055] text-[#9d9a92]',
+  },
+  local: {
+    label: { zh: '本地 / SQLite', en: 'Local / SQLite' },
+    color: 'border-[#9fe878]/35 bg-[#9fe878]/10 text-[#9fe878]',
+  },
+  'shelby-testnet': {
+    label: { zh: 'Shelby 测试网', en: 'Shelby testnet' },
+    color: 'border-[#ff77c9]/40 bg-[#ff77c9]/10 text-[#ffb1df]',
+  },
+};
+
 export default function EvidencePackCard({ pack, primaryBlobId }: EvidencePackCardProps) {
   const { language } = useLanguage();
   const category = categoryStyles[pack.category];
   const status = statusStyles[pack.status];
-  const isLocal = pack.dataSource === 'local';
+  const dataSource = dataSourceStyles[pack.dataSource ?? 'demo'];
   const detailHref = primaryBlobId ? `/blob/${primaryBlobId}` : `/dashboard?pack=${pack.id}`;
 
   return (
@@ -98,19 +116,9 @@ export default function EvidencePackCard({ pack, primaryBlobId }: EvidencePackCa
             {category.label[language]}
           </span>
           <span
-            className={`border px-2 py-1 font-mono text-xs font-semibold uppercase ${
-              isLocal
-                ? 'border-[#9fe878]/35 bg-[#9fe878]/10 text-[#9fe878]'
-                : 'border-white/12 bg-white/[0.055] text-[#9d9a92]'
-            }`}
+            className={`border px-2 py-1 font-mono text-xs font-semibold uppercase ${dataSource.color}`}
           >
-            {isLocal
-              ? language === 'zh'
-                ? '本地 / SQLite'
-                : 'Local / SQLite'
-              : language === 'zh'
-                ? 'Demo 语料'
-                : 'Demo corpus'}
+            {dataSource.label[language]}
           </span>
         </div>
 

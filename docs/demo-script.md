@@ -1,6 +1,6 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **X13 community testnet session candidate** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **X14 persistent testnet session ledger candidate** to stakeholders or the community.
 
 > **Current scope:**
 > - The product UI is Chinese-first with a top-nav English toggle.
@@ -10,7 +10,7 @@ A step-by-step walkthrough for demonstrating the **X13 community testnet session
 > - Local uploads get `shelby://mock/blob/{id}` references.
 > - Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require a participant wallet with testnet APT and ShelbyUSD.
 > - Real testnet read receipts include a receipt-level verification panel that aggregates every referenced Shelby testnet Blob.
-> - `/testnet` now aggregates the latest testnet receipt and Blob records into a copyable community test session summary.
+> - `/testnet` now aggregates the latest testnet receipt and Blob records from browser cache plus SQLite into a copyable community test session summary.
 > - The C8 agent-run script (`npm run generate-agent-run`) produces a deterministic evidence pack, blobs, and read receipt with zero credentials.
 
 ## Prerequisites
@@ -50,7 +50,7 @@ Click **测试网 / Testnet** or navigate to `/testnet`.
 - This is the public entry point for community testnet participation.
 - The runtime card shows whether the current deployment is still `mock` or has `SHELBY_MODE=testnet` enabled.
 - The wallet readiness panel detects Aptos wallets, supports connect/disconnect, and shows account plus network status.
-- The community test session panel remains empty until a real Shelby testnet upload exists; after upload it shows the latest receipt, referenced Blobs, and a copyable session summary.
+- The community test session panel remains empty until a real Shelby testnet upload exists; after upload it reads browser cache plus SQLite, shows the latest receipt, referenced Blobs, and a copyable session summary.
 - The four participant steps are explicit: connect wallet, prepare test assets, upload evidence, inspect receipt.
 - The product boundary section is honest: no mainnet claim, no private-key custody, no server signer, no token purchase flow.
 
@@ -202,7 +202,7 @@ The dashboard toolbar lets reviewers quickly narrow the full evidence index with
 **Empty state:**
 - If no packs match the current filters, a bilingual empty state appears with a **重置筛选 / Reset filters** button.
 
-**Important:** Filters and sort are client-side — they do not modify any stored data. The browser-cache reset button still only clears browser-cached local records; SQLite-persisted packs remain.
+**Important:** Filters and sort are client-side — they do not modify any stored data. The data-source filter covers Demo, Local/SQLite, and Shelby testnet records. The browser-cache reset button still only clears browser-cached local records; SQLite-persisted packs remain.
 
 ---
 
@@ -345,10 +345,11 @@ npm run lint                        # Must pass
 npm run build                       # Must pass
 npm run shelby-doctor               # C11: mock-mode readiness check (zero credentials, always passes)
 npm run verify-community-demo       # C9 harness: 35 DB-level assertions, zero credentials
+npm run verify-testnet-handoff -- path/to/handoff.json # Validate copied /testnet handoff after real upload
 npm run verify-release-candidate    # C12: full release-candidate gate — build + routes + doctor
 ```
 
-The `verify-release-candidate` command (C12) is the one-command release-candidate gate. It runs the complete product loop end to end: shelby-doctor checks, community demo harness, C8 ID assertions, production build, and route smoke checks against a live server. Uses an isolated temp database. Zero credentials required. See `docs/release-candidate-checklist.md` for the full checklist.
+The `verify-release-candidate` command (C12/X15) is the one-command release-candidate gate. It runs the complete product loop end to end: shelby-doctor checks, community demo harness, C8 ID assertions, public testnet handoff JSON contract, copied-handoff validator, production build, and route smoke checks against a live server. Uses an isolated temp database. Zero credentials required. See `docs/release-candidate-checklist.md` for the full checklist.
 
 The `verify-community-demo` harness (C9) creates an isolated temp SQLite database, runs the C8 generation path twice, and asserts all expected IDs, relationships, and idempotency in one automated step. See `docs/community-experiment-runbook.md` for the complete runbook.
 

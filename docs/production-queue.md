@@ -47,7 +47,13 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X10 public testnet readiness is merged: wallet detection/connect readiness on `/testnet`, account/network status, docs alignment, and launch QA.
 - X11 testnet proof verification is merged: in-app Blob proof panel, safe Shelby retrieval probe, and docs/acceptance alignment.
 - X12 receipt audit closure is merged: read receipts aggregate all referenced Shelby testnet Blob verification checks into one audit panel.
-- X13 community testnet session is the active Codex-owned stage: `/testnet` aggregates the latest testnet receipt/blob records and provides a copyable participant summary.
+- X13 community testnet session is merged: `/testnet` aggregates the latest testnet receipt/blob records and provides a copyable participant summary.
+- X14 persistent testnet session ledger is merged: `/testnet` merges browser-cache and SQLite testnet receipts/blobs, and `/dashboard` treats Shelby testnet packs as first-class indexed records.
+- X15 public testnet handoff is merged: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review.
+- X16 final Copilot review package is merged: `docs/final-copilot-review-brief.md` defines the final review scope, gates, real-testnet acceptance path, security boundaries, and expected review output.
+- X17 testnet handoff validator is merged: `scripts/verify-testnet-handoff.mjs` validates copied `/testnet` handoff JSON after a real Shelby testnet upload.
+- X18 final readiness artifact is merged: `scripts/final-readiness.mjs` writes `artifacts/final-readiness/latest.json` and separates code-candidate readiness from manual real-testnet/Copilot gates.
+- X19 public testnet release operator package is the active stage: `scripts/public-testnet-release-pack.mjs` writes `artifacts/public-testnet-release/latest.json` and gives the human operator one packet for wallet upload, handoff validation, and final Copilot review.
 
 ## Stage Gate
 
@@ -515,7 +521,7 @@ Turn the current community experiment into a release-candidate style package wit
 
 Scope:
 
-- `scripts/verify-release-candidate.mjs` — zero-credential, zero-network RC acceptance harness. Runs shelby-doctor (mock PASS, testnet fail-closed, public-key guard), verify-community-demo, generate-agent-run (with isolated DB, C8 ID assertions), npm run build, starts next start on an available local port, smoke-fetches 6 routes (HTTP 200 + page marker), and shuts down cleanly.
+- `scripts/verify-release-candidate.mjs` — zero-credential, zero-network RC acceptance harness. Runs shelby-doctor (mock PASS, testnet fail-closed, public-key guard), verify-community-demo, generate-agent-run (with isolated DB, C8 ID assertions), public handoff contract validation, copied-handoff file validation, npm run build, starts next start on an available local port, smoke-fetches 7 routes (HTTP 200 + page marker), and shuts down cleanly.
 - `package.json` — `verify-release-candidate` script added.
 - `.gitignore` — `artifacts/release-candidate/` added.
 - `docs/release-candidate-checklist.md` — release-candidate checklist and expected output.
@@ -681,7 +687,7 @@ Make the evidence index usable for community testers and operators once the vaul
 
 Scope:
 
-- `src/components/dashboard-client.tsx` — search input covering title, description, category, sourceType, status, tags, and dataSource; dropdown filters for category, source type, status, and data source (demo/local); sort controls (newest first, oldest first, title A–Z, most blobs); clear/reset filters button; filtered result counts on metric bar and section headers; empty state with reset control.
+- `src/components/dashboard-client.tsx` — search input covering title, description, category, sourceType, status, tags, and dataSource; dropdown filters for category, source type, status, and data source (demo/local/shelby-testnet); sort controls (newest first, oldest first, title A-Z, most blobs); clear/reset filters button; filtered result counts on metric bar and section headers; empty state with reset control.
 - `docs/demo-script.md` — new Step 7.5 covering the dashboard operator search/filter/sort workflow.
 - `docs/community-experiment-runbook.md` — new section on search/filter/sort for community testers.
 - `docs/architecture.md` — C10 entry added.

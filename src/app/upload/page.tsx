@@ -6,7 +6,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   ChevronRight,
-  ExternalLink,
   FileText,
   FileUp,
   Hash,
@@ -26,13 +25,15 @@ import { parseTags, buildEvidencePack, buildBlobRecord } from '@/lib/validation'
 import { addLocalPack, addLocalBlob, addLocalReadReceipt } from '@/lib/store/local-store';
 import { formatBytes } from '@/lib/utils';
 import { useShelbyUpload } from '@/lib/shelby/use-shelby-upload';
-import UploadProviders from './providers';
 import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import { useLanguage } from '@/components/language-state';
+import { useWalletSessionVerification } from '@/components/wallet-session-state';
 
 type Category = 'dataset' | 'agent-run' | 'document' | 'manifest';
 type SourceType = 'web-scrape' | 'api-export' | 'agent-output' | 'manual-upload';
+type UploadStage = 'idle' | 'packing' | 'testnet' | 'recording' | 'persisting';
+type ActiveUploadStage = Exclude<UploadStage, 'idle'>;
 
 interface FormState {
   title: string;
@@ -76,7 +77,10 @@ const uploadCopy = {
     localActiveBody: '文件会收到确定性的 Mock Shelby 引用，并持久化以便检查。',
     walletRequiredTitle: '测试网上传需要钱包',
     walletRequiredBody:
-      '连接 Aptos 钱包后才能把 Blob 上传到 Shelby 测试网。钱包会签名链上注册交易，并需要测试网 APT 与 ShelbyUSD。',
+      '连接 Aptos 钱包并完成右上角签名验证后，才能把 Blob 上传到 Shelby 测试网。上传交易仍由钱包签名，并需要测试网 APT 与 ShelbyUSD。',
+    configMissingTitle: '测试网 API key 未配置',
+    configMissingBody:
+      'Shelby 测试网拒绝匿名 RPC / Indexer 请求。请先在 .env.local 设置 NEXT_PUBLIC_TESTNET_API_KEY 并重启站点，再开放真实上传。',
     wrongNetworkTitle: '网络错误 - 请切换到 Aptos Testnet',
     wrongNetworkBody: 'Shelby 测试网上传要求钱包处于 Aptos Testnet。切换网络并重新连接后可继续。',
     walletReadyTitle: '钱包已连接 - Shelby 测试网上传就绪',
@@ -122,13 +126,17 @@ const uploadCopy = {
       uploadingTestnet: '正在上传到测试网',
       savingLocal: '正在本地保存',
       uploadTestnet: '上传到 Shelby 测试网',
+      configMissing: '缺少测试网 API key',
       wrongNetwork: '网络错误，请切换钱包',
+      verifyWallet: '先完成签名验证',
       connectWallet: '连接钱包后上传',
       saveLocal: '保存到本地',
     },
     saveBody: '保存对象会获得确定性的 Mock Shelby 引用，并写入 SQLite 持久化。',
     testnetBody: '文件会通过已连接钱包注册到 Shelby 测试网，并保留为可检查记录。',
     connectHint: '连接 Aptos 钱包后可启用测试网上传。',
+    configHint: '缺少 NEXT_PUBLIC_TESTNET_API_KEY，当前不能执行真实 Shelby 测试网上传。',
+    verifyHint: '请先使用右上角钱包入口完成签名验证。',
     wrongHint: '切换钱包到 Aptos Testnet 后可继续上传。',
     mockHint: '设置 SHELBY_MODE=testnet 并连接钱包后可执行真实 Shelby 测试网上传。',
     walletConnected: '钱包已连接',
@@ -145,6 +153,19 @@ const uploadCopy = {
     sessionConsole: '返回测试会话',
     viewIndex: '查看证据索引',
     uploadAnother: '继续上传证据包',
+    progressTitle: '上传进度',
+    progressSteps: {
+      packing: '封装证据包并读取文件',
+      testnet: '等待钱包确认，注册 Shelby Blob 并上传文件',
+      recording: '生成读取回执与 Blob 详情',
+      persisting: '写入本地 SQLite 记录',
+    },
+    progressNotes: {
+      packing: '正在整理元数据、哈希、标签和文件内容。',
+      testnet: '如果钱包弹出确认窗口，请完成签名；页面会继续等待 Shelby 测试网返回。',
+      recording: '链路已返回，正在把账号、blobName、检索链接写成产品内记录。',
+      persisting: '正在把证据包、Blob 和回执保存到本地数据库。',
+    },
     computingHash: '正在计算 SHA-256',
     hashError: '哈希计算失败',
     removeFile: '移除文件',
@@ -154,6 +175,9 @@ const uploadCopy = {
       fileRequired: '请至少选择一个文件。',
       hashPending: '请等待 SHA-256 计算完成。',
       walletMissing: '钱包未连接。请先连接 Aptos 钱包，再上传到 Shelby 测试网。',
+      configMissing:
+        '缺少 NEXT_PUBLIC_TESTNET_API_KEY。请配置 Shelby/Geomi frontend client API key 并重启站点。',
+      walletUnverified: '钱包已连接，但还没有完成签名验证。请先在右上角钱包入口完成签名验证。',
       wrongNetwork: (network: string) => `网络错误：钱包当前位于 "${network}"。请切换到 Aptos Testnet 并重新连接。`,
       uploadFailed: '上传失败。',
     },
@@ -172,7 +196,10 @@ const uploadCopy = {
     localActiveBody: 'Files receive deterministic mock Shelby references and are persisted for inspection.',
     walletRequiredTitle: 'Wallet required for testnet upload',
     walletRequiredBody:
-      'Connect your Aptos wallet to upload blobs to Shelby testnet. The wallet signs the on-chain registration transaction and requires testnet APT plus ShelbyUSD.',
+      'Connect your Aptos wallet and complete the top-right signature verification before uploading blobs to Shelby testnet. The upload transaction is still wallet-signed and requires testnet APT plus ShelbyUSD.',
+    configMissingTitle: 'Testnet API key is not configured',
+    configMissingBody:
+      'Shelby testnet rejects anonymous RPC / Indexer requests. Set NEXT_PUBLIC_TESTNET_API_KEY in .env.local and restart the app before enabling real uploads.',
     wrongNetworkTitle: 'Wrong network - switch to Aptos Testnet',
     wrongNetworkBody:
       'Shelby testnet upload requires your wallet to be on Aptos Testnet. Switch networks and reconnect to continue.',
@@ -221,13 +248,17 @@ const uploadCopy = {
       uploadingTestnet: 'Uploading to testnet',
       savingLocal: 'Saving locally',
       uploadTestnet: 'Upload to Shelby testnet',
+      configMissing: 'Missing testnet API key',
       wrongNetwork: 'Wrong network - switch wallet',
+      verifyWallet: 'Verify signature first',
       connectWallet: 'Connect wallet to upload',
       saveLocal: 'Save locally',
     },
     saveBody: 'The saved object receives a deterministic mock Shelby reference and SQLite persistence.',
     testnetBody: 'Files are registered on Shelby testnet via your connected wallet and persisted for inspection.',
     connectHint: 'Connect an Aptos wallet to enable testnet upload.',
+    configHint: 'NEXT_PUBLIC_TESTNET_API_KEY is missing, so real Shelby testnet upload is disabled.',
+    verifyHint: 'Use the top-right wallet control to complete signature verification first.',
     wrongHint: 'Switch your wallet to Aptos Testnet to enable upload.',
     mockHint: 'Set SHELBY_MODE=testnet and connect a wallet for real Shelby testnet upload.',
     walletConnected: 'Wallet connected',
@@ -246,6 +277,19 @@ const uploadCopy = {
     sessionConsole: 'Back to test session',
     viewIndex: 'View evidence index',
     uploadAnother: 'Upload another pack',
+    progressTitle: 'Upload progress',
+    progressSteps: {
+      packing: 'Package evidence and read files',
+      testnet: 'Await wallet confirmation, register Shelby Blob, and upload file',
+      recording: 'Create read receipt and Blob detail records',
+      persisting: 'Persist local SQLite records',
+    },
+    progressNotes: {
+      packing: 'Preparing metadata, hashes, tags, and file bytes.',
+      testnet: 'If the wallet opens a confirmation prompt, approve it; this page will wait for Shelby testnet to return.',
+      recording: 'The testnet path returned; writing account, blobName, and retrieval links into product records.',
+      persisting: 'Saving the evidence pack, Blob, and receipt into the local database.',
+    },
     computingHash: 'Computing SHA-256',
     hashError: 'Hash error',
     removeFile: 'Remove file',
@@ -255,6 +299,9 @@ const uploadCopy = {
       fileRequired: 'Please select at least one file.',
       hashPending: 'Please wait for SHA-256 computation to complete.',
       walletMissing: 'Wallet not connected. Please connect your Aptos wallet to upload to Shelby testnet.',
+      configMissing:
+        'NEXT_PUBLIC_TESTNET_API_KEY is missing. Configure a Shelby/Geomi frontend client API key and restart the app.',
+      walletUnverified: 'Wallet is connected but not signature-verified. Verify from the top-right wallet control first.',
       wrongNetwork: (network: string) => `Wrong network: wallet is on "${network}". Switch to Aptos Testnet and reconnect.`,
       uploadFailed: 'Upload failed.',
     },
@@ -270,11 +317,13 @@ async function computeSHA256(file: File): Promise<string> {
 
 function ModeIndicator({
   mode,
+  configReady,
   walletConnected,
   walletAddress,
   walletNetwork,
 }: {
   mode: 'mock' | 'testnet' | null;
+  configReady: boolean;
   walletConnected: boolean;
   walletAddress: string | null;
   walletNetwork: Network | null;
@@ -293,6 +342,20 @@ function ModeIndicator({
           <p className="font-semibold">{t.localActive}</p>
           <p className="mt-1 leading-6">
             {t.localActiveBody}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!configReady) {
+    return (
+      <div className="mb-8 flex gap-3 border border-[#fd8565]/45 bg-[#fff0ea]/90 px-4 py-3 text-sm text-[#7d2a15]">
+        <AlertTriangle className="mt-0.5 h-4 w-4 flex-none" />
+        <div>
+          <p className="font-semibold">{t.configMissingTitle}</p>
+          <p className="mt-1 leading-6">
+            {t.configMissingBody}
           </p>
         </div>
       </div>
@@ -487,63 +550,65 @@ function StepLabel({
   );
 }
 
-const participationIcons = [Wallet, HardDrive, UploadCloud, ShieldCheck];
-
-function PublicTestnetGuide({ mode }: { mode: 'mock' | 'testnet' | null }) {
+function UploadProgressPanel({
+  stage,
+  isTestnet,
+}: {
+  stage: UploadStage;
+  isTestnet: boolean;
+}) {
   const { language } = useLanguage();
   const t = uploadCopy[language];
-  const isTestnet = mode === 'testnet';
+  if (stage === 'idle') return null;
+
+  const steps: ActiveUploadStage[] = isTestnet
+    ? ['packing', 'testnet', 'recording', 'persisting']
+    : ['packing', 'recording', 'persisting'];
+  const activeIndex = Math.max(0, steps.indexOf(stage));
 
   return (
-    <section className="mb-8 shelby-surface shelby-cut p-5">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="font-mono text-xs font-semibold uppercase text-[#ff77c9]">
-            {t.participationTitle}
-          </p>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-[#f4f0e8]">
-            {t.participationBody}
-          </p>
-        </div>
-        <span
-          className={`inline-flex w-fit items-center gap-2 border px-3 py-1.5 font-mono text-xs font-semibold ${
-            isTestnet
-              ? 'border-[#9fe878]/35 bg-[#9fe878]/10 text-[#9fe878]'
-              : 'border-[#de8aff]/35 bg-[#de8aff]/10 text-[#e7b6ff]'
-          }`}
-        >
-          <span className={`h-2 w-2 rounded-full ${isTestnet ? 'bg-[#9fe878]' : 'bg-[#de8aff]'}`} />
-          {isTestnet ? t.participationBadgeTestnet : t.participationBadgeMock}
+    <div className="mt-5 shelby-cut border border-[#de8aff]/25 bg-[#160f1a] p-4">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <p className="font-mono text-xs font-semibold uppercase text-[#de8aff]">
+          {t.progressTitle}
+        </p>
+        <span className="inline-flex items-center gap-2 font-mono text-xs text-[#9d9a92]">
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-[#9fe878]" />
+          {activeIndex + 1}/{steps.length}
         </span>
       </div>
-
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {t.participationSteps.map(([title, body, label, href], index) => {
-          const Icon = participationIcons[index];
+      <div className="space-y-3">
+        {steps.map((item, index) => {
+          const done = index < activeIndex;
+          const active = item === stage;
           return (
-            <article key={title} className="border border-white/10 bg-white/[0.045] p-4">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <span className="grid h-9 w-9 place-items-center border border-[#9fe878]/25 bg-[#9fe878]/10 text-[#9fe878]">
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span className="font-mono text-xs font-bold text-[#6f716d]">0{index + 1}</span>
-              </div>
-              <h3 className="text-sm font-semibold text-[#f4f0e8]">{title}</h3>
-              <p className="mt-2 min-h-16 text-sm leading-6 text-[#9d9a92]">{body}</p>
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#de8aff] hover:text-[#ff77c9]"
+            <div key={item} className="flex gap-3">
+              <span
+                className={`mt-0.5 grid h-5 w-5 flex-none place-items-center rounded-full border text-[10px] ${
+                  done
+                    ? 'border-[#9fe878] bg-[#9fe878] text-[#101813]'
+                    : active
+                      ? 'border-[#de8aff] bg-[#de8aff]/15 text-[#de8aff]'
+                      : 'border-white/15 text-[#6f716d]'
+                }`}
               >
-                {label}
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            </article>
+                {done ? <CheckCircle2 className="h-3 w-3" /> : index + 1}
+              </span>
+              <div className="min-w-0">
+                <p className={`text-sm font-semibold ${active ? 'text-[#f4f0e8]' : 'text-[#9d9a92]'}`}>
+                  {t.progressSteps[item]}
+                </p>
+                {active && (
+                  <p className="mt-1 text-xs leading-5 text-[#9d9a92]">
+                    {t.progressNotes[item]}
+                  </p>
+                )}
+              </div>
+            </div>
           );
         })}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -560,12 +625,14 @@ function UploadPageContent() {
   const [files, setFiles] = useState<UploadFileEntry[]>([]);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadStage, setUploadStage] = useState<UploadStage>('idle');
   const [uploadResult, setUploadResult] = useState<UploadedResult | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [mode, setMode] = useState<'mock' | 'testnet' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const shelbyUpload = useShelbyUpload();
+  const walletSession = useWalletSessionVerification(shelbyUpload.walletAddress);
 
   useEffect(() => {
     getShelbyModeAction().then(setMode).catch(() => setMode('mock'));
@@ -653,6 +720,11 @@ function UploadPageContent() {
       return;
     }
 
+    if (mode === 'testnet' && !shelbyUpload.configReady) {
+      setUploadError(t.errors.configMissing);
+      return;
+    }
+
     if (mode === 'testnet' && !shelbyUpload.walletConnected) {
       setUploadError(t.errors.walletMissing);
       return;
@@ -667,7 +739,13 @@ function UploadPageContent() {
       return;
     }
 
+    if (mode === 'testnet' && !walletSession.verified) {
+      setUploadError(t.errors.walletUnverified);
+      return;
+    }
+
     setUploading(true);
+    setUploadStage('packing');
 
     try {
       const tags = parseTags(form.tags);
@@ -678,6 +756,7 @@ function UploadPageContent() {
         tags,
         description: form.description,
         blobCount: files.length,
+        dataSource: mode === 'testnet' ? 'shelby-testnet' : 'local',
       });
 
       const blobIds: string[] = [];
@@ -692,6 +771,7 @@ function UploadPageContent() {
           const buffer = await entry.file.arrayBuffer();
           const blobData = new Uint8Array(buffer);
 
+          setUploadStage('testnet');
           const testnetResult = await shelbyUpload.uploadBlob({
             packId: pack.id,
             fileName: entry.file.name,
@@ -699,6 +779,7 @@ function UploadPageContent() {
             hash,
           });
 
+          setUploadStage('recording');
           const blob = buildBlobRecord({
             evidencePackId: pack.id,
             hash,
@@ -752,6 +833,7 @@ function UploadPageContent() {
             throw new Error(actionResult.error);
           }
 
+          setUploadStage('recording');
           const blob = buildBlobRecord({
             evidencePackId: pack.id,
             hash,
@@ -772,6 +854,7 @@ function UploadPageContent() {
       }
 
       addLocalPack(pack);
+      setUploadStage('recording');
 
       const receipt: ReadReceipt = {
         id: `local-rr-${crypto.randomUUID()}`,
@@ -789,6 +872,7 @@ function UploadPageContent() {
       // Persist to SQLite (server-side) so uploads survive localStorage resets
       // and are visible across browser sessions.  Errors are non-fatal.
       try {
+        setUploadStage('persisting');
         await persistUploadAction(pack, builtBlobs, receipt);
       } catch {
         // SQLite persistence failure is non-fatal — localStorage already holds
@@ -808,6 +892,7 @@ function UploadPageContent() {
       setUploadError(err instanceof Error ? err.message : t.errors.uploadFailed);
     } finally {
       setUploading(false);
+      setUploadStage('idle');
     }
   }
 
@@ -896,21 +981,28 @@ function UploadPageContent() {
   }
 
   const isTestnet = mode === 'testnet';
+  const testnetMissingConfig = isTestnet && !shelbyUpload.configReady;
   const wrongNetwork =
     isTestnet &&
     shelbyUpload.walletConnected &&
     shelbyUpload.walletNetwork !== null &&
     shelbyUpload.walletNetwork !== Network.TESTNET;
   const testnetRequiresWallet = isTestnet && (!shelbyUpload.walletConnected || wrongNetwork);
+  const testnetRequiresSignature =
+    isTestnet && !testnetMissingConfig && shelbyUpload.walletConnected && !wrongNetwork && !walletSession.verified;
   const submitLabel = uploading
     ? isTestnet
       ? t.submit.uploadingTestnet
       : t.submit.savingLocal
     : isTestnet
-      ? shelbyUpload.walletConnected && !wrongNetwork
+      ? testnetMissingConfig
+        ? t.submit.configMissing
+        : shelbyUpload.walletConnected && !wrongNetwork && walletSession.verified
         ? t.submit.uploadTestnet
         : wrongNetwork
           ? t.submit.wrongNetwork
+          : shelbyUpload.walletConnected
+            ? t.submit.verifyWallet
           : t.submit.connectWallet
       : t.submit.saveLocal;
 
@@ -950,29 +1042,11 @@ function UploadPageContent() {
 
         <ModeIndicator
           mode={mode}
+          configReady={shelbyUpload.configReady}
           walletConnected={shelbyUpload.walletConnected}
           walletAddress={shelbyUpload.walletAddress}
           walletNetwork={shelbyUpload.walletNetwork}
         />
-
-        <PublicTestnetGuide mode={mode} />
-
-        <section className="mb-8 grid gap-4 md:grid-cols-2">
-          <div className="shelby-surface shelby-cut p-4">
-            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-[#9d9a92]">
-              <HardDrive className="h-3.5 w-3.5 text-[#9fe878]" />
-              {t.protocolPreviewTitle}
-            </div>
-            <p className="text-sm leading-6 text-[#f4f0e8]">{t.protocolPreviewBody}</p>
-          </div>
-          <div className="shelby-surface shelby-cut p-4">
-            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-[#9d9a92]">
-              <ShieldCheck className="h-3.5 w-3.5 text-[#de8aff]" />
-              {t.protocolTestnetTitle}
-            </div>
-            <p className="text-sm leading-6 text-[#f4f0e8]">{t.protocolTestnetBody}</p>
-          </div>
-        </section>
 
         {isTestnet && (
           <WalletConnector
@@ -1121,6 +1195,7 @@ function UploadPageContent() {
               <input
                 ref={fileInputRef}
                 type="file"
+                accept="image/*,.pdf,.json,.csv,.txt,.md,application/pdf,application/json,text/*"
                 multiple
                 className="hidden"
                 onChange={handleFileInput}
@@ -1182,15 +1257,31 @@ function UploadPageContent() {
               </p>
               <button
                 type="submit"
-                disabled={uploading || files.length === 0 || testnetRequiresWallet}
+                disabled={
+                  uploading ||
+                  files.length === 0 ||
+                  testnetMissingConfig ||
+                  testnetRequiresWallet ||
+                  testnetRequiresSignature
+                }
                 className="ui-button shelby-cut-sm mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {submitLabel}
               </button>
-              {testnetRequiresWallet && !wrongNetwork && (
+              {testnetMissingConfig && (
+                <p className="mt-3 text-xs leading-5 text-[#8793AA]">
+                  {t.configHint}
+                </p>
+              )}
+              {!testnetMissingConfig && testnetRequiresWallet && !wrongNetwork && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
                   {t.connectHint}
+                </p>
+              )}
+              {testnetRequiresSignature && (
+                <p className="mt-3 text-xs leading-5 text-[#8793AA]">
+                  {t.verifyHint}
                 </p>
               )}
               {wrongNetwork && (
@@ -1203,6 +1294,7 @@ function UploadPageContent() {
                   {t.mockHint}
                 </p>
               )}
+              <UploadProgressPanel stage={uploadStage} isTestnet={isTestnet} />
             </section>
           </aside>
         </form>
@@ -1212,9 +1304,5 @@ function UploadPageContent() {
 }
 
 export default function UploadPage() {
-  return (
-    <UploadProviders>
-      <UploadPageContent />
-    </UploadProviders>
-  );
+  return <UploadPageContent />;
 }

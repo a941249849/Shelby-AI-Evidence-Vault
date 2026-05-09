@@ -209,7 +209,7 @@ Exit code `0` on success, `1` on any assertion failure.
 npm run verify-release-candidate
 ```
 
-This is the one-command release-candidate gate (C12). It runs the complete product loop end to end, including all of the above plus a production build and route smoke checks against a live server instance. It is zero-credential and mock-safe by default.
+This is the one-command release-candidate gate (C12/X15). It runs the complete product loop end to end, including all of the above plus the public testnet handoff JSON contract, copied-handoff validator, a production build, and route smoke checks against a live server instance. It is zero-credential and mock-safe by default.
 
 See `docs/release-candidate-checklist.md` for the full list of checks.
 
