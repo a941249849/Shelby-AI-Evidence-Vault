@@ -181,7 +181,7 @@ if (!baseUrl) {
 
   await smokeRoute(baseUrl, '/', 'Shelby AI Evidence Vault');
   await smokeRoute(baseUrl, '/testnet', '开发者测试网演示控制台');
-  await smokeRoute(baseUrl, '/upload', 'Builder demo 测试网路径');
+  await smokeRoute(baseUrl, '/upload', 'Package files into a verifiable');
   await smokeRoute(baseUrl, '/dashboard', 'Evidence index');
 }
 
