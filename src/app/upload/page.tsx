@@ -73,6 +73,17 @@ const uploadCopy = {
     testnetStorage: 'Shelby 测试网 + SQLite',
     localActive: '本地 Demo 上传已启用',
     localActiveBody: '文件会收到确定性的 Mock Shelby 引用，并持久化以便检查。',
+    walletRequiredTitle: '测试网上传需要钱包',
+    walletRequiredBody:
+      '连接 Aptos 钱包后才能把 Blob 上传到 Shelby 测试网。钱包会签名链上注册交易，并需要测试网 APT 与 Shelby 存储额度。',
+    wrongNetworkTitle: '网络错误 - 请切换到 Aptos Testnet',
+    wrongNetworkBody: 'Shelby 测试网上传要求钱包处于 Aptos Testnet。切换网络并重新连接后可继续。',
+    walletReadyTitle: '钱包已连接 - Shelby 测试网上传就绪',
+    walletReadyBody: '每个文件都会注册到链上并上传到 Shelby 测试网 RPC。',
+    protocolPreviewTitle: '本地预览路径',
+    protocolPreviewBody: '用于封装证据包、计算哈希、生成 Mock Shelby 引用与读取回执；不声称真实 Shelby 存储。',
+    protocolTestnetTitle: 'Shelby 证明路径',
+    protocolTestnetBody: '切换 testnet 并连接钱包后，BlobRecord 会记录 accountAddress、blobName、网络、状态和 explorer 链接。',
     stepMeta: '证据包元数据',
     stepFiles: '文件与哈希',
     stepSave: '本地保存',
@@ -108,6 +119,31 @@ const uploadCopy = {
     connectHint: '连接 Aptos 钱包后可启用测试网上传。',
     wrongHint: '切换钱包到 Aptos Testnet 后可继续上传。',
     mockHint: '设置 SHELBY_MODE=testnet 并连接钱包后可执行真实 Shelby 测试网上传。',
+    walletConnected: '钱包已连接',
+    disconnect: '断开连接',
+    connectWalletTitle: '连接 Aptos 钱包',
+    noWallet: '未检测到 Aptos 钱包。安装 Petra 或其他 Aptos 钱包扩展后刷新页面。',
+    notInstalled: '未安装：',
+    successLocal: '本地证据包已封装',
+    successTestnet: 'Shelby 测试网证据包已封装',
+    successLocalBody: '已保存为本地 Mock Shelby 引用。未进行钱包签名、网络上传或真实 Shelby 注册。',
+    successTestnetBody: '已注册到 Shelby 测试网，并保存真实账号与 blob 元数据。',
+    readReceipt: '读取回执',
+    blobPages: 'Blob 详情页',
+    viewIndex: '查看证据索引',
+    uploadAnother: '继续上传证据包',
+    computingHash: '正在计算 SHA-256',
+    hashError: '哈希计算失败',
+    removeFile: '移除文件',
+    errors: {
+      oversized: (count: number, max: string) => `${count} 个文件已跳过：单个文件必须小于或等于 ${max}。`,
+      titleRequired: '请填写证据包标题。',
+      fileRequired: '请至少选择一个文件。',
+      hashPending: '请等待 SHA-256 计算完成。',
+      walletMissing: '钱包未连接。请先连接 Aptos 钱包，再上传到 Shelby 测试网。',
+      wrongNetwork: (network: string) => `网络错误：钱包当前位于 "${network}"。请切换到 Aptos Testnet 并重新连接。`,
+      uploadFailed: '上传失败。',
+    },
   },
   en: {
     intake: 'Evidence intake',
@@ -121,6 +157,20 @@ const uploadCopy = {
     testnetStorage: 'Shelby testnet + SQLite',
     localActive: 'Local demo upload active',
     localActiveBody: 'Files receive deterministic mock Shelby references and are persisted for inspection.',
+    walletRequiredTitle: 'Wallet required for testnet upload',
+    walletRequiredBody:
+      'Connect your Aptos wallet to upload blobs to Shelby testnet. The wallet signs the on-chain registration transaction and requires testnet APT plus Shelby storage credits.',
+    wrongNetworkTitle: 'Wrong network - switch to Aptos Testnet',
+    wrongNetworkBody:
+      'Shelby testnet upload requires your wallet to be on Aptos Testnet. Switch networks and reconnect to continue.',
+    walletReadyTitle: 'Wallet connected - Shelby testnet upload ready',
+    walletReadyBody: 'Each file will be registered on-chain and uploaded to Shelby testnet RPC.',
+    protocolPreviewTitle: 'Local preview path',
+    protocolPreviewBody:
+      'Packages evidence, computes hashes, generates mock Shelby references, and creates read receipts without claiming real Shelby storage.',
+    protocolTestnetTitle: 'Shelby proof path',
+    protocolTestnetBody:
+      'With testnet mode and a connected wallet, each BlobRecord captures accountAddress, blobName, network, status, and explorer link.',
     stepMeta: 'Pack metadata',
     stepFiles: 'Files and hashes',
     stepSave: 'Local save',
@@ -156,6 +206,33 @@ const uploadCopy = {
     connectHint: 'Connect an Aptos wallet to enable testnet upload.',
     wrongHint: 'Switch your wallet to Aptos Testnet to enable upload.',
     mockHint: 'Set SHELBY_MODE=testnet and connect a wallet for real Shelby testnet upload.',
+    walletConnected: 'Wallet connected',
+    disconnect: 'Disconnect',
+    connectWalletTitle: 'Connect Aptos wallet',
+    noWallet: 'No Aptos wallets detected. Install Petra or another Aptos wallet extension and refresh the page.',
+    notInstalled: 'Not installed:',
+    successLocal: 'Local evidence pack sealed',
+    successTestnet: 'Shelby testnet evidence pack sealed',
+    successLocalBody:
+      'Saved locally with mock Shelby references. No wallet signing, network upload, or real Shelby registration.',
+    successTestnetBody:
+      'Registered on Shelby testnet and saved locally with real account and blob metadata.',
+    readReceipt: 'Read receipt',
+    blobPages: 'Blob detail pages',
+    viewIndex: 'View evidence index',
+    uploadAnother: 'Upload another pack',
+    computingHash: 'Computing SHA-256',
+    hashError: 'Hash error',
+    removeFile: 'Remove file',
+    errors: {
+      oversized: (count: number, max: string) => `${count} file(s) skipped: files must be <= ${max}.`,
+      titleRequired: 'Pack title is required.',
+      fileRequired: 'Please select at least one file.',
+      hashPending: 'Please wait for SHA-256 computation to complete.',
+      walletMissing: 'Wallet not connected. Please connect your Aptos wallet to upload to Shelby testnet.',
+      wrongNetwork: (network: string) => `Wrong network: wallet is on "${network}". Switch to Aptos Testnet and reconnect.`,
+      uploadFailed: 'Upload failed.',
+    },
   },
 };
 
@@ -202,11 +279,9 @@ function ModeIndicator({
       <div className="mb-8 flex gap-3 border border-[#fd8565]/42 bg-[#fd8565]/12 px-4 py-3 text-sm text-[#ffc2ad]">
         <Wallet className="mt-0.5 h-4 w-4 flex-none" />
         <div>
-          <p className="font-semibold">Wallet required for testnet upload</p>
+          <p className="font-semibold">{t.walletRequiredTitle}</p>
           <p className="mt-1 leading-6">
-            Connect your Aptos wallet to upload blobs to Shelby testnet. The wallet will sign the
-            on-chain registration transaction. Requires testnet APT for gas and ShelbyUSD for
-            storage.
+            {t.walletRequiredBody}
           </p>
         </div>
       </div>
@@ -219,12 +294,10 @@ function ModeIndicator({
       <div className="mb-8 flex gap-3 border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
         <WifiOff className="mt-0.5 h-4 w-4 flex-none" />
         <div>
-          <p className="font-semibold">Wrong network — switch to Aptos Testnet</p>
+          <p className="font-semibold">{t.wrongNetworkTitle}</p>
           <p className="mt-1 leading-6">
-            Your wallet is connected to{' '}
-            <span className="font-mono font-semibold">{walletNetwork}</span>. Shelby testnet
-            upload requires <span className="font-semibold">Aptos Testnet</span>. Switch your
-            wallet network and reconnect.
+            {t.wrongNetworkBody}{' '}
+            <span className="font-mono font-semibold">{walletNetwork}</span>
           </p>
         </div>
       </div>
@@ -235,11 +308,10 @@ function ModeIndicator({
     <div className="mb-8 flex gap-3 border border-[#9fe878]/35 bg-[#9fe878]/10 px-4 py-3 text-sm text-[#9fe878]">
       <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none" />
       <div>
-        <p className="font-semibold">Wallet connected — Shelby testnet upload ready</p>
+        <p className="font-semibold">{t.walletReadyTitle}</p>
         <p className="mt-1 leading-6">
-          Uploading as{' '}
-          <span className="font-mono text-xs">{walletAddress ?? 'unknown'}</span>. Each file will
-          be registered on-chain and uploaded to Shelby testnet RPC.
+          {t.walletReadyBody}{' '}
+          <span className="font-mono text-xs">{walletAddress ?? 'unknown'}</span>
         </p>
       </div>
     </div>
@@ -267,6 +339,9 @@ function WalletConnector({
   connect: (name: string) => void;
   disconnect: () => void;
 }) {
+  const { language } = useLanguage();
+  const t = uploadCopy[language];
+
   if (walletConnected) {
     return (
       <div className="shelby-surface mb-6 shelby-cut p-4">
@@ -277,7 +352,7 @@ function WalletConnector({
             </div>
             <div className="min-w-0">
               <p className="font-mono text-xs font-semibold uppercase text-[#6f716d]">
-                {walletName ?? 'Wallet'} connected
+                {walletName ?? 'Wallet'} {t.walletConnected}
               </p>
               <p className="truncate font-mono text-xs text-[#f4f0e8]">
                 {walletAddress ?? 'unknown'}
@@ -289,7 +364,7 @@ function WalletConnector({
             onClick={disconnect}
             className="flex-none shelby-cut border border-white/12 px-3 py-1.5 text-xs font-semibold text-[#9d9a92] transition hover:border-red-400/60 hover:text-red-200"
           >
-            Disconnect
+            {t.disconnect}
           </button>
         </div>
       </div>
@@ -299,11 +374,11 @@ function WalletConnector({
   return (
     <div className="shelby-surface mb-6 shelby-cut p-4">
       <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#6f716d]">
-        Connect Aptos wallet
+        {t.connectWalletTitle}
       </p>
       {wallets.length === 0 && notDetectedWallets.length === 0 && (
         <p className="text-sm text-[#9d9a92]">
-          No Aptos wallets detected. Install{' '}
+          {language === 'zh' ? '未检测到 Aptos 钱包。安装 ' : 'No Aptos wallets detected. Install '}
           <a
             href="https://petra.app"
             target="_blank"
@@ -312,7 +387,9 @@ function WalletConnector({
           >
             Petra
           </a>{' '}
-          or another Aptos wallet extension and refresh the page.
+          {language === 'zh'
+            ? '或其他 Aptos 钱包扩展后刷新页面。'
+            : 'or another Aptos wallet extension and refresh the page.'}
         </p>
       )}
       {wallets.length > 0 && (
@@ -335,7 +412,7 @@ function WalletConnector({
       )}
       {notDetectedWallets.length > 0 && (
         <div className="mt-3">
-          <p className="mb-2 text-xs text-[#9d9a92]">Not installed:</p>
+          <p className="mb-2 text-xs text-[#9d9a92]">{t.notInstalled}</p>
           <div className="grid gap-1.5">
             {notDetectedWallets.map((w) => (
               <a
@@ -419,9 +496,7 @@ function UploadPageContent() {
     const valid = incoming.filter((f) => f.size <= MAX_FILE_SIZE);
     const oversized = incoming.filter((f) => f.size > MAX_FILE_SIZE);
     if (oversized.length > 0) {
-      setUploadError(
-        `${oversized.length} file(s) skipped: files must be <= ${formatBytes(MAX_FILE_SIZE)}.`
-      );
+      setUploadError(t.errors.oversized(oversized.length, formatBytes(MAX_FILE_SIZE)));
     }
 
     const entries: UploadFileEntry[] = valid.map((f) => ({
@@ -456,7 +531,7 @@ function UploadPageContent() {
           });
         });
     });
-  }, []);
+  }, [t.errors]);
 
   function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
     const chosen = Array.from(e.target.files ?? []);
@@ -480,23 +555,21 @@ function UploadPageContent() {
     setUploadError(null);
 
     if (!form.title.trim()) {
-      setUploadError('Pack title is required.');
+      setUploadError(t.errors.titleRequired);
       return;
     }
     if (files.length === 0) {
-      setUploadError('Please select at least one file.');
+      setUploadError(t.errors.fileRequired);
       return;
     }
     const notReady = files.some((f) => f.hashStatus !== 'done');
     if (notReady) {
-      setUploadError('Please wait for SHA-256 computation to complete.');
+      setUploadError(t.errors.hashPending);
       return;
     }
 
     if (mode === 'testnet' && !shelbyUpload.walletConnected) {
-      setUploadError(
-        'Wallet not connected. Please connect your Aptos wallet to upload to Shelby testnet.'
-      );
+      setUploadError(t.errors.walletMissing);
       return;
     }
 
@@ -505,9 +578,7 @@ function UploadPageContent() {
       shelbyUpload.walletNetwork !== null &&
       shelbyUpload.walletNetwork !== Network.TESTNET
     ) {
-      setUploadError(
-        `Wrong network: wallet is on "${shelbyUpload.walletNetwork}". Switch to Aptos Testnet and reconnect.`
-      );
+      setUploadError(t.errors.wrongNetwork(String(shelbyUpload.walletNetwork)));
       return;
     }
 
@@ -649,7 +720,7 @@ function UploadPageContent() {
         description: '',
       });
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'Upload failed.');
+      setUploadError(err instanceof Error ? err.message : t.errors.uploadFailed);
     } finally {
       setUploading(false);
     }
@@ -657,6 +728,10 @@ function UploadPageContent() {
 
   if (uploadResult) {
     const isTestnet = uploadResult.mode === 'testnet';
+    const blobCountText =
+      language === 'zh'
+        ? `${uploadResult.blobIds.length} 个 Blob`
+        : `${uploadResult.blobIds.length} blob${uploadResult.blobIds.length !== 1 ? 's' : ''}`;
     return (
       <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
@@ -665,22 +740,18 @@ function UploadPageContent() {
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <p className="font-mono text-xs font-semibold uppercase text-[#ff77c9]">
-              {isTestnet ? 'Shelby testnet evidence pack sealed' : 'Local evidence pack sealed'}
+              {isTestnet ? t.successTestnet : t.successLocal}
             </p>
             <h1 className="mt-3 text-3xl font-semibold text-[#f4f0e8]">
               {uploadResult.packTitle}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#9d9a92]">
-              {uploadResult.blobIds.length} blob
-              {uploadResult.blobIds.length !== 1 ? 's' : ''}{' '}
-              {isTestnet
-                ? 'registered on Shelby testnet and saved locally with real account/blob metadata.'
-                : 'saved locally with mock Shelby references. No wallet signing, no network upload, and no real Shelby registration.'}
+              {blobCountText} {isTestnet ? t.successTestnetBody : t.successLocalBody}
             </p>
 
             <div className="mt-8 shelby-cut border border-white/10 bg-white/[0.045] p-4">
               <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#6f716d]">
-                Read receipt
+                {t.readReceipt}
               </p>
               <Link
                 href={`/read-receipt/${uploadResult.receiptId}`}
@@ -693,7 +764,7 @@ function UploadPageContent() {
 
             <div className="mt-4 shelby-cut border border-white/10 bg-white/[0.045] p-4">
               <p className="mb-3 font-mono text-xs font-semibold uppercase text-[#6f716d]">
-                Blob detail pages
+                {t.blobPages}
               </p>
               <div className="grid gap-2">
                 {uploadResult.blobIds.map((blobId) => (
@@ -714,14 +785,14 @@ function UploadPageContent() {
                 href="/dashboard"
                 className="ui-button shelby-cut-sm"
               >
-                View evidence index
+                {t.viewIndex}
                 <ChevronRight className="h-4 w-4" />
               </Link>
               <button
                 onClick={() => setUploadResult(null)}
                 className="ui-button ui-button-secondary shelby-cut-sm"
               >
-                Upload another pack
+                {t.uploadAnother}
               </button>
             </div>
           </div>
@@ -789,6 +860,23 @@ function UploadPageContent() {
           walletAddress={shelbyUpload.walletAddress}
           walletNetwork={shelbyUpload.walletNetwork}
         />
+
+        <section className="mb-8 grid gap-4 md:grid-cols-2">
+          <div className="shelby-surface shelby-cut p-4">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-[#9d9a92]">
+              <HardDrive className="h-3.5 w-3.5 text-[#9fe878]" />
+              {t.protocolPreviewTitle}
+            </div>
+            <p className="text-sm leading-6 text-[#f4f0e8]">{t.protocolPreviewBody}</p>
+          </div>
+          <div className="shelby-surface shelby-cut p-4">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-[#9d9a92]">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#de8aff]" />
+              {t.protocolTestnetTitle}
+            </div>
+            <p className="text-sm leading-6 text-[#f4f0e8]">{t.protocolTestnetBody}</p>
+          </div>
+        </section>
 
         {isTestnet && (
           <WalletConnector
@@ -958,7 +1046,7 @@ function UploadPageContent() {
                         {entry.hashStatus === 'computing' && (
                           <span className="mt-1 flex items-center gap-1.5 text-xs text-[#de8aff]">
                             <Loader2 className="h-3 w-3 animate-spin" />
-                            Computing SHA-256
+                            {t.computingHash}
                           </span>
                         )}
                         {entry.hashStatus === 'done' && entry.hash && (
@@ -967,14 +1055,14 @@ function UploadPageContent() {
                           </span>
                         )}
                         {entry.hashStatus === 'error' && (
-                          <span className="mt-1 block text-xs text-red-600">Hash error</span>
+                          <span className="mt-1 block text-xs text-red-600">{t.hashError}</span>
                         )}
                       </span>
                       <button
                         type="button"
                         onClick={() => removeFile(idx)}
                         className="grid h-8 w-8 flex-none place-items-center text-[#9d9a92] transition hover:bg-red-500/10 hover:text-red-200"
-                        aria-label="Remove file"
+                        aria-label={t.removeFile}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

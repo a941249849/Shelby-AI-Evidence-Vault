@@ -6,20 +6,20 @@ import { useLanguage } from '@/components/language-state';
 
 const copy = {
   zh: {
-    subtitle: '热点存储证明界面',
+    subtitle: 'AI 证据回执层',
     product: '产品',
     registry: '索引',
     create: '上传',
     receipt: '回执',
-    language: '文A EN',
+    language: '中文 / EN',
   },
   en: {
-    subtitle: 'Verifiable evidence interface',
+    subtitle: 'AI evidence receipt layer',
     product: 'Product',
     registry: 'Registry',
     create: 'Upload',
     receipt: 'Receipt',
-    language: 'EN 文A',
+    language: 'EN / 中文',
   },
 };
 
