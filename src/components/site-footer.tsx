@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useLanguage } from '@/components/language-state';
 
 export default function SiteFooter() {
@@ -22,7 +23,17 @@ export default function SiteFooter() {
           </div>
         </div>
         <div className="flex flex-wrap justify-center gap-6 text-sm font-semibold text-[#6d5f55]">
-          <span>{language === 'zh' ? '文档' : 'Docs'}</span>
+          <Link href="/testnet" className="transition hover:text-[#ff4faf]">
+            {language === 'zh' ? '测试网' : 'Testnet'}
+          </Link>
+          <a
+            href="https://docs.shelby.xyz/sdks/react/mutations/use-upload-blobs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition hover:text-[#ff4faf]"
+          >
+            {language === 'zh' ? '文档' : 'Docs'}
+          </a>
           <span>SDK</span>
           <span>API</span>
           <span>{language === 'zh' ? '生态' : 'Ecosystem'}</span>

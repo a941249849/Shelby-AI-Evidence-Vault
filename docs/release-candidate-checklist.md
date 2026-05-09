@@ -153,8 +153,9 @@ Manual checks:
 | Area | Expected result |
 |---|---|
 | Language | Default surface is Chinese; top-nav language toggle switches the main product routes to English |
-| Home | Shelby ecosystem positioning, evidence-flow board, core capability cards, product preview |
+| Home | Shelby ecosystem positioning, evidence-flow board, core capability cards, product preview, testnet entry |
 | Registry | Evidence packs from demo/local/SQLite are visible; search, filters, sort, and cards remain usable |
+| Testnet | `/testnet` launch console shows mode status, wallet/funding prerequisites, upload entry, and product boundaries |
 | Upload | Mock + SQLite path is clear; public testnet path is gated by wallet, Aptos Testnet, testnet APT, and ShelbyUSD |
 | Blob detail | Shows provenance, Shelby ref, SHA-256 hash, source, metadata, and pack relationship |
 | Read receipt | Shows query, answer summary, run metadata, referenced Blob identity, and evidence pack links |

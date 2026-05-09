@@ -5,7 +5,7 @@
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                            Browser                                │
-│  /  /dashboard  /upload  /blob  /read-receipt                     │
+│  /  /testnet  /dashboard  /upload  /blob  /read-receipt            │
 │  localStorage: packs + blobs + receipts (M1/M4 — fallback)       │
 │  Browser wallet: Aptos wallet extension (testnet mode only)       │
 └──────────────────────┬───────────────────────────────────────────┘

@@ -30,14 +30,16 @@ Official references:
 ## Participant Flow
 
 1. Open the deployed app.
-2. Go to `/upload`.
-3. Connect Petra or another compatible Aptos wallet.
-4. Switch the wallet to Aptos Testnet.
-5. Ensure the wallet has testnet APT for gas.
-6. Ensure the wallet has ShelbyUSD for Shelby file upload cost.
-7. Upload one or more evidence files.
-8. Approve the wallet transaction.
-9. Inspect the success state:
+2. Go to `/testnet`.
+3. Confirm the runtime status and public testnet boundaries.
+4. Continue to `/upload`.
+5. Connect Petra or another compatible Aptos wallet.
+6. Switch the wallet to Aptos Testnet.
+7. Ensure the wallet has testnet APT for gas.
+8. Ensure the wallet has ShelbyUSD for Shelby file upload cost.
+9. Upload one or more evidence files.
+10. Approve the wallet transaction.
+11. Inspect the success state:
    - `shelbyRef`: `shelby://testnet/{account}/{blobName}`
    - `accountAddress`
    - `blobName`
@@ -45,7 +47,7 @@ Official references:
    - `storageStatus: registered`
    - `explorerUrl`
    - `retrievalUrl`
-10. Open the generated read receipt and Blob detail pages.
+12. Open the generated read receipt and Blob detail pages.
 
 ## Deployment Switch
 
@@ -75,6 +77,7 @@ Implemented:
 - Fail-closed upload page when wallet is missing or on the wrong network.
 - Local SQLite persistence plus browser cache/fallback.
 - Blob and receipt pages resolve testnet records after upload.
+- Public `/testnet` launch console with mode status, prerequisites, upload entry, and acceptance boundaries.
 - Public testnet participation guide on `/upload`.
 - Chinese and English product copy for the participant path.
 
@@ -98,13 +101,15 @@ npm run verify-release-candidate
 Manual testnet gate:
 
 1. Deploy with `SHELBY_MODE=testnet` and `NEXT_PUBLIC_SHELBY_NETWORK=testnet`.
-2. Open `/upload`.
-3. Confirm the wallet connector and public testnet guide are visible.
-4. Connect a wallet on Aptos Testnet.
-5. Upload a small file.
-6. Confirm the returned record contains real testnet identity fields.
-7. Open the generated `/blob/{id}` and `/read-receipt/{id}` pages.
-8. Run the opt-in smoke retrieval check with the returned account and blobName:
+2. Open `/testnet`.
+3. Confirm the mode status, launch checks, and public testnet boundaries are visible.
+4. Open `/upload`.
+5. Confirm the wallet connector and public testnet guide are visible.
+6. Connect a wallet on Aptos Testnet.
+7. Upload a small file.
+8. Confirm the returned record contains real testnet identity fields.
+9. Open the generated `/blob/{id}` and `/read-receipt/{id}` pages.
+10. Run the opt-in smoke retrieval check with the returned account and blobName:
 
 ```bash
 SHELBY_SMOKE=true \
