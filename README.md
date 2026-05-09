@@ -79,6 +79,7 @@ npm run verify-testnet-handoff -- path/to/handoff.json # Validate copied /testne
 npm run verify-release-candidate # C12: full release-candidate gate (build + routes + doctor)
 npm run final-readiness        # X18: write final readiness artifact after the RC gate
 npm run public-testnet-release-pack # X19: write the operator package for the real testnet run
+npm run verify-public-testnet-deploy # X20: public deployment env + persistence preflight
 npm run smoke                   # Opt-in Shelby testnet smoke harness (requires SHELBY_SMOKE=true)
 ```
 
@@ -136,6 +137,37 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | `SHELBY_SMOKE_BLOB_NAME` | — | Shelby blob name from a prior manual upload |
 
 > **Public testnet prerequisites:** Real Shelby testnet upload requires a connected Aptos browser wallet (e.g. Petra) on Aptos Testnet, testnet APT for gas fees, and ShelbyUSD for Shelby storage operations. CI does not perform real uploads — the browser-wallet path requires an interactive browser session. See `docs/public-testnet-participation.md` for the participant path and `docs/c3-smoke-test-guide.md` for retrieval smoke checks.
+
+---
+
+## Public deployment
+
+For community-facing testing, deploy on a long-running Node.js runtime with a
+persistent writable disk for SQLite. A Dockerfile is included for this shape.
+
+Minimum deployment env:
+
+```bash
+SHELBY_MODE=testnet
+NEXT_PUBLIC_SHELBY_NETWORK=testnet
+NEXT_PUBLIC_TESTNET_API_KEY=<Shelby/Geomi frontend client key>
+SHELBY_DB_PATH=/app/data/shelby-vault.sqlite
+```
+
+Before opening the URL publicly, run:
+
+```bash
+npm run verify-public-testnet-deploy
+```
+
+After deployment, check:
+
+```txt
+/api/health
+```
+
+See `docs/public-testnet-deployment.md` for Docker commands, health-check
+expectations, persistence boundaries, and the community test path.
 
 ---
 
@@ -280,6 +312,8 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
 | `docs/public-testnet-participation.md` | X8 public Shelby testnet participant and deployment path |
+| `docs/public-testnet-deployment.md` | X20 public deployment package: Docker, env preflight, health check, persistent SQLite guidance |
+| `docs/community-launch-announcement.md` | Draft community-facing testnet announcement and feedback request |
 | `docs/final-product-acceptance.md` | X15 public testnet candidate acceptance package |
 | `docs/final-copilot-review-brief.md` | X16 final Copilot review and merge-readiness handoff |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |

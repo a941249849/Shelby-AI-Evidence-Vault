@@ -43,6 +43,24 @@ Expected result:
 
 Runtime artifacts under `artifacts/` are ignored by Git.
 
+## Public Deployment Preflight
+
+Before opening a deployed URL to community testers, run the X20 deployment
+preflight in the target runtime environment:
+
+```bash
+npm run verify-public-testnet-deploy
+```
+
+Also check:
+
+```txt
+/api/health
+```
+
+See `docs/public-testnet-deployment.md` for Docker deployment, persistent
+SQLite volume requirements, and the community launch checklist.
+
 ## Deployment Environment
 
 Required:

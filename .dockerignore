@@ -1,0 +1,14 @@
+.git
+.next
+node_modules
+npm-debug.log*
+.env
+.env.*
+!.env.example
+data
+artifacts
+tmp
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.tmp-issue18-draft-*.png
