@@ -3,14 +3,18 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
+  AlertTriangle,
   ArrowLeft,
   CalendarClock,
+  CheckCircle2,
   Database,
+  ExternalLink,
   FileText,
   Fingerprint,
   HardDrive,
   Hash,
   Link2,
+  RefreshCw,
   ShieldCheck,
   Tag,
 } from 'lucide-react';
@@ -20,6 +24,10 @@ import { formatBytes, formatDateTime } from '@/lib/utils';
 import { getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getBlobById, getEvidencePackById } from '@/lib/evidence/service';
 import { getPersistedBlobAction, getPersistedPackAction } from '@/app/actions/persist';
+import {
+  verifyShelbyRetrievalAction,
+  type VerifyShelbyRetrievalResult,
+} from '@/app/actions/verify';
 import { useLanguage } from '@/components/language-state';
 
 interface BlobDetailClientProps {
@@ -48,6 +56,25 @@ const blobCopy = {
     pack: '证据包',
     tags: '标签与适配器元数据',
     unknown: '未知证据包',
+    proofTitle: 'Shelby 测试网证明验证',
+    proofBody: '对真实测试网 Blob 检查账号命名空间、blobName、状态、explorer 与 RPC 检索端点。',
+    localProofTitle: '本地引用不可做测试网验证',
+    localProofBody: 'Mock/Demo Blob 只能用于产品预览；真实证明需要通过 Shelby testnet 上传生成。',
+    account: '账号',
+    blobName: 'Blob 名称',
+    network: '网络',
+    storageStatus: '存储状态',
+    explorer: 'Explorer',
+    retrieval: '检索 URL',
+    runVerification: '验证检索',
+    checking: '验证中',
+    verified: '检索验证通过',
+    failed: '检索验证未通过',
+    httpStatus: 'HTTP 状态',
+    contentType: '内容类型',
+    contentLength: '内容长度',
+    checkedAt: '验证时间',
+    unavailable: '未提供',
   },
   en: {
     notFound: 'Blob not found',
@@ -73,6 +100,27 @@ const blobCopy = {
     pack: 'Evidence pack',
     tags: 'Tags and adapter metadata',
     unknown: 'Unknown pack',
+    proofTitle: 'Shelby testnet proof verification',
+    proofBody:
+      'For real testnet blobs, inspect account namespace, blobName, status, explorer, and RPC retrieval endpoint.',
+    localProofTitle: 'Local reference is not testnet-verifiable',
+    localProofBody:
+      'Mock/demo blobs are product previews only. Real proof is produced by Shelby testnet upload.',
+    account: 'Account',
+    blobName: 'Blob name',
+    network: 'Network',
+    storageStatus: 'Storage status',
+    explorer: 'Explorer',
+    retrieval: 'Retrieval URL',
+    runVerification: 'Verify retrieval',
+    checking: 'Checking',
+    verified: 'Retrieval verified',
+    failed: 'Retrieval not verified',
+    httpStatus: 'HTTP status',
+    contentType: 'Content type',
+    contentLength: 'Content length',
+    checkedAt: 'Checked at',
+    unavailable: 'Unavailable',
   },
 };
 
@@ -131,6 +179,136 @@ function MonoBlock({ children }: { children: React.ReactNode }) {
     <code className="block break-all rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-xs text-[#f4f0e8]">
       {children}
     </code>
+  );
+}
+
+function ProofValue({
+  label,
+  value,
+  href,
+}: {
+  label: string;
+  value?: string | null;
+  href?: string | null;
+}) {
+  return (
+    <div className="border border-white/10 bg-white/[0.04] px-3 py-2">
+      <p className="mb-1 font-mono text-xs font-semibold uppercase text-[#9d9a92]">{label}</p>
+      {href ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex max-w-full items-center gap-1.5 break-all font-mono text-xs text-[#de8aff] hover:text-[#ff77c9]"
+        >
+          <span className="break-all">{value ?? href}</span>
+          <ExternalLink className="h-3.5 w-3.5 flex-none" />
+        </a>
+      ) : (
+        <p className="break-all font-mono text-xs text-[#f4f0e8]">{value}</p>
+      )}
+    </div>
+  );
+}
+
+function TestnetProofPanel({ blob }: { blob: BlobRecord }) {
+  const { language } = useLanguage();
+  const t = blobCopy[language];
+  const [result, setResult] = useState<VerifyShelbyRetrievalResult | null>(null);
+  const [checking, setChecking] = useState(false);
+  const isTestnetBlob =
+    blob.uploadMode === 'testnet' || blob.network === 'testnet' || blob.dataSource === 'shelby-testnet';
+  const canVerify = isTestnetBlob && Boolean(blob.retrievalUrl || (blob.accountAddress && blob.blobName));
+
+  async function handleVerify() {
+    if (!canVerify) return;
+    setChecking(true);
+    try {
+      const verification = await verifyShelbyRetrievalAction({
+        accountAddress: blob.accountAddress,
+        blobName: blob.blobName,
+        retrievalUrl: blob.retrievalUrl,
+      });
+      setResult(verification);
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  if (!isTestnetBlob) {
+    return (
+      <section className="mt-6 shelby-cut shelby-surface p-5 shadow-sm">
+        <div className="flex gap-3 text-sm text-[#9d9a92]">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-none text-[#fd8565]" />
+          <div>
+            <h2 className="font-semibold text-[#f4f0e8]">{t.localProofTitle}</h2>
+            <p className="mt-1 leading-6">{t.localProofBody}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mt-6 shelby-cut shelby-surface p-5 shadow-sm">
+      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex gap-3">
+          <div className="grid h-10 w-10 place-items-center shelby-cut bg-[#111217] text-[#9fe878]">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase text-[#9d9a92]">{t.proofTitle}</p>
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-[#9d9a92]">{t.proofBody}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleVerify}
+          disabled={!canVerify || checking}
+          className="inline-flex items-center justify-center gap-2 border border-[#9fe878]/35 bg-[#9fe878]/10 px-4 py-2 text-sm font-semibold text-[#9fe878] transition hover:border-[#9fe878]/60 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {checking ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+          {checking ? t.checking : t.runVerification}
+        </button>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <ProofValue label={t.account} value={blob.accountAddress ?? t.unavailable} />
+        <ProofValue label={t.blobName} value={blob.blobName ?? t.unavailable} />
+        <ProofValue label={t.network} value={blob.network ?? t.unavailable} />
+        <ProofValue label={t.storageStatus} value={blob.storageStatus ?? t.unavailable} />
+        <ProofValue label={t.explorer} value={blob.explorerUrl ?? t.unavailable} href={blob.explorerUrl} />
+        <ProofValue label={t.retrieval} value={blob.retrievalUrl ?? t.unavailable} href={blob.retrievalUrl} />
+        {result && (
+          <>
+            <ProofValue label={t.httpStatus} value={result.httpStatus ? String(result.httpStatus) : t.unavailable} />
+            <ProofValue label={t.checkedAt} value={formatDateTime(result.checkedAt)} />
+          </>
+        )}
+      </div>
+
+      {result && (
+        <div
+          className={`mt-4 flex gap-3 border px-4 py-3 text-sm ${
+            result.ok
+              ? 'border-[#9fe878]/35 bg-[#9fe878]/10 text-[#9fe878]'
+              : 'border-[#fd8565]/35 bg-[#fd8565]/10 text-[#ffc2ad]'
+          }`}
+        >
+          {result.ok ? <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none" /> : <AlertTriangle className="mt-0.5 h-4 w-4 flex-none" />}
+          <div>
+            <p className="font-semibold">{result.ok ? t.verified : t.failed}</p>
+            <p className="mt-1 leading-6">{result.detail}</p>
+            {(result.contentType || result.contentLength) && (
+              <p className="mt-1 font-mono text-xs">
+                {t.contentType}: {result.contentType ?? t.unavailable} · {t.contentLength}:{' '}
+                {result.contentLength ?? t.unavailable}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -316,6 +494,8 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
             </Fact>
           </aside>
         </div>
+
+        <TestnetProofPanel blob={blob} />
 
         <section className="mt-6 shelby-cut shelby-surface p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase  text-[#9d9a92]">

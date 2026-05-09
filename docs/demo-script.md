@@ -1,6 +1,6 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **X10 public Shelby testnet readiness candidate** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **X11 testnet proof verification candidate** to stakeholders or the community.
 
 > **Current scope:**
 > - The product UI is Chinese-first with a top-nav English toggle.
@@ -83,6 +83,7 @@ Navigate to `/blob/blob-001`.
 - **大小**: 50 MB
 - **证据包** link: clicking it goes back to the dashboard for that pack
 - **Demo 数据** badge: shows this is built-in demo data
+- The proof panel states demo/mock references are not testnet-verifiable; real verification appears for Shelby testnet blobs
 - Try `/blob/blob-003` — shows the GPT-4o agent output blob
 
 ---
@@ -309,6 +310,7 @@ Key message: "Mock mode is the default and requires zero configuration. The brow
    - `storageStatus`: `registered`
    - `explorerUrl`: Shelby explorer link
    - A **read receipt link** with `receiptMode: 'shelby-testnet'`
+8. Open the generated Blob detail page and click **Verify retrieval** in the Shelby testnet proof panel.
 
 ### Follow-up: C3 smoke harness
 

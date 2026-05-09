@@ -191,7 +191,13 @@ upload/page.tsx (client component)
       → getBrowserShelbyConfig() [browser-client.ts — NEXT_PUBLIC_ vars only]
       → createBrowserShelbyClient() [browser-client.ts — ShelbyClient from SDK]
       → useUploadBlobs() [@shelby-protocol/react]
-  → On success: returns { blobName, accountAddress, shelbyRef, storageStatus, explorerUrl, retrievalUrl }
+	→ On success: returns { blobName, accountAddress, shelbyRef, storageStatus, explorerUrl, retrievalUrl }
+
+blob/[id]
+  → BlobDetailClient
+      → TestnetProofPanel for real testnet blobs
+      → verifyShelbyRetrievalAction() [server action]
+      → safe GET probe against allowed Shelby retrieval hosts only
 ```
 
 **Security boundary:**
@@ -199,6 +205,7 @@ upload/page.tsx (client component)
 - No `NEXT_PUBLIC_SHELBY_API_KEY` exists or is consumed anywhere.
 - `SHELBY_API_KEY` stays in the Server Action on the server.
 - Browser wallet signing is handled by the user's wallet extension (e.g. Petra) — no private key custody.
+- Retrieval verification is server-side, limited to HTTPS Shelby blob retrieval URLs, and never uses wallet keys or API secrets.
 
 The browser-wallet path is wrapped in `UploadProviders` (`src/app/upload/providers.tsx`), which sets up `QueryClientProvider` and `AptosWalletAdapterProvider`. The provider is used by `/testnet` for wallet readiness and by `/upload` for real Shelby upload signing.
 
