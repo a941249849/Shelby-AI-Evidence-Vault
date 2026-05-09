@@ -183,6 +183,8 @@ testnet/page.tsx
   → TestnetPageClient wallet readiness panel
       → useWallet() [@aptos-labs/wallet-adapter-react]
       → shows detected wallets, connected account, and Aptos Testnet status
+      → Community test session panel reads local shelby-testnet receipts/blobs
+      → Copyable session summary for participant submission
 
 upload/page.tsx (client component)
   → UploadProviders

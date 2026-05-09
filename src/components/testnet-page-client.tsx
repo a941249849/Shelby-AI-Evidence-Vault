@@ -1,15 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
   AlertTriangle,
   CheckCircle2,
   CloudUpload,
+  Copy,
   ExternalLink,
   FileCheck2,
+  FileJson,
   FlaskConical,
+  RefreshCw,
   ReceiptText,
   ShieldCheck,
   Wallet,
@@ -19,6 +22,10 @@ import { Network } from '@aptos-labs/ts-sdk';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import type { AdapterNotDetectedWallet, AdapterWallet } from '@aptos-labs/wallet-adapter-react';
 import { useLanguage, type Language } from '@/components/language-state';
+import type { BlobRecord } from '@/lib/demo-data/blobs';
+import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
+import { getLocalBlobs, getLocalReadReceipts } from '@/lib/store/local-store';
+import { formatDateTime } from '@/lib/utils';
 
 const copy = {
   zh: {
@@ -58,6 +65,24 @@ const copy = {
       ['检查回执', '验证账号、blobName、哈希、状态、检索链接与 explorer 入口。', 'Receipt'],
     ],
     acceptanceTitle: '发布验收',
+    sessionTitle: '社区测试会话',
+    sessionBody:
+      '完成真实测试网上传后，这里会聚合最近的 shelby-testnet 回执、引用 Blob 与可提交的测试摘要。社区用户可以把它作为参与回执提交。',
+    sessionEmptyTitle: '尚未形成测试网会话',
+    sessionEmptyBody:
+      '当前浏览器还没有 shelby-testnet 回执。先连接钱包并完成一次测试网上传，再回到这里检查会话。',
+    latestReceipt: '最近回执',
+    linkedBlobs: '引用 Blob',
+    noReceipt: '无测试网回执',
+    openReceipt: '打开回执',
+    openBlob: '打开 Blob',
+    copySession: '复制会话摘要',
+    copied: '已复制',
+    refreshSession: '刷新会话',
+    sessionMode: '会话模式',
+    generatedAt: '生成时间',
+    proofPath: '证明链路',
+    proofPathValue: '钱包 → 上传 → Blob 证明 → 回执聚合 → smoke 可选验证',
     acceptance: [
       '自动门禁：lint、build、release-candidate verifier 必须全绿。',
       '真实测试：连接 Aptos Testnet 钱包，完成一次小文件上传。',
@@ -110,6 +135,24 @@ const copy = {
       ['Inspect receipt', 'Verify account, blobName, hash, status, retrieval URL, and explorer entry.', 'Receipt'],
     ],
     acceptanceTitle: 'Launch acceptance',
+    sessionTitle: 'Community test session',
+    sessionBody:
+      'After a real testnet upload, this panel aggregates the latest shelby-testnet receipt, referenced Blobs, and a shareable test summary for community participation.',
+    sessionEmptyTitle: 'No testnet session yet',
+    sessionEmptyBody:
+      'This browser has no shelby-testnet receipt yet. Connect a wallet, complete one testnet upload, then return here to inspect the session.',
+    latestReceipt: 'Latest receipt',
+    linkedBlobs: 'Referenced blobs',
+    noReceipt: 'No testnet receipt',
+    openReceipt: 'Open receipt',
+    openBlob: 'Open Blob',
+    copySession: 'Copy session summary',
+    copied: 'Copied',
+    refreshSession: 'Refresh session',
+    sessionMode: 'Session mode',
+    generatedAt: 'Generated at',
+    proofPath: 'Proof path',
+    proofPathValue: 'wallet → upload → Blob proof → receipt aggregation → optional smoke check',
     acceptance: [
       'Automated gate: lint, build, and release-candidate verifier must stay green.',
       'Real test: connect an Aptos Testnet wallet and upload one small file.',
@@ -155,6 +198,22 @@ const copy = {
     mockBody: string;
     steps: Array<[string, string, string]>;
     acceptanceTitle: string;
+    sessionTitle: string;
+    sessionBody: string;
+    sessionEmptyTitle: string;
+    sessionEmptyBody: string;
+    latestReceipt: string;
+    linkedBlobs: string;
+    noReceipt: string;
+    openReceipt: string;
+    openBlob: string;
+    copySession: string;
+    copied: string;
+    refreshSession: string;
+    sessionMode: string;
+    generatedAt: string;
+    proofPath: string;
+    proofPathValue: string;
     acceptance: string[];
     boundaryTitle: string;
     boundaries: string[];
@@ -322,6 +381,14 @@ export default function TestnetPageClient({ mode }: { mode: 'mock' | 'testnet' }
           walletError={walletError}
           connectWallet={connectWallet}
           disconnectWallet={disconnectWallet}
+          language={language}
+        />
+
+        <TestnetSessionPanel
+          mode={mode}
+          walletReady={walletReady}
+          accountAddress={accountAddress}
+          walletNetwork={walletNetwork}
           language={language}
         />
 
@@ -501,6 +568,242 @@ function WalletReadinessPanel({
         </Link>
       </div>
     </section>
+  );
+}
+
+interface CommunitySession {
+  receipts: ReadReceipt[];
+  blobs: BlobRecord[];
+  latestReceipt: ReadReceipt | null;
+  latestReceiptBlobs: BlobRecord[];
+}
+
+function loadCommunitySession(): CommunitySession {
+  if (typeof window === 'undefined') {
+    return { receipts: [], blobs: [], latestReceipt: null, latestReceiptBlobs: [] };
+  }
+
+  const receipts = getLocalReadReceipts()
+    .filter((receipt) => receipt.receiptMode === 'shelby-testnet')
+    .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp));
+  const blobs = getLocalBlobs()
+    .filter(
+      (blob) =>
+        blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet' || blob.network === 'testnet'
+    )
+    .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+  const latestReceipt = receipts[0] ?? null;
+  const latestReceiptBlobs = latestReceipt
+    ? latestReceipt.referencedBlobIds
+        .map((blobId) => blobs.find((blob) => blob.id === blobId))
+        .filter(Boolean) as BlobRecord[]
+    : [];
+
+  return { receipts, blobs, latestReceipt, latestReceiptBlobs };
+}
+
+function buildSessionSummary({
+  mode,
+  walletReady,
+  accountAddress,
+  walletNetwork,
+  session,
+}: {
+  mode: 'mock' | 'testnet';
+  walletReady: boolean;
+  accountAddress: string | null;
+  walletNetwork: string | null;
+  session: CommunitySession;
+}) {
+  const proofBlobs = session.latestReceiptBlobs.length > 0 ? session.latestReceiptBlobs : session.blobs;
+
+  return {
+    product: 'Shelby AI Evidence Vault',
+    milestone: 'X13 community testnet session',
+    generatedAt: new Date().toISOString(),
+    runtimeMode: mode,
+    wallet: {
+      ready: walletReady,
+      accountAddress,
+      network: walletNetwork,
+    },
+    latestReceipt: session.latestReceipt
+      ? {
+          id: session.latestReceipt.id,
+          runId: session.latestReceipt.runId,
+          timestamp: session.latestReceipt.timestamp,
+          receiptMode: session.latestReceipt.receiptMode,
+          url: `/read-receipt/${session.latestReceipt.id}`,
+        }
+      : null,
+    blobs: proofBlobs.map((blob) => ({
+      id: blob.id,
+      shelbyRef: blob.shelbyRef,
+      accountAddress: blob.accountAddress,
+      blobName: blob.blobName,
+      network: blob.network,
+      storageStatus: blob.storageStatus,
+      explorerUrl: blob.explorerUrl,
+      retrievalUrl: blob.retrievalUrl,
+      url: `/blob/${blob.id}`,
+    })),
+    acceptancePath: [
+      'connect Aptos Testnet wallet',
+      'upload evidence through Shelby browser-wallet flow',
+      'verify Blob detail proof panel',
+      'verify receipt-level testnet audit panel',
+      'optionally run npm run smoke with accountAddress/blobName',
+    ],
+  };
+}
+
+function TestnetSessionPanel({
+  mode,
+  walletReady,
+  accountAddress,
+  walletNetwork,
+  language,
+}: {
+  mode: 'mock' | 'testnet';
+  walletReady: boolean;
+  accountAddress: string | null;
+  walletNetwork: string | null;
+  language: Language;
+}) {
+  const t = copy[language];
+  const [session, setSession] = useState<CommunitySession>(loadCommunitySession);
+  const [copied, setCopied] = useState(false);
+  const proofBlobs = session.latestReceiptBlobs.length > 0 ? session.latestReceiptBlobs : session.blobs;
+  const hasSession = Boolean(session.latestReceipt || session.blobs.length > 0);
+
+  const refreshSession = () => {
+    setSession(loadCommunitySession());
+    setCopied(false);
+  };
+
+  useEffect(() => {
+    const onFocus = () => refreshSession();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
+
+  const copySummary = async () => {
+    const summary = buildSessionSummary({
+      mode,
+      walletReady,
+      accountAddress,
+      walletNetwork,
+      session,
+    });
+    await navigator.clipboard.writeText(JSON.stringify(summary, null, 2));
+    setCopied(true);
+  };
+
+  return (
+    <section className="mt-8 shelby-surface shelby-cut p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-3xl">
+          <p className="font-mono text-xs font-bold uppercase text-[#ff4faf]">{t.sessionTitle}</p>
+          <h2 className="mt-3 text-2xl font-black text-[#2f1f12]">
+            {hasSession ? t.sessionTitle : t.sessionEmptyTitle}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-[#6d5f55]">
+            {hasSession ? t.sessionBody : t.sessionEmptyBody}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={refreshSession}
+            className="inline-flex items-center gap-2 border border-[#d8c7bb] bg-white/55 px-3 py-2 text-sm font-bold text-[#6d5f55] transition hover:border-[#de8aff]/50 hover:text-[#de5cff]"
+          >
+            <RefreshCw size={15} />
+            {t.refreshSession}
+          </button>
+          <button
+            type="button"
+            onClick={copySummary}
+            disabled={!hasSession}
+            className="inline-flex items-center gap-2 border border-[#2f1f12] bg-[#2f1f12] px-3 py-2 text-sm font-bold text-[#fffdf9] transition hover:bg-[#3a281a] disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            {copied ? <CheckCircle2 size={15} /> : <Copy size={15} />}
+            {copied ? t.copied : t.copySession}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
+        <SessionMetric label={t.sessionMode} value={mode} ok={mode === 'testnet'} />
+        <SessionMetric label={t.latestReceipt} value={session.latestReceipt?.id ?? t.noReceipt} ok={Boolean(session.latestReceipt)} />
+        <SessionMetric label={t.linkedBlobs} value={String(proofBlobs.length)} ok={proofBlobs.length > 0} />
+      </div>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="border border-[#eadfd6] bg-white/50 p-4">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <p className="font-mono text-xs font-bold uppercase text-[#7b695d]">{t.linkedBlobs}</p>
+            <FileJson className="h-4 w-4 text-[#de5cff]" />
+          </div>
+          {proofBlobs.length > 0 ? (
+            <div className="space-y-3">
+              {proofBlobs.slice(0, 4).map((blob) => (
+                <div key={blob.id} className="border border-[#eadfd6] bg-[#fffdf9]/80 px-3 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Link href={`/blob/${blob.id}`} className="font-mono text-xs font-bold text-[#2f1f12] hover:text-[#de5cff]">
+                      {blob.id}
+                    </Link>
+                    <Link href={`/blob/${blob.id}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-[#de5cff]">
+                      {t.openBlob}
+                      <ArrowRight size={13} />
+                    </Link>
+                  </div>
+                  <p className="mt-2 break-all font-mono text-xs text-[#6d5f55]">{blob.shelbyRef}</p>
+                  <div className="mt-2 grid gap-2 text-xs text-[#6d5f55] sm:grid-cols-2">
+                    <span className="break-all">account: {blob.accountAddress ?? '-'}</span>
+                    <span className="break-all">blobName: {blob.blobName ?? '-'}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm leading-6 text-[#6d5f55]">{t.sessionEmptyBody}</p>
+          )}
+        </div>
+
+        <aside className="border border-[#eadfd6] bg-[#fffdf9]/75 p-4">
+          <p className="font-mono text-xs font-bold uppercase text-[#7b695d]">{t.proofPath}</p>
+          <p className="mt-3 text-sm font-semibold leading-6 text-[#2f1f12]">{t.proofPathValue}</p>
+          <div className="mt-5 space-y-3 text-sm text-[#6d5f55]">
+            <p>
+              {t.generatedAt}: <span className="font-mono">{formatDateTime(new Date().toISOString())}</span>
+            </p>
+            <p>
+              wallet: <span className="font-mono">{accountAddress ?? '-'}</span>
+            </p>
+            <p>
+              network: <span className="font-mono">{walletNetwork ?? '-'}</span>
+            </p>
+          </div>
+          {session.latestReceipt && (
+            <Link href={`/read-receipt/${session.latestReceipt.id}`} className="shelby-secondary-button mt-5 w-full">
+              {t.openReceipt}
+              <ArrowRight size={15} />
+            </Link>
+          )}
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function SessionMetric({ label, value, ok }: { label: string; value: string; ok: boolean }) {
+  return (
+    <div className="border border-[#eadfd6] bg-white/50 px-4 py-3">
+      <p className="font-mono text-xs font-bold uppercase text-[#7b695d]">{label}</p>
+      <p className={`mt-1 break-all text-lg font-black ${ok ? 'text-[#317c24]' : 'text-[#9a361f]'}`}>
+        {value}
+      </p>
+    </div>
   );
 }
 
