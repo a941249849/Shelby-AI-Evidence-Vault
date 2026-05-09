@@ -25,6 +25,7 @@ const copy = {
     body:
       '将源文件封装成证据包，绑定为 Shelby-ready Blob，并把每次回答引用的证据沉淀为可追溯回执。',
     actions: {
+      wallet: '连接钱包测试',
       upload: '上传证据',
       registry: '打开证据索引',
       receipt: '查看回执',
@@ -58,7 +59,7 @@ const copy = {
       body:
         '部署方开启 testnet 后，用户连接 Aptos 钱包、准备测试网 APT 与 ShelbyUSD，即可把证据包写入 Shelby 测试网并生成可追溯回执。',
       points: ['钱包签名', 'Shelby Blob 注册', '回执可审计'],
-      cta: '进入测试网',
+      cta: '连接钱包',
       docs: '查看接入文档',
     },
     preview: '产品预览',
@@ -77,6 +78,7 @@ const copy = {
     body:
       'Package source files into Evidence Packs, bind them as Shelby-ready Blobs, and turn every referenced answer into an auditable Read Receipt.',
     actions: {
+      wallet: 'Connect wallet',
       upload: 'Upload evidence',
       registry: 'Open registry',
       receipt: 'View receipt',
@@ -110,7 +112,7 @@ const copy = {
       body:
         'When deployed with testnet mode enabled, users connect an Aptos wallet, prepare testnet APT and ShelbyUSD, upload evidence to Shelby testnet, and receive traceable receipts.',
       points: ['Wallet signing', 'Shelby Blob registration', 'Auditable receipts'],
-      cta: 'Open testnet',
+      cta: 'Connect wallet',
       docs: 'Read integration docs',
     },
     preview: 'Product preview',
@@ -274,12 +276,16 @@ export default function HomePageClient() {
             </div>
 
             <div className="hero-actions">
-              <Link href="/upload" className="shelby-primary-button">
-                <CloudUpload size={19} />
-                {t.actions.upload}
+              <Link href="/testnet" className="shelby-primary-button">
+                <Wallet size={19} />
+                {t.actions.wallet}
                 <span className="button-arrow">
                   <ArrowRight size={20} />
                 </span>
+              </Link>
+              <Link href="/upload" className="shelby-secondary-button">
+                <CloudUpload size={16} />
+                {t.actions.upload}
               </Link>
               <Link href="/dashboard" className="shelby-secondary-button">
                 {t.actions.registry}
