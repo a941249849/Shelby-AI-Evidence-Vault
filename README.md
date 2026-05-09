@@ -221,7 +221,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Data-source badge on blob/receipt detail (Demo / Local mock / Shelby testnet)
 - Opt-in Node.js smoke harness (`npm run smoke`) for RPC connectivity and retrieval verification
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
-- Dashboard shows built-in demo data + locally uploaded packs; reset button clears all local data
+- Dashboard shows built-in demo data + locally uploaded packs; reset button clears browser cache only while SQLite records remain durable
 - Mode indicator and wallet connect UI on upload page
 - C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
 - X3 product closeout status: release-candidate gate remains green after the UI/product pass

@@ -105,7 +105,7 @@ All IDs are **deterministic and stable** — you will get the same IDs every tim
 | `http://localhost:3000/read-receipt/c8-rr-agent-sentinel-v1` | Read receipt: query, answer summary, referenced blobs, run ID |
 | `http://localhost:3000/blob/c8-blob-input-v1` | Input blob: Shelby mock ref, SHA-256 hash, source, pack link |
 | `http://localhost:3000/blob/c8-blob-output-v1` | Output blob: Shelby mock ref, SHA-256 hash, source, pack link |
-| `http://localhost:3000/dashboard` | Dashboard: C8 pack appears in "Local workspace" under "User-created records" |
+| `http://localhost:3000/dashboard` | Evidence registry: C8 pack appears in the local/SQLite user-created evidence section, with an Inspect first blob link |
 
 ### Step 3 — Upload your own file (optional)
 
@@ -113,7 +113,7 @@ All IDs are **deterministic and stable** — you will get the same IDs every tim
 2. Enter a title and select any local file
 3. Click **保存到本地** / **Save locally**
 4. The success screen shows blob links and a read receipt link
-5. Navigate to `/dashboard` — your pack appears in **本地工作区** / **Local workspace** under **用户创建记录** / **User-created records**
+5. Navigate to `/dashboard` — your pack appears in the local/SQLite user-created evidence section and can deep-link to its Blob provenance page
 
 User-uploaded packs are persisted to `data/shelby-vault.sqlite` and survive page refresh.
 
@@ -338,13 +338,13 @@ The toolbar above the evidence sections lets you narrow the full index without m
 
 ### Search
 
-Type any text into the **"Search title, tags, category…"** input. The search covers:
+Type any text into the **搜索标题、标签、分类... / Search title, tags, category...** input. The search covers:
 
 - Pack title
 - Pack description
-- Category (e.g. `dataset`, `agent-run`)
-- Source type (e.g. `agent-output`, `web-scrape`)
-- Status (e.g. `active`, `archived`)
+- Category (visible labels such as Dataset / Agent run / Document / Manifest)
+- Source type (visible labels such as Web scrape / API export / Agent output / Manual upload)
+- Status (visible labels such as Verifiable / Archived / Pending)
 - Tags
 - Data source label (`local` or `demo`)
 
@@ -365,8 +365,8 @@ Four dropdown controls are available next to the search box:
 | Control | Options |
 |---------|---------|
 | Category | All categories / dataset / agent-run / document / manifest |
-| Source type | All source types / web-scrape / api-export / agent-output / manual-upload |
-| Status | All statuses / active / archived / pending |
+| Source type | All source types / Web scrape / API export / Agent output / Manual upload |
+| Status | All statuses / Verifiable / Archived / Pending |
 | Data source | All sources / "Local / uploaded" / "Demo corpus" |
 
 ### Sort
@@ -403,7 +403,7 @@ If no packs match the current filters:
 
 ### Section visibility
 
-- The **Local workspace** section only appears when there are user-created packs in the filtered result.
+- The local/SQLite user-created evidence section only appears when there are user-created packs in the filtered result.
 - The **Demo evidence** section is always shown when unfiltered; it is hidden only if filters exclude all demo packs.
 - When both sections have results, they are shown with their existing section headers so you can always tell which source each card belongs to.
 
@@ -423,7 +423,7 @@ The file will be recreated on the next `npm run generate-agent-run` or `npm run 
 
 ### Browser localStorage
 
-Navigate to `http://localhost:3000/dashboard` and click **"Reset browser cache"** (top right of the "Local workspace" section). This clears browser-cached local packs, blobs, and receipts.
+Navigate to `http://localhost:3000/dashboard` and click **重置浏览器缓存 / Reset browser cache** in the local/SQLite records area. This clears browser-cached local packs, blobs, and receipts.
 
 The button asks for confirmation (click once → "Click again to reset browser cache" → click again to proceed). Built-in demo data is not affected. SQLite-persisted records are not deleted by this browser-cache reset.
 

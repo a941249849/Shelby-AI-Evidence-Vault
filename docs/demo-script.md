@@ -161,9 +161,9 @@ The dashboard toolbar lets reviewers quickly narrow the full evidence index with
   - `local` — narrows to user-created/local records only
 
 **Filters (dropdown controls next to the search box):**
-- **全部类别 / All categories** — filter to `dataset`, `agent-run`, `document`, or `manifest`
-- **全部来源类型 / All source types** — filter to `web-scrape`, `api-export`, `agent-output`, or `manual-upload`
-- **全部状态 / All statuses** — filter to `active`, `archived`, or `pending`
+- **全部类别 / All categories** — filter to Dataset, Agent run, Document, or Manifest
+- **全部来源类型 / All source types** — filter to Web scrape, API export, Agent output, or Manual upload
+- **全部状态 / All statuses** — filter to Verifiable, Archived, or Pending
 - **全部来源 / All sources** — filter to local/uploaded records or built-in demo corpus
 
 **Sort:**
