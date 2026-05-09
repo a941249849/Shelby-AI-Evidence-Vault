@@ -50,7 +50,7 @@ Click **索引** or navigate to `/dashboard`.
 - The responsive grid of evidence pack cards
 - Each card shows: title, status badge (green/gray/yellow), category badge, source type, tags, blob count, created date
 - Five packs: dataset (Common Crawl), agent-run (GPT-4o legal extractor), manifest (arXiv), document (policy), dataset (synthetic QA benchmark)
-- The **检查证据** link on each card
+- The **检查首个 Blob / Inspect first blob** link on each card, which opens the Blob provenance inspector instead of looping back to the index
 
 After you upload a pack (Step 5), come back here to see the local/SQLite records appear in the user-created area. In Chinese this is surfaced as the local workspace / user-created evidence section; in English the labels switch through the top-nav language toggle.
 

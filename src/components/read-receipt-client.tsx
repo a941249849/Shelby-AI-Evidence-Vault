@@ -319,15 +319,34 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
     // Try localStorage (handles receipts created by the upload page)
     const localReceipt = getLocalReadReceiptById(id);
     if (localReceipt) {
-      setResolved({
-        receipt: localReceipt,
-        blobs: localReceipt.referencedBlobIds
-          .map((bid) => getLocalBlobById(bid) ?? getBlobById(bid))
-          .filter(Boolean) as BlobRecord[],
-        packs: localReceipt.evidencePackIds
-          .map((pid) => getLocalPackById(pid) ?? getEvidencePackById(pid))
-          .filter(Boolean) as EvidencePack[],
-      });
+      (async () => {
+        const resolvedBlobs: BlobRecord[] = [];
+        for (const bid of localReceipt.referencedBlobIds) {
+          const blob =
+            getLocalBlobById(bid) ??
+            getBlobById(bid) ??
+            (await getPersistedBlobAction(bid).catch((err) => {
+              console.error('[ReadReceiptClient] getPersistedBlobAction failed for', bid, err);
+              return null;
+            }));
+          if (blob) resolvedBlobs.push(blob);
+        }
+
+        const resolvedPacks: EvidencePack[] = [];
+        for (const pid of localReceipt.evidencePackIds) {
+          const pack =
+            getLocalPackById(pid) ??
+            getEvidencePackById(pid) ??
+            (await getPersistedPackAction(pid).catch(() => null));
+          if (pack) resolvedPacks.push(pack);
+        }
+
+        setResolved({
+          receipt: localReceipt,
+          blobs: resolvedBlobs,
+          packs: resolvedPacks,
+        });
+      })();
       return;
     }
 

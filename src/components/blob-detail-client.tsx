@@ -153,7 +153,18 @@ export default function BlobDetailClient({ id }: BlobDetailClientProps) {
     if (localBlob) {
       setBlob(localBlob);
       const localPack = getLocalPackById(localBlob.evidencePackId);
-      setPack(localPack ?? getEvidencePackById(localBlob.evidencePackId));
+      const staticPack = getEvidencePackById(localBlob.evidencePackId);
+      if (localPack ?? staticPack) {
+        setPack(localPack ?? staticPack);
+      } else {
+        getPersistedPackAction(localBlob.evidencePackId)
+          .then((persistedPack) => {
+            setPack(persistedPack ?? undefined);
+          })
+          .catch((err) => {
+            console.error('[BlobDetailClient] getPersistedPackAction failed', err);
+          });
+      }
       return;
     }
 

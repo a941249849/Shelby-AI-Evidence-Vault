@@ -17,7 +17,7 @@ import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import EvidencePackCard from '@/components/evidence-pack-card';
 import { getLocalPacks, getLocalBlobsByPackId, resetLocalData } from '@/lib/store/local-store';
-import { getPersistedPacksAction } from '@/app/actions/persist';
+import { getPersistedBlobsByPackAction, getPersistedPacksAction } from '@/app/actions/persist';
 import { useLanguage } from '@/components/language-state';
 
 interface DashboardClientProps {
@@ -151,6 +151,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
   const t = dashboardCopy[language];
   const [localPacks, setLocalPacks] = useState<EvidencePack[]>([]);
   const [persistedPacks, setPersistedPacks] = useState<EvidencePack[]>([]);
+  const [persistedBlobs, setPersistedBlobs] = useState<BlobRecord[]>([]);
   const [resetConfirm, setResetConfirm] = useState(false);
 
   // Search / filter / sort state
@@ -165,8 +166,12 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalPacks(getLocalPacks());
     getPersistedPacksAction()
-      .then((packs) => {
+      .then(async (packs) => {
         setPersistedPacks(packs);
+        const blobs = await Promise.all(
+          packs.map((pack) => getPersistedBlobsByPackAction(pack.id))
+        );
+        setPersistedBlobs(blobs.flat());
       })
       .catch((err) => {
         console.error('[DashboardClient] getPersistedPacksAction failed', err);
@@ -205,7 +210,10 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
     () => [...allUserPacks, ...demoPacks],
     [allUserPacks, demoPacks]
   );
-  const localBlobs = localPacks.flatMap((p) => getLocalBlobsByPackId(p.id));
+  const localBlobs = useMemo(
+    () => localPacks.flatMap((p) => getLocalBlobsByPackId(p.id)),
+    [localPacks]
+  );
   const persistedBlobCount = dedupedPersisted.reduce((sum, p) => sum + p.blobCount, 0);
   const totalBlobs = localBlobs.length + persistedBlobCount + demoBlobs.length;
   const activePacks = allPacks.filter((p) => p.status === 'active').length;
@@ -241,6 +249,15 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
   const filteredUserPacks = useMemo(() => applyFilters(allUserPacks), [applyFilters, allUserPacks]);
   const filteredDemoPacks = useMemo(() => applyFilters(demoPacks), [applyFilters, demoPacks]);
   const totalFiltered = filteredUserPacks.length + filteredDemoPacks.length;
+  const primaryBlobByPackId = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const blob of [...demoBlobs, ...localBlobs, ...persistedBlobs]) {
+      if (!map.has(blob.evidencePackId)) {
+        map.set(blob.evidencePackId, blob.id);
+      }
+    }
+    return map;
+  }, [demoBlobs, localBlobs, persistedBlobs]);
 
   const showUserSection =
     filteredUserPacks.length > 0 || (allUserPacks.length > 0 && !isFiltered);
@@ -448,7 +465,11 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             {filteredUserPacks.length > 0 ? (
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {filteredUserPacks.map((pack) => (
-                  <EvidencePackCard key={pack.id} pack={pack} />
+                  <EvidencePackCard
+                    key={pack.id}
+                    pack={pack}
+                    primaryBlobId={primaryBlobByPackId.get(pack.id)}
+                  />
                 ))}
               </div>
             ) : (
@@ -479,7 +500,11 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             {filteredDemoPacks.length > 0 ? (
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {filteredDemoPacks.map((pack) => (
-                  <EvidencePackCard key={pack.id} pack={pack} />
+                  <EvidencePackCard
+                    key={pack.id}
+                    pack={pack}
+                    primaryBlobId={primaryBlobByPackId.get(pack.id)}
+                  />
                 ))}
               </div>
             ) : (

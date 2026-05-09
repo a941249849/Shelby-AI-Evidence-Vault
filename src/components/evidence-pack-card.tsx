@@ -1,12 +1,23 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { ArrowUpRight, Boxes, CalendarDays, Database, FileText, Workflow } from 'lucide-react';
+import {
+  Archive,
+  ArrowUpRight,
+  Boxes,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  Database,
+  FileText,
+  Workflow,
+} from 'lucide-react';
 import type { EvidencePack } from '@/lib/evidence/types';
 import { formatDate } from '@/lib/utils';
 import { useLanguage } from '@/components/language-state';
 
 interface EvidencePackCardProps {
   pack: EvidencePack;
+  primaryBlobId?: string;
 }
 
 const categoryStyles: Record<
@@ -39,10 +50,40 @@ const categoryStyles: Record<
   },
 };
 
-export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
+const statusStyles: Record<
+  EvidencePack['status'],
+  { label: { zh: string; en: string }; color: string; icon: ReactNode }
+> = {
+  active: {
+    label: { zh: '可验证', en: 'Verifiable' },
+    color: 'border-[#9fe878]/40 bg-[#9fe878]/10 text-[#9fe878]',
+    icon: <CheckCircle2 size={13} />,
+  },
+  archived: {
+    label: { zh: '已归档', en: 'Archived' },
+    color: 'border-white/12 bg-white/[0.055] text-[#c7c1b8]',
+    icon: <Archive size={13} />,
+  },
+  pending: {
+    label: { zh: '待检查', en: 'Pending' },
+    color: 'border-[#fd8565]/45 bg-[#fd8565]/12 text-[#ffc2ad]',
+    icon: <Clock3 size={13} />,
+  },
+};
+
+const sourceLabels: Record<EvidencePack['sourceType'], { zh: string; en: string }> = {
+  'web-scrape': { zh: '网页抓取', en: 'Web scrape' },
+  'api-export': { zh: 'API 导出', en: 'API export' },
+  'agent-output': { zh: 'Agent 输出', en: 'Agent output' },
+  'manual-upload': { zh: '手动上传', en: 'Manual upload' },
+};
+
+export default function EvidencePackCard({ pack, primaryBlobId }: EvidencePackCardProps) {
   const { language } = useLanguage();
   const category = categoryStyles[pack.category];
+  const status = statusStyles[pack.status];
   const isLocal = pack.dataSource === 'local';
+  const detailHref = primaryBlobId ? `/blob/${primaryBlobId}` : `/dashboard?pack=${pack.id}`;
 
   return (
     <article className="shelby-cut group relative overflow-hidden border border-white/10 bg-[#15161c] transition hover:-translate-y-0.5 hover:border-white/18 hover:bg-[#1b1d25]">
@@ -63,8 +104,21 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
                 : 'border-white/12 bg-white/[0.055] text-[#9d9a92]'
             }`}
           >
-            {isLocal ? (language === 'zh' ? '本地' : 'Local') : 'Demo'}
+            {isLocal
+              ? language === 'zh'
+                ? '本地 / SQLite'
+                : 'Local / SQLite'
+              : language === 'zh'
+                ? 'Demo 语料'
+                : 'Demo corpus'}
           </span>
+        </div>
+
+        <div
+          className={`mt-4 inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-xs font-semibold uppercase ${status.color}`}
+        >
+          {status.icon}
+          {status.label[language]}
         </div>
 
         <h3 className="mt-5 text-base font-semibold leading-snug text-[#f4f0e8] line-clamp-2">
@@ -82,11 +136,17 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
             <dd className="mt-1 font-semibold text-[#f4f0e8]">{pack.blobCount}</dd>
           </div>
           <div>
-            <dt className="font-mono uppercase text-[#6f716d]">{language === 'zh' ? '来源' : 'Source'}</dt>
-            <dd className="mt-1 truncate font-semibold text-[#f4f0e8]">{pack.sourceType}</dd>
+            <dt className="font-mono uppercase text-[#6f716d]">
+              {language === 'zh' ? '来源' : 'Source'}
+            </dt>
+            <dd className="mt-1 truncate font-semibold text-[#f4f0e8]">
+              {sourceLabels[pack.sourceType][language]}
+            </dd>
           </div>
           <div>
-            <dt className="font-mono uppercase text-[#6f716d]">{language === 'zh' ? '创建' : 'Created'}</dt>
+            <dt className="font-mono uppercase text-[#6f716d]">
+              {language === 'zh' ? '创建' : 'Created'}
+            </dt>
             <dd className="mt-1 flex items-center gap-1 font-semibold text-[#f4f0e8]">
               <CalendarDays size={12} />
               {formatDate(pack.createdAt)}
@@ -106,10 +166,16 @@ export default function EvidencePackCard({ pack }: EvidencePackCardProps) {
         </div>
 
         <Link
-          href={`/dashboard?pack=${pack.id}`}
+          href={detailHref}
           className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#9fe878] transition group-hover:text-[#de8aff]"
         >
-          {language === 'zh' ? '检查证据' : 'Inspect evidence'}
+          {primaryBlobId
+            ? language === 'zh'
+              ? '检查首个 Blob'
+              : 'Inspect first blob'
+            : language === 'zh'
+              ? '查看证据包'
+              : 'View evidence pack'}
           <ArrowUpRight size={15} />
         </Link>
       </div>
