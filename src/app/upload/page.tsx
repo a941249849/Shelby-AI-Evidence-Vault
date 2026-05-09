@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   ChevronRight,
+  ExternalLink,
   FileText,
   FileUp,
   Hash,
@@ -75,7 +76,7 @@ const uploadCopy = {
     localActiveBody: '文件会收到确定性的 Mock Shelby 引用，并持久化以便检查。',
     walletRequiredTitle: '测试网上传需要钱包',
     walletRequiredBody:
-      '连接 Aptos 钱包后才能把 Blob 上传到 Shelby 测试网。钱包会签名链上注册交易，并需要测试网 APT 与 Shelby 存储额度。',
+      '连接 Aptos 钱包后才能把 Blob 上传到 Shelby 测试网。钱包会签名链上注册交易，并需要测试网 APT 与 ShelbyUSD。',
     wrongNetworkTitle: '网络错误 - 请切换到 Aptos Testnet',
     wrongNetworkBody: 'Shelby 测试网上传要求钱包处于 Aptos Testnet。切换网络并重新连接后可继续。',
     walletReadyTitle: '钱包已连接 - Shelby 测试网上传就绪',
@@ -84,6 +85,17 @@ const uploadCopy = {
     protocolPreviewBody: '用于封装证据包、计算哈希、生成 Mock Shelby 引用与读取回执；不声称真实 Shelby 存储。',
     protocolTestnetTitle: 'Shelby 证明路径',
     protocolTestnetBody: '切换 testnet 并连接钱包后，BlobRecord 会记录 accountAddress、blobName、网络、状态和 explorer 链接。',
+    participationTitle: '公开测试网参与路径',
+    participationBadgeMock: '待部署方开启 testnet',
+    participationBadgeTestnet: 'Shelby testnet-ready',
+    participationBody:
+      '面向社区测试的真实路径：钱包在 Aptos Testnet 签名，文件注册为 Shelby Blob，回执记录账号、blobName、哈希、读取链路与 explorer 入口。',
+    participationSteps: [
+      ['连接钱包', '安装 Petra 或兼容 Aptos 钱包，并切换到 Aptos Testnet。', 'Petra', 'https://petra.app/'],
+      ['准备资产', '测试网 APT 用于 gas，ShelbyUSD 用于 Shelby 文件上传。', 'Aptos Faucet', 'https://aptoslabs.com/testnet-faucet'],
+      ['上传证据', '上传文件后由钱包签名；应用会保存真实 shelby://testnet 引用。', 'Shelby React SDK', 'https://docs.shelby.xyz/sdks/react/mutations/use-upload-blobs'],
+      ['验证回执', '打开 Blob 详情和读取回执，检查账号、哈希、状态、检索链接。', '下载说明', 'https://docs.shelby.xyz/sdks/typescript/browser/guides/download'],
+    ],
     stepMeta: '证据包元数据',
     stepFiles: '文件与哈希',
     stepSave: '本地保存',
@@ -159,7 +171,7 @@ const uploadCopy = {
     localActiveBody: 'Files receive deterministic mock Shelby references and are persisted for inspection.',
     walletRequiredTitle: 'Wallet required for testnet upload',
     walletRequiredBody:
-      'Connect your Aptos wallet to upload blobs to Shelby testnet. The wallet signs the on-chain registration transaction and requires testnet APT plus Shelby storage credits.',
+      'Connect your Aptos wallet to upload blobs to Shelby testnet. The wallet signs the on-chain registration transaction and requires testnet APT plus ShelbyUSD.',
     wrongNetworkTitle: 'Wrong network - switch to Aptos Testnet',
     wrongNetworkBody:
       'Shelby testnet upload requires your wallet to be on Aptos Testnet. Switch networks and reconnect to continue.',
@@ -171,6 +183,17 @@ const uploadCopy = {
     protocolTestnetTitle: 'Shelby proof path',
     protocolTestnetBody:
       'With testnet mode and a connected wallet, each BlobRecord captures accountAddress, blobName, network, status, and explorer link.',
+    participationTitle: 'Public testnet participation path',
+    participationBadgeMock: 'Waiting for testnet deploy',
+    participationBadgeTestnet: 'Shelby testnet-ready',
+    participationBody:
+      'The real community path: the wallet signs on Aptos Testnet, files become Shelby Blobs, and receipts keep account, blobName, hash, retrieval, and explorer evidence visible.',
+    participationSteps: [
+      ['Connect wallet', 'Install Petra or a compatible Aptos wallet and switch to Aptos Testnet.', 'Petra', 'https://petra.app/'],
+      ['Prepare assets', 'Testnet APT pays gas; ShelbyUSD pays Shelby file upload costs.', 'Aptos Faucet', 'https://aptoslabs.com/testnet-faucet'],
+      ['Upload evidence', 'After wallet signing, the app stores a real shelby://testnet reference.', 'Shelby React SDK', 'https://docs.shelby.xyz/sdks/react/mutations/use-upload-blobs'],
+      ['Verify receipt', 'Open Blob details and receipts to inspect account, hash, status, and retrieval links.', 'Download guide', 'https://docs.shelby.xyz/sdks/typescript/browser/guides/download'],
+    ],
     stepMeta: 'Pack metadata',
     stepFiles: 'Files and hashes',
     stepSave: 'Local save',
@@ -262,7 +285,7 @@ function ModeIndicator({
 
   if (!isTestnet) {
     return (
-      <div className="mb-8 flex gap-3 border border-[#de8aff]/28 bg-[#de8aff]/10 px-4 py-3 text-sm text-[#e7b6ff]">
+      <div className="mb-8 flex gap-3 border border-[#de8aff]/35 bg-[#fff2fb]/85 px-4 py-3 text-sm text-[#5f256e]">
         <ShieldCheck className="mt-0.5 h-4 w-4 flex-none" />
         <div>
           <p className="font-semibold">{t.localActive}</p>
@@ -276,7 +299,7 @@ function ModeIndicator({
 
   if (!walletConnected) {
     return (
-      <div className="mb-8 flex gap-3 border border-[#fd8565]/42 bg-[#fd8565]/12 px-4 py-3 text-sm text-[#ffc2ad]">
+      <div className="mb-8 flex gap-3 border border-[#fd8565]/45 bg-[#fff0ea]/90 px-4 py-3 text-sm text-[#7d2a15]">
         <Wallet className="mt-0.5 h-4 w-4 flex-none" />
         <div>
           <p className="font-semibold">{t.walletRequiredTitle}</p>
@@ -291,7 +314,7 @@ function ModeIndicator({
   // Wallet connected but on the wrong network
   if (walletNetwork !== null && walletNetwork !== Network.TESTNET) {
     return (
-      <div className="mb-8 flex gap-3 border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+      <div className="mb-8 flex gap-3 border border-red-400/45 bg-red-50/90 px-4 py-3 text-sm text-red-800">
         <WifiOff className="mt-0.5 h-4 w-4 flex-none" />
         <div>
           <p className="font-semibold">{t.wrongNetworkTitle}</p>
@@ -305,7 +328,7 @@ function ModeIndicator({
   }
 
   return (
-    <div className="mb-8 flex gap-3 border border-[#9fe878]/35 bg-[#9fe878]/10 px-4 py-3 text-sm text-[#9fe878]">
+    <div className="mb-8 flex gap-3 border border-[#9fe878]/45 bg-[#f1ffe9]/90 px-4 py-3 text-sm text-[#275a1c]">
       <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none" />
       <div>
         <p className="font-semibold">{t.walletReadyTitle}</p>
@@ -459,6 +482,66 @@ function StepLabel({
         </h2>
       </div>
     </div>
+  );
+}
+
+const participationIcons = [Wallet, HardDrive, UploadCloud, ShieldCheck];
+
+function PublicTestnetGuide({ mode }: { mode: 'mock' | 'testnet' | null }) {
+  const { language } = useLanguage();
+  const t = uploadCopy[language];
+  const isTestnet = mode === 'testnet';
+
+  return (
+    <section className="mb-8 shelby-surface shelby-cut p-5">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="font-mono text-xs font-semibold uppercase text-[#ff77c9]">
+            {t.participationTitle}
+          </p>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[#f4f0e8]">
+            {t.participationBody}
+          </p>
+        </div>
+        <span
+          className={`inline-flex w-fit items-center gap-2 border px-3 py-1.5 font-mono text-xs font-semibold ${
+            isTestnet
+              ? 'border-[#9fe878]/35 bg-[#9fe878]/10 text-[#9fe878]'
+              : 'border-[#de8aff]/35 bg-[#de8aff]/10 text-[#e7b6ff]'
+          }`}
+        >
+          <span className={`h-2 w-2 rounded-full ${isTestnet ? 'bg-[#9fe878]' : 'bg-[#de8aff]'}`} />
+          {isTestnet ? t.participationBadgeTestnet : t.participationBadgeMock}
+        </span>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {t.participationSteps.map(([title, body, label, href], index) => {
+          const Icon = participationIcons[index];
+          return (
+            <article key={title} className="border border-white/10 bg-white/[0.045] p-4">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="grid h-9 w-9 place-items-center border border-[#9fe878]/25 bg-[#9fe878]/10 text-[#9fe878]">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className="font-mono text-xs font-bold text-[#6f716d]">0{index + 1}</span>
+              </div>
+              <h3 className="text-sm font-semibold text-[#f4f0e8]">{title}</h3>
+              <p className="mt-2 min-h-16 text-sm leading-6 text-[#9d9a92]">{body}</p>
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#de8aff] hover:text-[#ff77c9]"
+              >
+                {label}
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -860,6 +943,8 @@ function UploadPageContent() {
           walletAddress={shelbyUpload.walletAddress}
           walletNetwork={shelbyUpload.walletNetwork}
         />
+
+        <PublicTestnetGuide mode={mode} />
 
         <section className="mb-8 grid gap-4 md:grid-cols-2">
           <div className="shelby-surface shelby-cut p-4">

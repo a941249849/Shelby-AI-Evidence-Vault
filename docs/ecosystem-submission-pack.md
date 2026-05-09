@@ -1,7 +1,7 @@
 # Ecosystem Submission Pack — Shelby AI Evidence Vault
 
-Date: 2026-05-08
-Milestone: X3 — Product Closeout / Community Experiment Candidate
+Date: 2026-05-09
+Milestone: X8 — Public Shelby Testnet Candidate
 
 ---
 
@@ -9,7 +9,7 @@ Milestone: X3 — Product Closeout / Community Experiment Candidate
 
 **Shelby AI Evidence Vault** is an AI evidence and read-receipt layer built for Shelby. It demonstrates how AI pipelines can turn datasets, agent run outputs, and documents into verifiable evidence records with Shelby Blob identity — then produce auditable receipts that trace every answer back to the evidence that informed it.
 
-It ships as a complete, runnable open-source community experiment candidate. Local mock mode works with zero configuration as a community preview and development fallback. A browser-wallet Shelby testnet upload path is available for operators with funded wallets. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
+It ships as a complete, runnable open-source public testnet candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path is the browser-wallet Shelby testnet upload flow: users connect an Aptos Testnet wallet, sign through the wallet, upload to Shelby testnet, and inspect Blob identity plus read receipts. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
 
 **What it is:**
 - A Shelby ecosystem application layer for AI evidence storage using Shelby blob references and on-chain registration
@@ -31,7 +31,7 @@ It ships as a complete, runnable open-source community experiment candidate. Loc
 
 **Shelby AI 证据库（Shelby AI Evidence Vault）** 是一个构建在 Shelby 之上的 AI 证据与读取回执应用层。它展示了 AI 流水线如何把数据集、智能体运行产出及文档转化为带有 Shelby Blob 身份的可验证证据记录，并生成可审计的回执，将每一次回答与所依据的证据关联起来。
 
-该项目作为完整、可运行的开源社区实验候选版本发布。本地模拟模式无需任何配置即可使用，但它只是社区预览与开发 fallback；真实协议证明路径是通过浏览器钱包上传至 Shelby 测试网。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和社区实验链路。产品界面默认中文，并提供英文切换，面向社区实验展示。
+该项目作为完整、可运行的公开测试网候选版本发布。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径是社区用户连接 Aptos Testnet 钱包，通过浏览器钱包签名上传至 Shelby 测试网，并检查 Blob 身份与读取回执。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
 
 **产品定位：**
 - 使用 Shelby Blob 引用和链上注册的 AI 证据应用层
@@ -51,7 +51,7 @@ It ships as a complete, runnable open-source community experiment candidate. Loc
 
 ## 30-Second Elevator Pitch
 
-AI agents make decisions based on data — but how do you prove which data they used, and that it hasn't been tampered with? Shelby AI Evidence Vault gives every dataset and agent output a Shelby Blob identity, then produces auditable read receipts that trace every answer back to its evidence. Local mock mode works in under a minute as a preview path. Operators with a funded Aptos testnet wallet can use the browser-wallet Shelby testnet path for real protocol proof.
+AI agents make decisions based on data — but how do you prove which data they used, and that it hasn't been tampered with? Shelby AI Evidence Vault gives every dataset and agent output a Shelby Blob identity, then produces auditable read receipts that trace every answer back to its evidence. Local mock mode works in under a minute as a review path. The public testnet path lets community users connect an Aptos Testnet wallet and create real Shelby testnet proof.
 
 ---
 
@@ -72,9 +72,9 @@ Clone the repo, run `npm install && npm run dev`, and open `http://localhost:300
 
 Refresh the page. Navigate to `/read-receipt/local-rr-{uuid}`. The receipt resolves. Blob hash, source, and Shelby ref are all there. That's the audit trail, working locally, zero infrastructure.
 
-**Testnet path — operator demo (60 seconds)**
+**Testnet path — public participant demo (60 seconds)**
 
-For operators with a funded Aptos testnet wallet: set `SHELBY_MODE=testnet` and `NEXT_PUBLIC_SHELBY_NETWORK=testnet`, start the dev server, connect Petra wallet on Aptos Testnet, and upload. The upload uses `@shelby-protocol/react` `useUploadBlobs` — the browser wallet signs the transaction. On success you get a real `shelby://testnet/{account}/{blobName}` reference, a `storageStatus: registered`, and an explorer URL. Run `npm run smoke` with the returned address and blobName to verify retrieval from the Shelby RPC.
+Deploy with `SHELBY_MODE=testnet` and `NEXT_PUBLIC_SHELBY_NETWORK=testnet`, open `/upload`, connect Petra wallet on Aptos Testnet, and upload. The upload uses `@shelby-protocol/react` `useUploadBlobs` — the browser wallet signs the transaction. On success you get a real `shelby://testnet/{account}/{blobName}` reference, a `storageStatus: registered`, and an explorer URL. Run `npm run smoke` with the returned address and blobName to verify retrieval from the Shelby RPC.
 
 **Read receipts — the audit trail (30 seconds)**
 
@@ -101,11 +101,12 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | C11 | Merged | Shelby testnet readiness doctor and operator runbook |
 | C12 | Merged | Release-candidate acceptance harness and product QA gate |
 | X2 | Merged | Shelby-first bilingual product UI: home, registry, upload, Blob detail, read receipt, footer |
-| X3 | Current | Product closeout docs, community experiment framing, final QA package |
+| X3 | Merged | Product closeout docs, community experiment framing, final QA package |
+| X8 | Current | Public Shelby testnet participation path, participant docs, upload-page onboarding |
 
 ---
 
-## Known Operator Prerequisites (testnet upload)
+## Public Testnet Prerequisites
 
 The following are required for a real Shelby testnet upload and are not provided by this demo:
 
@@ -113,12 +114,12 @@ The following are required for a real Shelby testnet upload and are not provided
 |---|---|
 | Aptos browser wallet | e.g. [Petra](https://petra.app/) on Aptos Testnet |
 | Testnet APT | From [Aptos testnet faucet](https://aptoslabs.com/testnet-faucet) for transaction gas fees |
-| Shelby storage credits | ShelbyUSD or SHEL tokens on the connected account |
+| Shelby storage credits | ShelbyUSD tokens on the connected account |
 | `NEXT_PUBLIC_SHELBY_NETWORK=testnet` | In `.env.local` |
 | `SHELBY_MODE=testnet` | In `.env.local` (activates testnet UI path) |
 | Manual browser session | `@shelby-protocol/react` hook requires interactive wallet — cannot be run in CI |
 
-CI does not run real uploads. All real-upload paths are operator-dependent. See `docs/c3-smoke-test-guide.md`.
+CI does not run real uploads. The participant path is documented in `docs/public-testnet-participation.md`; retrieval checks are documented in `docs/c3-smoke-test-guide.md`.
 
 ---
 
@@ -132,7 +133,7 @@ CI does not run real uploads. All real-upload paths are operator-dependent. See 
 - **No private key custody.** No server signer, no seed phrase handling, no mnemonic anywhere in the codebase.
 - **No wallet payment UX.** No token purchase flow, no APT/SHEL purchase UI.
 - **No social posting.** No automated posting to Twitter/X, Discord, or any other platform.
-- **No production deployment.** This is a local community experiment candidate. Production hosting is an operator decision.
+- **No mainnet production claim.** This is a public testnet candidate. Mainnet hosting is a separate decision.
 - **No hidden mainnet claim.** The default path is Mock + SQLite. Shelby testnet proof requires operator wallet/funding prerequisites and explicit configuration.
 
 ---
@@ -146,6 +147,7 @@ CI does not run real uploads. All real-upload paths are operator-dependent. See 
 | Demo script | `docs/demo-script.md` |
 | Production queue | `docs/production-queue.md` |
 | Release-candidate checklist | `docs/release-candidate-checklist.md` |
+| Public testnet participation | `docs/public-testnet-participation.md` |
 | Smoke test guide | `docs/c3-smoke-test-guide.md` |
 | M4 read receipt binding | `docs/m4-read-receipt-binding.md` |
 | M2–M4 architecture plan | `docs/m2-m4-product-architecture-plan.md` |

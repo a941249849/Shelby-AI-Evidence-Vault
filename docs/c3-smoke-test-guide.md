@@ -198,7 +198,7 @@ Browser-wallet upload **cannot be tested non-interactively**. The `@shelby-proto
 - A connected Aptos wallet (e.g. [Petra](https://petra.app/))
 - The wallet must be on **Aptos Testnet**
 - Testnet APT for transaction gas fees
-- Sufficient Shelby storage credits (ShelbyUSD or SHEL)
+- Sufficient ShelbyUSD for Shelby storage operations
 
 ### Manual steps
 

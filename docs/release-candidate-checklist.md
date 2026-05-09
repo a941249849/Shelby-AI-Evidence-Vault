@@ -1,12 +1,12 @@
 # Release-Candidate Checklist — Shelby AI Evidence Vault
 
-**Stage: C12/X3 — Release-candidate gate plus product closeout QA**
+**Stage: C12/X8 — Release-candidate gate plus public testnet candidate QA**
 
-This document describes the release-candidate validation gate for the Shelby AI Evidence Vault community experiment. The gate is zero-credential, mock-safe by default, and is designed to verify the complete product loop in a single deterministic command.
+This document describes the release-candidate validation gate for Shelby AI Evidence Vault. The gate is zero-credential, mock-safe by default, and is designed to verify the complete product loop in a single deterministic command.
 
-The X3 product closeout keeps this command as the hard automated gate, then adds a manual UI/product pass for the Chinese-first bilingual Shelby ecosystem surface.
+X8 keeps this command as the hard automated gate, then adds a manual public-testnet pass for wallet connection, upload, Blob identity, and read-receipt inspection.
 
-> **This is a community experiment and demo.** Nothing here implies mainnet or production Shelby storage readiness. Mock/local references (e.g. `shelby://mock/blob/…`) are deterministic local identifiers that demonstrate the data model and UI.
+> **This is a public testnet candidate, not a mainnet claim.** Mock/local references (e.g. `shelby://mock/blob/…`) are deterministic local identifiers used for review; Shelby proof requires `SHELBY_MODE=testnet`, a wallet, testnet APT, ShelbyUSD, and manual signing.
 
 ---
 
@@ -155,7 +155,7 @@ Manual checks:
 | Language | Default surface is Chinese; top-nav language toggle switches the main product routes to English |
 | Home | Shelby ecosystem positioning, evidence-flow board, core capability cards, product preview |
 | Registry | Evidence packs from demo/local/SQLite are visible; search, filters, sort, and cards remain usable |
-| Upload | Mock + SQLite path is clear; testnet path is gated by wallet and operator prerequisites |
+| Upload | Mock + SQLite path is clear; public testnet path is gated by wallet, Aptos Testnet, testnet APT, and ShelbyUSD |
 | Blob detail | Shows provenance, Shelby ref, SHA-256 hash, source, metadata, and pack relationship |
 | Read receipt | Shows query, answer summary, run metadata, referenced Blob identity, and evidence pack links |
 | Boundaries | No UI implies mainnet readiness, token trading, marketplace behavior, or server-side wallet custody |
