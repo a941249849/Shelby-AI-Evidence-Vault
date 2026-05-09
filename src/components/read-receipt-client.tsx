@@ -85,7 +85,7 @@ function ReceiptModeBadge({ mode }: { mode: ReadReceipt['receiptMode'] }) {
   const { language } = useLanguage();
   if (mode === 'shelby-testnet') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fd8565]/50 bg-[#ffdcd9] px-3 py-1 text-xs font-semibold text-[#f4f0e8]">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fd8565]/50 bg-[#ffdcd9] px-3 py-1 text-xs font-semibold text-[#4b2419]">
         <ShieldCheck className="h-3.5 w-3.5" />
         Shelby testnet
       </span>
@@ -111,7 +111,7 @@ function BlobDataSourceBadge({ blob }: { blob: BlobRecord }) {
   const { language } = useLanguage();
   if (blob.dataSource === 'shelby-testnet') {
     return (
-      <span className="inline-flex items-center gap-1 rounded border border-[#fd8565]/50 bg-[#ffdcd9] px-2 py-0.5 text-xs font-semibold text-[#f4f0e8]">
+      <span className="inline-flex items-center gap-1 rounded border border-[#fd8565]/50 bg-[#ffdcd9] px-2 py-0.5 text-xs font-semibold text-[#4b2419]">
         Shelby testnet
       </span>
     );
