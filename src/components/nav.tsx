@@ -6,6 +6,7 @@ import { CheckCircle2, Database, ExternalLink, FileUp, Languages, Loader2, Recei
 import { Network } from '@aptos-labs/ts-sdk';
 import { useWallet } from '@aptos-labs/wallet-adapter-react';
 import { useLanguage } from '@/components/language-state';
+import { useWalletSessionVerification } from '@/components/wallet-session-state';
 
 const copy = {
   zh: {
@@ -58,24 +59,24 @@ function WalletControl() {
   const wallet = useWallet();
   const [open, setOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const accountAddress = wallet.account?.address?.toString() ?? null;
   const walletNetwork = wallet.network?.name ? String(wallet.network.name) : null;
   const walletReady = wallet.connected && walletNetwork === Network.TESTNET;
   const shortAddress = accountAddress ? `${accountAddress.slice(0, 6)}...${accountAddress.slice(-4)}` : '';
+  const { verified, markVerified, clearVerification } = useWalletSessionVerification(accountAddress);
 
   function connect(name: string) {
     setError(null);
-    setVerified(false);
+    clearVerification();
     wallet.connect(name);
     setOpen(false);
   }
 
   async function disconnect() {
     setError(null);
-    setVerified(false);
+    clearVerification();
     wallet.disconnect();
   }
 
@@ -91,7 +92,7 @@ function WalletControl() {
         message: t.challenge,
         nonce: crypto.randomUUID(),
       });
-      setVerified(Boolean(ok));
+      if (ok && accountAddress) markVerified(accountAddress);
       if (!ok) setError(language === 'zh' ? '签名验证未通过' : 'Signature verification failed');
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));

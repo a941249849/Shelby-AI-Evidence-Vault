@@ -4,7 +4,6 @@ import Link from 'next/link';
 import {
   ArrowRight,
   Box,
-  CloudUpload,
   ExternalLink,
   FileArchive,
   FolderOpen,
@@ -255,17 +254,9 @@ export default function HomePageClient() {
                   <ArrowRight size={20} />
                 </span>
               </Link>
-              <Link href="/upload" className="shelby-secondary-button">
-                <CloudUpload size={16} />
-                {t.actions.upload}
-              </Link>
               <Link href="/dashboard" className="shelby-secondary-button">
                 {t.actions.registry}
                 <ArrowRight size={16} />
-              </Link>
-              <Link href="/read-receipt/rr-001" className="receipt-link">
-                {t.actions.receipt}
-                <ReceiptText size={16} />
               </Link>
             </div>
           </div>
