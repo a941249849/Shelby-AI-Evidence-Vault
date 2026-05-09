@@ -51,7 +51,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X14 persistent testnet session ledger is merged: `/testnet` merges browser-cache and SQLite testnet receipts/blobs, and `/dashboard` treats Shelby testnet packs as first-class indexed records.
 - X15 public testnet handoff is merged: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review.
 - X16 final Copilot review package is merged: `docs/final-copilot-review-brief.md` defines the final review scope, gates, real-testnet acceptance path, security boundaries, and expected review output.
-- X17 testnet handoff validator is the active stage: `scripts/verify-testnet-handoff.mjs` validates copied `/testnet` handoff JSON after a real Shelby testnet upload.
+- X17 testnet handoff validator is merged: `scripts/verify-testnet-handoff.mjs` validates copied `/testnet` handoff JSON after a real Shelby testnet upload.
+- X18 final readiness artifact is the active stage: `scripts/final-readiness.mjs` writes `artifacts/final-readiness/latest.json` and separates code-candidate readiness from manual real-testnet/Copilot gates.
 
 ## Stage Gate
 
