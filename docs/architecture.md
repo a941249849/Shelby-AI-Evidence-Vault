@@ -178,7 +178,14 @@ interface ShelbyAdapter {
 The testnet upload path uses a React hook and is browser-only:
 
 ```
+testnet/page.tsx
+  → UploadProviders
+  → TestnetPageClient wallet readiness panel
+      → useWallet() [@aptos-labs/wallet-adapter-react]
+      → shows detected wallets, connected account, and Aptos Testnet status
+
 upload/page.tsx (client component)
+  → UploadProviders
   → useShelbyUpload() [src/lib/shelby/use-shelby-upload.ts]
       → useWallet() [@aptos-labs/wallet-adapter-react]
       → getBrowserShelbyConfig() [browser-client.ts — NEXT_PUBLIC_ vars only]
@@ -193,7 +200,7 @@ upload/page.tsx (client component)
 - `SHELBY_API_KEY` stays in the Server Action on the server.
 - Browser wallet signing is handled by the user's wallet extension (e.g. Petra) — no private key custody.
 
-The browser-wallet path is wrapped in `UploadProviders` (`src/app/upload/providers.tsx`), which sets up `QueryClientProvider` and `AptosWalletAdapterProvider`. This provider wrapping is required by the SDK hooks and is isolated to the upload route.
+The browser-wallet path is wrapped in `UploadProviders` (`src/app/upload/providers.tsx`), which sets up `QueryClientProvider` and `AptosWalletAdapterProvider`. The provider is used by `/testnet` for wallet readiness and by `/upload` for real Shelby upload signing.
 
 ---
 

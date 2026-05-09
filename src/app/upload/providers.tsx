@@ -1,15 +1,15 @@
 'use client';
 
 /**
- * Client-side providers for the upload page.
+ * Client-side providers for Shelby browser-wallet surfaces.
  *
  * Wraps children with:
  *  - QueryClientProvider (@tanstack/react-query) — required by useUploadBlobs
  *  - AptosWalletAdapterProvider — required by useWallet for browser wallet signing
  *    Pinned to Network.TESTNET so only testnet-aligned wallets are accepted.
  *
- * These providers are scoped to the upload page only to avoid unnecessary overhead
- * in the rest of the application.
+ * These providers are scoped to wallet-aware routes so the rest of the app does
+ * not carry wallet adapter overhead.
  */
 
 import { useMemo, type ReactNode } from 'react';

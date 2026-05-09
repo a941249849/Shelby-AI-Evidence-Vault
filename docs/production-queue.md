@@ -43,7 +43,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X3 product closeout docs are merged in PR #31.
 - X4-X7 acceptance/doc consistency stages are merged.
 - X8 public Shelby testnet participation is merged: upload-page participant onboarding, public testnet docs, and current official-doc alignment.
-- X9 testnet launch console is the active Codex-owned stage: a navigation-level `/testnet` entry for mode status, participant prerequisites, launch acceptance, and product boundaries.
+- X9 testnet launch console is merged: a navigation-level `/testnet` entry for mode status, participant prerequisites, launch acceptance, and product boundaries.
+- X10 public testnet readiness is the active Codex-owned stage: wallet detection/connect readiness on `/testnet`, account/network status, docs alignment, and launch QA.
 
 ## Stage Gate
 
