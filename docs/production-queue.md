@@ -38,8 +38,10 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - C10 evidence index search/filter/sort is merged: `src/components/dashboard-client.tsx`.
 - C11 Shelby testnet readiness doctor is merged: `scripts/shelby-doctor.mjs`, `docs/shelby-testnet-operator-runbook.md`.
 - C12 release-candidate acceptance harness is merged: `scripts/verify-release-candidate.mjs`, `docs/release-candidate-checklist.md`.
-- Backend/protocol/product QA gates are stable enough for Codex-owned product closeout.
-- UI and product narrative redesign is now the active Codex stage: Task X2.
+- Backend/protocol/product QA gates are stable enough for final community experiment review.
+- X2 Shelby-first bilingual product UI is merged in PR #30.
+- X3 product closeout docs are merged in PR #31.
+- X4 final acceptance package is the active Codex-owned stage.
 
 ## Stage Gate
 
@@ -440,9 +442,11 @@ Review PR #4 as the local/mock M1B milestone and make small corrections directly
 
 Owner: Codex
 
+Status: **Complete** — merged in PR #30.
+
 Goal:
 
-After protocol boundaries stabilize, redesign the app UI toward a stronger Shelby/product-grade visual direction. This remains paused until backend/product milestones need UI again.
+After protocol boundaries stabilize, redesign the app UI toward a stronger Shelby/product-grade visual direction.
 
 ### Task X3: M2 design review
 
@@ -456,12 +460,36 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-X2 product closeout and UI redesign is the current stage.
+X4 final acceptance package is the current stage.
 
-After C12, do not continue expanding Copilot production tasks by default. The product should now be tightened around the Shelby-first narrative and final community presentation.
+After C12, do not continue expanding Copilot production tasks by default. X2 and X3 are merged; the product should now be checked as a community experiment candidate, not expanded with more small Copilot tasks.
 
-- **X2 (Codex):** Product closeout and UI redesign pass. Reframe the app from a generic upload/demo surface into a Shelby AI evidence layer: Evidence Registry, Shelby Blob Identity, Read Receipt, and testnet proof path.
+- **X4 (Codex):** Final acceptance package. Lock the current product shape, demo path, manual QA checklist, and release gate evidence.
 - Further Copilot work should be avoided unless a concrete blocker appears in the Shelby testnet proof path.
+
+### Task X4: Final product acceptance package
+
+Owner: Codex
+
+Status: **Ready for review.**
+
+Goal:
+
+Close the current stage with a concise acceptance package that makes the final community experiment review path unambiguous.
+
+Scope:
+
+- Add a final product acceptance checklist.
+- Refresh demo-script wording to match the Chinese-first bilingual UI.
+- Update the production queue so it no longer points at old X2 active work.
+- Link the acceptance package from README.
+
+Hard boundaries:
+
+- No runtime behavior changes.
+- No UI redesign in this task.
+- No backend/protocol expansion.
+- No new Copilot task unless a concrete blocker appears.
 
 ### Task C12: Community release candidate acceptance harness and product QA gate
 

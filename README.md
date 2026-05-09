@@ -225,6 +225,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Mode indicator and wallet connect UI on upload page
 - C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
 - X3 product closeout status: release-candidate gate remains green after the UI/product pass
+- X4 final acceptance package: manual product QA path, demo route checklist, and boundary review
 
 ---
 
@@ -260,6 +261,7 @@ CI does not run real uploads. All real-upload paths are operator-dependent and d
 | `docs/architecture.md` | System design, data flow, security boundaries |
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
+| `docs/final-product-acceptance.md` | X4 final manual acceptance path for community experiment review |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |
 | `docs/release-candidate-checklist.md` | C12 release-candidate verification gate |
 | `docs/c3-smoke-test-guide.md` | Smoke harness setup and manual testnet verification |
