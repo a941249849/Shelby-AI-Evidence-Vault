@@ -16,6 +16,7 @@ import {
 import type { EvidencePack } from '@/lib/demo-data/evidence-packs';
 import type { BlobRecord } from '@/lib/demo-data/blobs';
 import EvidencePackCard from '@/components/evidence-pack-card';
+import TestnetProofSummary from '@/components/testnet-proof-summary';
 import { getLocalPacks, getLocalBlobsByPackId, resetLocalData } from '@/lib/store/local-store';
 import { getPersistedBlobsByPackAction, getPersistedPacksAction } from '@/app/actions/persist';
 import { useLanguage } from '@/components/language-state';
@@ -314,6 +315,10 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
           <Metric label={t.metrics[1]} value={activePacks} tone="text-[#9fe878]" />
           <Metric label={t.metrics[2]} value={totalBlobs} tone="text-[#de8aff]" />
           <Metric label={t.metrics[3]} value={allUserPacks.length} tone="text-[#fd8565]" />
+        </div>
+
+        <div className="mb-8">
+          <TestnetProofSummary compact />
         </div>
 
         {/* Search / filter / sort toolbar */}

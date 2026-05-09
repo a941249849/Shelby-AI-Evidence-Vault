@@ -12,6 +12,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useLanguage, type Language } from '@/components/language-state';
+import TestnetProofSummary from '@/components/testnet-proof-summary';
 
 const copy = {
   zh: {
@@ -264,6 +265,10 @@ export default function HomePageClient() {
           <FlowBoard language={language} />
         </div>
 
+      </section>
+
+      <section className="mx-auto mt-10 max-w-[1320px] px-5 sm:px-8">
+        <TestnetProofSummary />
       </section>
 
       <TestnetParticipationBand language={language} />
