@@ -42,7 +42,8 @@
  *   SHELBY_ACCOUNT_ADDRESS, SHELBY_BLOB_EXPIRATION_MICROS, APTOS_NETWORK,
  *   SHELBY_APTOS_FULLNODE_URL, SHELBY_INDEXER_URL,
  *   NEXT_PUBLIC_SHELBY_NETWORK, NEXT_PUBLIC_SHELBY_RPC_URL,
- *   NEXT_PUBLIC_SHELBY_INDEXER_URL, NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS
+ *   NEXT_PUBLIC_SHELBY_INDEXER_URL, NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS,
+ *   NEXT_PUBLIC_TESTNET_API_KEY
  *
  * FORBIDDEN ENV VARS (any mode):
  *   NEXT_PUBLIC_SHELBY_API_KEY — API key must never be browser-public
@@ -590,6 +591,25 @@ if (isTestnet) {
       id: 'nextpublic-expiration-hours',
       status: 'PASS',
       message: `NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS=${expirationHours} hours`,
+    });
+  }
+
+  // NEXT_PUBLIC_TESTNET_API_KEY
+  if (!env.NEXT_PUBLIC_TESTNET_API_KEY) {
+    addCheck({
+      id: 'nextpublic-testnet-api-key-missing',
+      status: 'FAIL',
+      message: 'NEXT_PUBLIC_TESTNET_API_KEY is not set.',
+      detail:
+        'Shelby browser DApps need a frontend/client API key for testnet indexer and RPC access. ' +
+        'Do not use a server/private key here.',
+      action: 'Create a Shelby/Geomi frontend client key and set NEXT_PUBLIC_TESTNET_API_KEY in .env.local.',
+    });
+  } else {
+    addCheck({
+      id: 'nextpublic-testnet-api-key',
+      status: 'PASS',
+      message: 'NEXT_PUBLIC_TESTNET_API_KEY is set (value redacted).',
     });
   }
 

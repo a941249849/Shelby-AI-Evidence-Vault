@@ -50,6 +50,7 @@ Required:
 ```bash
 SHELBY_MODE=testnet
 NEXT_PUBLIC_SHELBY_NETWORK=testnet
+NEXT_PUBLIC_TESTNET_API_KEY=<Shelby/Geomi frontend client key>
 ```
 
 Recommended public endpoint overrides:
@@ -59,6 +60,11 @@ NEXT_PUBLIC_SHELBY_RPC_URL=https://api.testnet.shelby.xyz/shelby
 NEXT_PUBLIC_SHELBY_INDEXER_URL=https://api.testnet.aptoslabs.com/nocode/v1/public/alias/shelby/testnet/v1/graphql
 NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS=24
 ```
+
+`NEXT_PUBLIC_TESTNET_API_KEY` must be a frontend/client API key intended for
+browser DApp use, as described by Shelby's current DApp/API-key docs. Do not
+put a private server key, wallet key, seed phrase, or signer material in any
+`NEXT_PUBLIC_` variable.
 
 Forbidden:
 

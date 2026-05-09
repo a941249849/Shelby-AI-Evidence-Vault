@@ -77,6 +77,9 @@ const uploadCopy = {
     walletRequiredTitle: '测试网上传需要钱包',
     walletRequiredBody:
       '连接 Aptos 钱包并完成右上角签名验证后，才能把 Blob 上传到 Shelby 测试网。上传交易仍由钱包签名，并需要测试网 APT 与 ShelbyUSD。',
+    configMissingTitle: '测试网 API key 未配置',
+    configMissingBody:
+      'Shelby 测试网拒绝匿名 RPC / Indexer 请求。请先在 .env.local 设置 NEXT_PUBLIC_TESTNET_API_KEY 并重启站点，再开放真实上传。',
     wrongNetworkTitle: '网络错误 - 请切换到 Aptos Testnet',
     wrongNetworkBody: 'Shelby 测试网上传要求钱包处于 Aptos Testnet。切换网络并重新连接后可继续。',
     walletReadyTitle: '钱包已连接 - Shelby 测试网上传就绪',
@@ -122,6 +125,7 @@ const uploadCopy = {
       uploadingTestnet: '正在上传到测试网',
       savingLocal: '正在本地保存',
       uploadTestnet: '上传到 Shelby 测试网',
+      configMissing: '缺少测试网 API key',
       wrongNetwork: '网络错误，请切换钱包',
       verifyWallet: '先完成签名验证',
       connectWallet: '连接钱包后上传',
@@ -130,6 +134,7 @@ const uploadCopy = {
     saveBody: '保存对象会获得确定性的 Mock Shelby 引用，并写入 SQLite 持久化。',
     testnetBody: '文件会通过已连接钱包注册到 Shelby 测试网，并保留为可检查记录。',
     connectHint: '连接 Aptos 钱包后可启用测试网上传。',
+    configHint: '缺少 NEXT_PUBLIC_TESTNET_API_KEY，当前不能执行真实 Shelby 测试网上传。',
     verifyHint: '请先使用右上角钱包入口完成签名验证。',
     wrongHint: '切换钱包到 Aptos Testnet 后可继续上传。',
     mockHint: '设置 SHELBY_MODE=testnet 并连接钱包后可执行真实 Shelby 测试网上传。',
@@ -156,6 +161,8 @@ const uploadCopy = {
       fileRequired: '请至少选择一个文件。',
       hashPending: '请等待 SHA-256 计算完成。',
       walletMissing: '钱包未连接。请先连接 Aptos 钱包，再上传到 Shelby 测试网。',
+      configMissing:
+        '缺少 NEXT_PUBLIC_TESTNET_API_KEY。请配置 Shelby/Geomi frontend client API key 并重启站点。',
       walletUnverified: '钱包已连接，但还没有完成签名验证。请先在右上角钱包入口完成签名验证。',
       wrongNetwork: (network: string) => `网络错误：钱包当前位于 "${network}"。请切换到 Aptos Testnet 并重新连接。`,
       uploadFailed: '上传失败。',
@@ -176,6 +183,9 @@ const uploadCopy = {
     walletRequiredTitle: 'Wallet required for testnet upload',
     walletRequiredBody:
       'Connect your Aptos wallet and complete the top-right signature verification before uploading blobs to Shelby testnet. The upload transaction is still wallet-signed and requires testnet APT plus ShelbyUSD.',
+    configMissingTitle: 'Testnet API key is not configured',
+    configMissingBody:
+      'Shelby testnet rejects anonymous RPC / Indexer requests. Set NEXT_PUBLIC_TESTNET_API_KEY in .env.local and restart the app before enabling real uploads.',
     wrongNetworkTitle: 'Wrong network - switch to Aptos Testnet',
     wrongNetworkBody:
       'Shelby testnet upload requires your wallet to be on Aptos Testnet. Switch networks and reconnect to continue.',
@@ -224,6 +234,7 @@ const uploadCopy = {
       uploadingTestnet: 'Uploading to testnet',
       savingLocal: 'Saving locally',
       uploadTestnet: 'Upload to Shelby testnet',
+      configMissing: 'Missing testnet API key',
       wrongNetwork: 'Wrong network - switch wallet',
       verifyWallet: 'Verify signature first',
       connectWallet: 'Connect wallet to upload',
@@ -232,6 +243,7 @@ const uploadCopy = {
     saveBody: 'The saved object receives a deterministic mock Shelby reference and SQLite persistence.',
     testnetBody: 'Files are registered on Shelby testnet via your connected wallet and persisted for inspection.',
     connectHint: 'Connect an Aptos wallet to enable testnet upload.',
+    configHint: 'NEXT_PUBLIC_TESTNET_API_KEY is missing, so real Shelby testnet upload is disabled.',
     verifyHint: 'Use the top-right wallet control to complete signature verification first.',
     wrongHint: 'Switch your wallet to Aptos Testnet to enable upload.',
     mockHint: 'Set SHELBY_MODE=testnet and connect a wallet for real Shelby testnet upload.',
@@ -260,6 +272,8 @@ const uploadCopy = {
       fileRequired: 'Please select at least one file.',
       hashPending: 'Please wait for SHA-256 computation to complete.',
       walletMissing: 'Wallet not connected. Please connect your Aptos wallet to upload to Shelby testnet.',
+      configMissing:
+        'NEXT_PUBLIC_TESTNET_API_KEY is missing. Configure a Shelby/Geomi frontend client API key and restart the app.',
       walletUnverified: 'Wallet is connected but not signature-verified. Verify from the top-right wallet control first.',
       wrongNetwork: (network: string) => `Wrong network: wallet is on "${network}". Switch to Aptos Testnet and reconnect.`,
       uploadFailed: 'Upload failed.',
@@ -276,11 +290,13 @@ async function computeSHA256(file: File): Promise<string> {
 
 function ModeIndicator({
   mode,
+  configReady,
   walletConnected,
   walletAddress,
   walletNetwork,
 }: {
   mode: 'mock' | 'testnet' | null;
+  configReady: boolean;
   walletConnected: boolean;
   walletAddress: string | null;
   walletNetwork: Network | null;
@@ -299,6 +315,20 @@ function ModeIndicator({
           <p className="font-semibold">{t.localActive}</p>
           <p className="mt-1 leading-6">
             {t.localActiveBody}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!configReady) {
+    return (
+      <div className="mb-8 flex gap-3 border border-[#fd8565]/45 bg-[#fff0ea]/90 px-4 py-3 text-sm text-[#7d2a15]">
+        <AlertTriangle className="mt-0.5 h-4 w-4 flex-none" />
+        <div>
+          <p className="font-semibold">{t.configMissingTitle}</p>
+          <p className="mt-1 leading-6">
+            {t.configMissingBody}
           </p>
         </div>
       </div>
@@ -660,6 +690,11 @@ function UploadPageContent() {
       return;
     }
 
+    if (mode === 'testnet' && !shelbyUpload.configReady) {
+      setUploadError(t.errors.configMissing);
+      return;
+    }
+
     if (mode === 'testnet' && !shelbyUpload.walletConnected) {
       setUploadError(t.errors.walletMissing);
       return;
@@ -909,19 +944,23 @@ function UploadPageContent() {
   }
 
   const isTestnet = mode === 'testnet';
+  const testnetMissingConfig = isTestnet && !shelbyUpload.configReady;
   const wrongNetwork =
     isTestnet &&
     shelbyUpload.walletConnected &&
     shelbyUpload.walletNetwork !== null &&
     shelbyUpload.walletNetwork !== Network.TESTNET;
   const testnetRequiresWallet = isTestnet && (!shelbyUpload.walletConnected || wrongNetwork);
-  const testnetRequiresSignature = isTestnet && shelbyUpload.walletConnected && !wrongNetwork && !walletSession.verified;
+  const testnetRequiresSignature =
+    isTestnet && !testnetMissingConfig && shelbyUpload.walletConnected && !wrongNetwork && !walletSession.verified;
   const submitLabel = uploading
     ? isTestnet
       ? t.submit.uploadingTestnet
       : t.submit.savingLocal
     : isTestnet
-      ? shelbyUpload.walletConnected && !wrongNetwork && walletSession.verified
+      ? testnetMissingConfig
+        ? t.submit.configMissing
+        : shelbyUpload.walletConnected && !wrongNetwork && walletSession.verified
         ? t.submit.uploadTestnet
         : wrongNetwork
           ? t.submit.wrongNetwork
@@ -966,6 +1005,7 @@ function UploadPageContent() {
 
         <ModeIndicator
           mode={mode}
+          configReady={shelbyUpload.configReady}
           walletConnected={shelbyUpload.walletConnected}
           walletAddress={shelbyUpload.walletAddress}
           walletNetwork={shelbyUpload.walletNetwork}
@@ -1199,13 +1239,24 @@ function UploadPageContent() {
               </p>
               <button
                 type="submit"
-                disabled={uploading || files.length === 0 || testnetRequiresWallet || testnetRequiresSignature}
+                disabled={
+                  uploading ||
+                  files.length === 0 ||
+                  testnetMissingConfig ||
+                  testnetRequiresWallet ||
+                  testnetRequiresSignature
+                }
                 className="ui-button shelby-cut-sm mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {submitLabel}
               </button>
-              {testnetRequiresWallet && !wrongNetwork && (
+              {testnetMissingConfig && (
+                <p className="mt-3 text-xs leading-5 text-[#8793AA]">
+                  {t.configHint}
+                </p>
+              )}
+              {!testnetMissingConfig && testnetRequiresWallet && !wrongNetwork && (
                 <p className="mt-3 text-xs leading-5 text-[#8793AA]">
                   {t.connectHint}
                 </p>

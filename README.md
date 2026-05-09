@@ -125,6 +125,7 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | `NEXT_PUBLIC_SHELBY_RPC_URL` | — | Optional RPC override for browser SDK |
 | `NEXT_PUBLIC_SHELBY_INDEXER_URL` | — | Optional indexer override for browser SDK |
 | `NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS` | `24` | Blob lifetime in hours for browser wallet uploads |
+| `NEXT_PUBLIC_TESTNET_API_KEY` | — | Shelby/Geomi frontend client key for browser DApp testnet access |
 
 **Smoke harness (opt-in)**
 

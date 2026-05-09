@@ -412,6 +412,7 @@ runCheck(
       NEXT_PUBLIC_SHELBY_RPC_URL: '',
       NEXT_PUBLIC_SHELBY_INDEXER_URL: '',
       NEXT_PUBLIC_SHELBY_EXPIRATION_HOURS: '',
+      NEXT_PUBLIC_TESTNET_API_KEY: '',
     },
     expectedExit: 1,
   }

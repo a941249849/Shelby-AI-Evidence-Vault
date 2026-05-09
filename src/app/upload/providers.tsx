@@ -24,7 +24,12 @@ export default function UploadProviders({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AptosWalletAdapterProvider
         autoConnect={false}
-        dappConfig={{ network: Network.TESTNET }}
+        dappConfig={{
+          network: Network.TESTNET,
+          aptosApiKeys: process.env.NEXT_PUBLIC_TESTNET_API_KEY
+            ? { testnet: process.env.NEXT_PUBLIC_TESTNET_API_KEY }
+            : undefined,
+        }}
         disableTelemetry
       >
         {children}

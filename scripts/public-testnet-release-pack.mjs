@@ -71,6 +71,7 @@ const packet = {
     required: {
       SHELBY_MODE: 'testnet',
       NEXT_PUBLIC_SHELBY_NETWORK: 'testnet',
+      NEXT_PUBLIC_TESTNET_API_KEY: '<Shelby/Geomi frontend client key>',
     },
     recommendedPublic: {
       NEXT_PUBLIC_SHELBY_RPC_URL: 'https://api.testnet.shelby.xyz/shelby',

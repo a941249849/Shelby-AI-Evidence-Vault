@@ -60,6 +60,8 @@ export interface TestnetUploadResult {
 }
 
 export interface UseShelbyUploadReturn {
+  /** Whether browser-side Shelby testnet config is complete. */
+  configReady: boolean;
   /** Whether an Aptos wallet is currently connected. */
   walletConnected: boolean;
   /** The connected wallet account address, or null if not connected. */
@@ -119,6 +121,7 @@ export function useShelbyUpload(): UseShelbyUploadReturn {
   const isReady =
     wallet.connected &&
     !!shelbyClient &&
+    browserConfig.isReady &&
     walletNetwork === Network.TESTNET;
 
   async function uploadBlob(input: TestnetUploadInput): Promise<TestnetUploadResult> {
@@ -139,7 +142,14 @@ export function useShelbyUpload(): UseShelbyUploadReturn {
     if (!shelbyClient) {
       throw new Error(
         'Shelby testnet client could not be initialised. ' +
-          'Check NEXT_PUBLIC_SHELBY_NETWORK configuration.'
+          'Set NEXT_PUBLIC_TESTNET_API_KEY to a Shelby/Geomi client API key and restart the app.'
+      );
+    }
+
+    if (!browserConfig.isReady) {
+      throw new Error(
+        'Shelby testnet upload is missing NEXT_PUBLIC_TESTNET_API_KEY. ' +
+          'Create a Shelby/Geomi frontend client API key, set it in .env.local, and restart the app.'
       );
     }
 
@@ -180,6 +190,7 @@ export function useShelbyUpload(): UseShelbyUploadReturn {
   }
 
   return {
+    configReady: browserConfig.isReady,
     walletConnected: wallet.connected,
     walletAddress,
     walletNetwork,
@@ -194,4 +205,3 @@ export function useShelbyUpload(): UseShelbyUploadReturn {
     uploadBlob,
   };
 }
-
