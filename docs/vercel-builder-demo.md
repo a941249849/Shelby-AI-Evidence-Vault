@@ -1,7 +1,7 @@
 # Vercel Builder Demo Deployment
 
 Date: 2026-05-09
-Status: X21 Vercel + Neon builder demo
+Status: X21/X23 Vercel + Neon builder demo and hosted acceptance
 
 This stage positions Shelby AI Evidence Vault as a developer-built Shelby
 testnet demo: something the Shelby team and community can open, inspect, and
@@ -115,6 +115,34 @@ Expected:
   }
 }
 ```
+
+## Hosted Acceptance
+
+After Vercel deploys the app, run the hosted acceptance gate against the real
+URL:
+
+```bash
+DEPLOYMENT_URL=https://<deployment-url> npm run verify-deployment-acceptance
+```
+
+The command checks:
+
+- `/api/health` returns HTTP 200 JSON.
+- `positioning` is `builder-demo`.
+- `runtime.mode` is `testnet`.
+- browser testnet API key readiness is true.
+- persistence is `postgres`, ready, and configured.
+- key routes render the deployed Builder Demo copy.
+
+Expected:
+
+```txt
+Accepted : yes
+Failed   : 0
+```
+
+It writes a local artifact to `artifacts/deployment-acceptance/latest.json`.
+That file is gitignored and should be treated as operator evidence, not source.
 
 ## Demo Path
 

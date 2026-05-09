@@ -57,6 +57,7 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X20 Docker/Render style deployment package was reviewed but superseded before merge.
 - X21 Vercel Builder Demo is merged: Vercel hosts the website/API, Neon/Postgres stores evidence records, Shelby testnet stores real Blobs, and the product positioning is developer builder demo rather than official ecosystem launch.
 - X22 Builder Demo presentation is complete locally: live UI copy, metadata, README, and release-candidate route markers now describe the project as a Shelby testnet builder demo for team/community review, not an official ecosystem/product launch.
+- X23 hosted deployment acceptance is in progress: `npm run verify-deployment-acceptance` will validate a deployed Vercel URL through `/api/health` and key route smoke checks.
 
 ## Stage Gate
 

@@ -80,6 +80,7 @@ npm run verify-release-candidate # C12: full release-candidate gate (build + rou
 npm run final-readiness        # X18: write final readiness artifact after the RC gate
 npm run public-testnet-release-pack # X19: write the operator package for the real testnet run
 npm run verify-vercel-builder-demo # X21: Vercel + Neon deployment preflight
+DEPLOYMENT_URL=https://your-app.vercel.app npm run verify-deployment-acceptance # X23: hosted URL acceptance
 npm run smoke                   # Opt-in Shelby testnet smoke harness (requires SHELBY_SMOKE=true)
 ```
 
@@ -168,6 +169,7 @@ Before sharing the URL:
 
 ```bash
 npm run verify-vercel-builder-demo
+DEPLOYMENT_URL=https://your-app.vercel.app npm run verify-deployment-acceptance
 ```
 
 Health check:
@@ -321,7 +323,7 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
 | `docs/public-testnet-participation.md` | X8 public Shelby testnet participant and deployment path |
-| `docs/vercel-builder-demo.md` | X21 Vercel + Neon builder demo deployment |
+| `docs/vercel-builder-demo.md` | X21/X23 Vercel + Neon builder demo deployment and hosted acceptance |
 | `docs/builder-demo-presentation.md` | Builder-demo pitch, demo path, and feedback request |
 | `docs/final-product-acceptance.md` | X15 public testnet candidate acceptance package |
 | `docs/final-copilot-review-brief.md` | X16 final Copilot review and merge-readiness handoff |
