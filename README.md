@@ -178,6 +178,8 @@ src/
     │   ├── use-shelby-upload.ts  # React hook: browser wallet + useUploadBlobs
     │   ├── status-map.ts         # Conservative evidence storage status utilities
     │   └── index.ts              # getAdapter() factory
+    ├── testnet/
+    │   └── handoff.mjs           # Public testnet handoff JSON builder
     ├── store/
     │   └── local-store.ts        # localStorage: packs, blobs, and receipts
     ├── server/
@@ -190,7 +192,7 @@ src/
 
 ## Validation utilities (`src/lib/validation.ts`)
 
-No test framework is installed. Validation logic lives in `src/lib/validation.ts` and can be imported anywhere, including in Node.js test runners if added later.
+No test framework is installed. Validation logic lives in `src/lib/validation.ts`, and the public testnet handoff contract lives in `src/lib/testnet/handoff.mjs`; both can be imported by Node.js verification scripts.
 
 | Utility | What it validates / builds |
 |---|---|
@@ -233,7 +235,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, Aptos Testnet network status, and a persistent community test session summary
 - Testnet session ledger reads browser cache plus SQLite records, dedupes receipts/blobs, and preserves the participant summary even when browser cache is incomplete
 - Public handoff JSON includes full app routes, receipt/blob proof URLs, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review
-- C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
+- C12 release-candidate verifier: doctor checks, isolated SQLite, public handoff JSON contract, production build, and route smoke checks
 - X3 product closeout status: release-candidate gate remained green after the UI/product pass
 - X15 public testnet handoff: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, durable session summary, and optional smoke retrieval
 

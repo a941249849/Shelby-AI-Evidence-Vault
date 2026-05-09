@@ -54,7 +54,7 @@ Expected:
 
 - `lint` exits 0.
 - `build` exits 0.
-- `verify-release-candidate` exits 0 with `Passed: 21`, `Failed: 0`, `Skipped: 0`.
+- `verify-release-candidate` exits 0 with `Passed: 22`, `Failed: 0`, `Skipped: 0`.
 
 ## Manual product QA
 

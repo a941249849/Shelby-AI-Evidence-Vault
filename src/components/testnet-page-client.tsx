@@ -27,6 +27,7 @@ import type { ReadReceipt } from '@/lib/demo-data/read-receipts';
 import { getLocalBlobs, getLocalReadReceipts } from '@/lib/store/local-store';
 import { getPersistedBlobsAction, getPersistedReceiptsAction } from '@/app/actions/persist';
 import { formatDateTime } from '@/lib/utils';
+import { buildTestnetHandoffSummary } from '@/lib/testnet/handoff.mjs';
 
 const copy = {
   zh: {
@@ -669,84 +670,6 @@ async function loadLedgerCommunitySession(): Promise<CommunitySession> {
   }
 }
 
-function buildSessionSummary({
-  mode,
-  walletReady,
-  accountAddress,
-  walletNetwork,
-  session,
-  origin,
-}: {
-  mode: 'mock' | 'testnet';
-  walletReady: boolean;
-  accountAddress: string | null;
-  walletNetwork: string | null;
-  session: CommunitySession;
-  origin: string;
-}) {
-  const proofBlobs = session.latestReceiptBlobs.length > 0 ? session.latestReceiptBlobs : session.blobs;
-  const route = (path: string) => (origin ? `${origin}${path}` : path);
-  const smokeCommands = proofBlobs
-    .filter((blob) => blob.accountAddress && blob.blobName)
-    .map((blob) => ({
-      blobId: blob.id,
-      command: `SHELBY_SMOKE=true SHELBY_SMOKE_ACCOUNT_ADDRESS=${blob.accountAddress} SHELBY_SMOKE_BLOB_NAME=${blob.blobName} npm run smoke`,
-    }));
-
-  return {
-    product: 'Shelby AI Evidence Vault',
-    milestone: 'X15 public testnet handoff artifact',
-    generatedAt: new Date().toISOString(),
-    runtimeMode: mode,
-    ledgerSource: session.source,
-    routes: {
-      testnetConsole: route('/testnet'),
-      upload: route('/upload'),
-      dashboard: route('/dashboard'),
-    },
-    wallet: {
-      ready: walletReady,
-      accountAddress,
-      network: walletNetwork,
-    },
-    latestReceipt: session.latestReceipt
-      ? {
-          id: session.latestReceipt.id,
-          runId: session.latestReceipt.runId,
-          timestamp: session.latestReceipt.timestamp,
-          receiptMode: session.latestReceipt.receiptMode,
-          url: route(`/read-receipt/${session.latestReceipt.id}`),
-        }
-      : null,
-    blobs: proofBlobs.map((blob) => ({
-      id: blob.id,
-      shelbyRef: blob.shelbyRef,
-      accountAddress: blob.accountAddress,
-      blobName: blob.blobName,
-      network: blob.network,
-      storageStatus: blob.storageStatus,
-      explorerUrl: blob.explorerUrl,
-      retrievalUrl: blob.retrievalUrl,
-      url: route(`/blob/${blob.id}`),
-    })),
-    smokeCommands,
-    acceptanceStatus: {
-      runtimeModeReady: mode === 'testnet',
-      walletReady,
-      testnetReceiptPresent: Boolean(session.latestReceipt),
-      testnetBlobPresent: proofBlobs.length > 0,
-      smokeCommandReady: smokeCommands.length > 0,
-    },
-    acceptancePath: [
-      'connect Aptos Testnet wallet',
-      'upload evidence through Shelby browser-wallet flow',
-      'verify Blob detail proof panel',
-      'verify receipt-level testnet audit panel',
-      'optionally run npm run smoke with accountAddress/blobName',
-    ],
-  };
-}
-
 function TestnetSessionPanel({
   mode,
   walletReady,
@@ -804,7 +727,7 @@ function TestnetSessionPanel({
   }, []);
 
   const copySummary = async () => {
-    const summary = buildSessionSummary({
+    const summary = buildTestnetHandoffSummary({
       mode,
       walletReady,
       accountAddress,

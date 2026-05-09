@@ -110,6 +110,8 @@ src/
     │   ├── use-shelby-upload.ts React hook: browser wallet + useUploadBlobs (testnet path)
     │   ├── status-map.ts       Conservative evidence storage status mapping utilities
     │   └── index.ts            getAdapter() factory + re-exports
+    ├── testnet/
+    │   └── handoff.mjs         Pure JSON builder for the public testnet handoff artifact
     ├── store/
     │   └── local-store.ts      Browser localStorage: packs, blobs, and receipts (fallback)
     ├── validation.ts           parseTags, isValidSHA256, buildEvidencePack, buildBlobRecord
@@ -127,7 +129,7 @@ scripts/
 ├── generate-agent-run.mjs          C8: deterministic agent-run example script
 ├── verify-community-demo.mjs       C9: zero-credential verification harness (35 assertions)
 ├── shelby-doctor.mjs               C11: zero-secret readiness doctor (mock + testnet config validation)
-└── verify-release-candidate.mjs    C12: release-candidate acceptance harness (build + routes + doctor)
+└── verify-release-candidate.mjs    C12/X15: release-candidate acceptance harness (handoff + build + routes + doctor)
 
 artifacts/
 └── release-candidate/

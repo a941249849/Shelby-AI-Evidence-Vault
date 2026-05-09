@@ -348,7 +348,7 @@ npm run verify-community-demo       # C9 harness: 35 DB-level assertions, zero c
 npm run verify-release-candidate    # C12: full release-candidate gate — build + routes + doctor
 ```
 
-The `verify-release-candidate` command (C12) is the one-command release-candidate gate. It runs the complete product loop end to end: shelby-doctor checks, community demo harness, C8 ID assertions, production build, and route smoke checks against a live server. Uses an isolated temp database. Zero credentials required. See `docs/release-candidate-checklist.md` for the full checklist.
+The `verify-release-candidate` command (C12/X15) is the one-command release-candidate gate. It runs the complete product loop end to end: shelby-doctor checks, community demo harness, C8 ID assertions, public testnet handoff JSON contract, production build, and route smoke checks against a live server. Uses an isolated temp database. Zero credentials required. See `docs/release-candidate-checklist.md` for the full checklist.
 
 The `verify-community-demo` harness (C9) creates an isolated temp SQLite database, runs the C8 generation path twice, and asserts all expected IDs, relationships, and idempotency in one automated step. See `docs/community-experiment-runbook.md` for the complete runbook.
 

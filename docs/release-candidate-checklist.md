@@ -73,7 +73,16 @@ SHELBY_DB_PATH=<isolated-temp-db> npm run generate-agent-run
   - Receipt: `c8-rr-agent-sentinel-v1`
 - **Why:** Confirms the generation script works and that INSERT OR REPLACE is truly idempotent.
 
-### 6. Production build
+### 6. Testnet handoff summary contract
+
+```bash
+npm run verify-release-candidate
+```
+
+- **Expect:** copied handoff JSON includes X15 milestone, full route URLs, receipt/blob proof URLs, explorer/retrieval identity, smoke command, and acceptance-status flags.
+- **Why:** Confirms the public testnet handoff is a stable product contract, not only UI copy.
+
+### 7. Production build
 
 ```bash
 npm run build
@@ -82,7 +91,7 @@ npm run build
 - **Expect:** exit 0
 - **Why:** Confirms the full Next.js production build succeeds. This is the artefact that is served in the route smoke checks.
 
-### 7. Route smoke checks
+### 8. Route smoke checks
 
 The verifier starts the built Next.js app (`next start`) on an available local port with `SHELBY_MODE=mock` and the isolated temp database, then fetches the following routes:
 
@@ -90,6 +99,7 @@ The verifier starts the built Next.js app (`next start`) on an available local p
 |---|---|---|
 | `/` | 200 | `Evidence Vault` |
 | `/dashboard` | 200 | `Evidence index` |
+| `/testnet` | 200 | `公开测试网参与控制台` |
 | `/upload` | 200 | `Package files into a verifiable` |
 | `/blob/blob-001` | 200 | `Shelby AI Evidence Vault` |
 | `/read-receipt/rr-001` | 200 | `Shelby AI Evidence Vault` |
@@ -235,24 +245,28 @@ npm run dev
   ✓  C8 receipt id "c8-rr-agent-sentinel-v1" persisted
   ✓  generate-agent-run is idempotent (no duplicate rows)
 
-[rc] ── 6. npm run build ─────────────────────────────────────────────────
+[rc] ── 6. testnet handoff summary contract ──────────────────────────────
+  ✓  testnet handoff summary contract
+
+[rc] ── 7. npm run build ─────────────────────────────────────────────────
   ✓  npm run build: exit 0
 
-[rc] ── 7. Start built app + route smoke checks ─────────────────────────
+[rc] ── 8. Start built app + route smoke checks ─────────────────────────
   → Using port 34821
   → Waiting for server at http://127.0.0.1:34821/…
   ✓  Server started and ready at :34821
 
-[rc] ── 7a. Route smoke checks ───────────────────────────────────────────
+[rc] ── 8a. Route smoke checks ───────────────────────────────────────────
   ✓  GET /: HTTP 200 + marker found
   ✓  GET /dashboard: HTTP 200 + marker found
+  ✓  GET /testnet: HTTP 200 + marker found
   ✓  GET /upload: HTTP 200 + marker found
   ✓  GET /blob/blob-001: HTTP 200 + marker found
   ✓  GET /read-receipt/rr-001: HTTP 200 + marker found
   ✓  GET /read-receipt/c8-rr-agent-sentinel-v1: HTTP 200 + marker found
 
 [rc] ── Summary ──────────────────────────────────────────────────────────
-  Passed  : 18
+  Passed  : 22
   Failed  : 0
   Skipped : 0
 
