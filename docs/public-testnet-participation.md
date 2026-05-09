@@ -1,4 +1,4 @@
-# X10 Public Shelby Testnet Readiness
+# X11 Public Shelby Testnet Proof Verification
 
 Last verified against official Shelby docs: 2026-05-09.
 
@@ -47,7 +47,8 @@ Official references:
    - `storageStatus: registered`
    - `explorerUrl`
    - `retrievalUrl`
-12. Open the generated read receipt and Blob detail pages.
+12. Open the generated Blob detail page and run the in-app retrieval verification panel.
+13. Open the generated read receipt page.
 
 ## Deployment Switch
 
@@ -79,6 +80,7 @@ Implemented:
 - Blob and receipt pages resolve testnet records after upload.
 - Public `/testnet` launch console with mode status, wallet detection, connect/disconnect, account/network readiness, prerequisites, upload entry, and acceptance boundaries.
 - Public testnet participation guide on `/upload`.
+- Testnet proof panel on `/blob/{id}` with account, blobName, status, explorer/retrieval links, and a safe server-side retrieval probe.
 - Chinese and English product copy for the participant path.
 
 Still manual:
@@ -86,7 +88,7 @@ Still manual:
 - Actual wallet funding.
 - ShelbyUSD acquisition.
 - Real wallet transaction approval.
-- Retrieval smoke check after a real upload.
+- Retrieval smoke check after a real upload remains optional for CLI-level confirmation.
 
 ## Acceptance Gate
 
@@ -108,8 +110,9 @@ Manual testnet gate:
 6. Confirm the upload page still enforces wallet and network readiness.
 7. Upload a small file.
 8. Confirm the returned record contains real testnet identity fields.
-9. Open the generated `/blob/{id}` and `/read-receipt/{id}` pages.
-10. Run the opt-in smoke retrieval check with the returned account and blobName:
+9. Open the generated `/blob/{id}` page and run the in-app proof verification.
+10. Open the generated `/read-receipt/{id}` page.
+11. Run the opt-in smoke retrieval check with the returned account and blobName:
 
 ```bash
 SHELBY_SMOKE=true \

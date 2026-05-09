@@ -1,6 +1,6 @@
 # Shelby AI Evidence Vault
 
-![Milestone](https://img.shields.io/badge/milestone-X10%20Public%20Testnet%20Readiness-violet?style=flat-square)
+![Milestone](https://img.shields.io/badge/milestone-X11%20Testnet%20Proof%20Verification-violet?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
@@ -18,6 +18,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 - **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a development and review fallback, not the protocol endpoint
 - **Public Shelby testnet participation path** — when deployed with `SHELBY_MODE=testnet`, community users can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
 - **Testnet launch console** — `/testnet` gives community users a direct launch surface for mode status, wallet readiness, funding prerequisites, upload entry, and receipt verification
+- **In-app proof verification** — testnet Blob detail pages expose account/blobName/status/explorer/retrieval identity and can run a safe server-side retrieval probe
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 - **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
 - **Shelby-first product UI** — Chinese-first, English-toggleable product surface across landing, registry, upload, Blob detail, and read receipt pages
@@ -153,6 +154,7 @@ src/
 ├── app/                          # Next.js App Router pages
 │   ├── actions/upload.ts         # Server Action: shelbyUploadAction (API key stays server-side)
 │   ├── actions/persist.ts        # Server Actions: SQLite persistence for packs/blobs/receipts
+│   ├── actions/verify.ts         # Server Action: safe Shelby testnet retrieval probe
 │   ├── dashboard/                # Evidence registry (server → DashboardClient)
 │   ├── upload/
 │   │   ├── page.tsx              # Full upload flow (client component — mock + testnet paths)
@@ -208,7 +210,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 
 ---
 
-## Current features (X10 public testnet readiness)
+## Current features (X11 testnet proof verification)
 
 - Shelby-first evidence model: EvidencePack, BlobRecord identity, and ReadReceipt lineage
 - Chinese-first / English-toggleable product UI across the main routes
@@ -220,6 +222,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Read receipt created automatically after upload (mock or testnet); link shown on success screen
 - Read receipt page resolves blob identity from demo data, localStorage, or SQLite
 - BlobRecord identity fields surfaced on receipt page: shelbyRef, hash, source, accountAddress, blobName, network, storageStatus, explorerUrl, retrievalUrl
+- Testnet Blob detail proof panel: account, blobName, storage status, explorer/retrieval links, and safe retrieval verification action
 - Data-source badge on blob/receipt detail (Demo / Local mock / Shelby testnet)
 - Opt-in Node.js smoke harness (`npm run smoke`) for RPC connectivity and retrieval verification
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
@@ -228,7 +231,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, and Aptos Testnet network status
 - C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
 - X3 product closeout status: release-candidate gate remained green after the UI/product pass
-- X8 public testnet candidate: UI/docs now describe the real community path from wallet connection to Shelby testnet proof and receipt verification
+- X11 testnet proof verification: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, read receipt, and optional smoke retrieval
 
 ---
 
