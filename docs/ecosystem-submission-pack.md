@@ -1,7 +1,7 @@
 # Ecosystem Submission Pack — Shelby AI Evidence Vault
 
 Date: 2026-05-09
-Milestone: X15 — Public Testnet Handoff Candidate
+Milestone: X23 — Hosted Public Testnet Builder Demo
 
 ---
 
@@ -9,7 +9,7 @@ Milestone: X15 — Public Testnet Handoff Candidate
 
 **Shelby AI Evidence Vault** is an AI evidence and read-receipt layer built for Shelby. It demonstrates how AI pipelines can turn datasets, agent run outputs, and documents into verifiable evidence records with Shelby Blob identity — then produce auditable receipts that trace every answer back to the evidence that informed it.
 
-It ships as a complete, runnable open-source public testnet handoff candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, inspect Blob identity, run an in-app retrieval verification probe, verify the generated read receipt as an aggregate audit bundle, and copy a durable session handoff for community participation. The session ledger reads both browser cache and SQLite records, and the handoff JSON includes route URLs, receipt/blob proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags. An opt-in smoke harness still provides CLI-level RPC connectivity and blob retrieval verification, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
+It ships as a complete, hosted public testnet builder demo. Local mock mode still works with zero configuration as a development and review fallback, while the hosted path uses Vercel for the website/API, Postgres for the evidence index, Shelby testnet for Blob storage, and browser wallet signing for participation. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, inspect Blob identity, run an in-app retrieval verification probe, verify the generated read receipt as an aggregate audit bundle, and copy a durable session handoff for community participation. The hosted session ledger persists records through Postgres, with browser cache and SQLite remaining local fallback paths. The handoff JSON includes route URLs, receipt/blob proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags. An opt-in smoke harness still provides CLI-level RPC connectivity and blob retrieval verification, and the release-candidate verifier plus deployment-acceptance verifier provide repeatable acceptance gates. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
 
 **What it is:**
 - A Shelby ecosystem application layer for AI evidence storage using Shelby blob references and on-chain registration
@@ -20,7 +20,7 @@ It ships as a complete, runnable open-source public testnet handoff candidate. L
 **What it is not:**
 - Not a marketplace or dataset trading platform
 - Not a token or tokenomics model
-- Not a production database or authentication system
+- Not an authentication system or custody system
 - Not a real AI agent framework or LLM integration
 - Not a private key custody solution
 - No server signer — the browser wallet signs transactions
@@ -29,9 +29,9 @@ It ships as a complete, runnable open-source public testnet handoff candidate. L
 
 ## 中文定位（Chinese Positioning）
 
-**Shelby AI 证据库（Shelby AI Evidence Vault）** 是一个构建在 Shelby 之上的 AI 证据与读取回执应用层。它展示了 AI 流水线如何把数据集、智能体运行产出及文档转化为带有 Shelby Blob 身份的可验证证据记录，并生成可审计的回执，将每一次回答与所依据的证据关联起来。
+**Shelby AI Evidence Vault** 是一个构建在 Shelby 之上的 AI 证据与读取回执应用层。它展示了 AI 流水线如何把数据集、智能体运行产出及文档转化为带有 Shelby Blob 身份的可验证证据记录，并生成可审计的回执，将每一次回答与所依据的证据关联起来。
 
-该项目作为完整、可运行的持久化测试网会话账本候选版本发布。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径从 `/testnet` 开始，社区用户可以检测并连接 Aptos 钱包、确认 Aptos Testnet 状态，再通过浏览器钱包签名上传至 Shelby 测试网，检查 Blob 身份，运行产品内检索验证，在读取回执页面聚合验证所有引用的测试网 Blob，并复制一份可提交的持久化测试会话摘要。测试会话账本同时读取浏览器缓存与 SQLite 记录。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
+该项目作为完整、可访问的公开测试网 builder demo 发布。当前托管形态使用 Vercel 承载网站/API，Postgres 保存证据索引，Shelby testnet 负责真实 Blob 存储，浏览器钱包负责用户签名。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径从 `/testnet` 开始，社区用户可以检测并连接 Aptos 钱包、确认 Aptos Testnet 状态，再通过浏览器钱包签名上传至 Shelby 测试网，检查 Blob 身份，运行产品内检索验证，在读取回执页面聚合验证所有引用的测试网 Blob，并复制一份可提交的持久化测试会话摘要。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
 
 **产品定位：**
 - 使用 Shelby Blob 引用和链上注册的 AI 证据应用层
@@ -42,7 +42,7 @@ It ships as a complete, runnable open-source public testnet handoff candidate. L
 **明确不包含：**
 - 不包含市场交易或数据集交易功能
 - 不涉及代币或代币经济模型
-- 不包含生产级数据库或认证系统
+- 不包含用户认证系统或托管私钥系统
 - 不包含真正的 AI 智能体框架或大语言模型集成
 - 不包含私钥托管解决方案
 - 无服务端签名者——交易由浏览器钱包签名
@@ -113,7 +113,8 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | X16 | Merged | Final Copilot review brief: fixed merge-readiness scope, gates, real-testnet path, and security boundaries |
 | X17 | Merged | Copied handoff validator: `npm run verify-testnet-handoff -- path/to/handoff.json` validates real-upload handoff JSON |
 | X18 | Merged | Final readiness artifact: `npm run final-readiness` separates code-candidate readiness from real testnet and review gates |
-| X19 | Current | Public testnet release operator package: `npm run public-testnet-release-pack` writes the wallet-upload and final-review packet |
+| X19 | Merged | Public testnet release operator package: `npm run public-testnet-release-pack` writes the wallet-upload and final-review packet |
+| X23 | Current | Hosted deployment acceptance: Vercel URL, health endpoint, testnet mode, browser API key, Postgres persistence, and public route smoke checks pass |
 
 ---
 
@@ -138,14 +139,14 @@ CI does not run real uploads. The participant path is documented in `docs/public
 
 - **No trading or marketplace.** No dataset trading, no NFT minting, no exchange integration.
 - **No token speculation.** No tokenomics modeling, no price data, no yield strategies.
-- **No hosted production database or auth.** The project uses local SQLite plus browser localStorage fallback for demo/operator workflows.
+- **No user account system or custody backend.** The hosted builder demo persists evidence records in Postgres, but it does not add login, custody, server signing, or production SLA claims.
 - **No authentication system.** No user accounts, no session management, no OAuth.
 - **No real LLM/AI calls.** Read receipt answer summaries are deterministic placeholders — no API calls to any AI provider.
 - **No private key custody.** No server signer, no seed phrase handling, no mnemonic anywhere in the codebase.
 - **No wallet payment UX.** No token purchase flow, no APT/SHEL purchase UI.
 - **No social posting.** No automated posting to Twitter/X, Discord, or any other platform.
 - **No mainnet production claim.** This is a public testnet candidate. Mainnet hosting is a separate decision.
-- **No hidden mainnet claim.** The default path is Mock + SQLite. Shelby testnet proof requires operator wallet/funding prerequisites and explicit configuration.
+- **No hidden mainnet claim.** The local fallback is Mock + SQLite. Shelby testnet proof requires operator wallet/funding prerequisites and explicit configuration.
 
 ---
 

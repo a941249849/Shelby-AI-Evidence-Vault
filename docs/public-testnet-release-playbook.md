@@ -1,10 +1,10 @@
 # Public Testnet Release Playbook
 
 Date: 2026-05-09
-Status: X19 operator package
+Status: X23 hosted deployment acceptance
 
-This is the single operator playbook for moving Shelby AI Evidence Vault from
-code-candidate readiness to a community-facing Shelby public testnet run.
+This is the single operator playbook for keeping Shelby AI Evidence Vault aligned
+as a community-facing Shelby public testnet builder demo.
 
 ## Release Shape
 
@@ -18,10 +18,13 @@ Source file / dataset / agent output
   -> public testnet handoff
 ```
 
-Mock + SQLite remains the zero-credential preview path. The release target is
-the browser-wallet Shelby testnet path where a participant connects an Aptos
-Testnet wallet, uploads evidence to Shelby testnet, verifies the Blob and read
-receipt, then copies a handoff JSON for community review.
+The hosted demo uses Vercel for the website/API, Postgres for the evidence
+index, Shelby testnet for Blob storage, and browser wallet signing for user
+participation. Mock + SQLite remains the zero-credential local preview path.
+The release target is the browser-wallet Shelby testnet path where a
+participant connects an Aptos Testnet wallet, uploads evidence to Shelby
+testnet, verifies the Blob and read receipt, then copies a handoff JSON for
+community review.
 
 ## Automated Local Gate
 
@@ -33,6 +36,7 @@ npm run build
 npm run verify-release-candidate
 npm run final-readiness
 npm run public-testnet-release-pack
+DEPLOYMENT_URL=https://shelby-ai-evidence-vault.vercel.app npm run verify-deployment-acceptance
 ```
 
 Expected result:
@@ -40,6 +44,7 @@ Expected result:
 - `verify-release-candidate` reports `Passed: 23`, `Failed: 0`, `Skipped: 0`.
 - `final-readiness` reports `Code candidate ready : yes`.
 - `public-testnet-release-pack` writes `artifacts/public-testnet-release/latest.json`.
+- `verify-deployment-acceptance` reports `Passed: 16`, `Failed: 0`, `Accepted: yes`.
 
 Runtime artifacts under `artifacts/` are ignored by Git.
 

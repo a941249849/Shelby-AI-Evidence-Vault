@@ -1,7 +1,7 @@
 # Final Product Acceptance — Shelby AI Evidence Vault
 
 Date: 2026-05-09
-Status: X19 public testnet release operator package
+Status: X23 hosted deployment acceptance
 
 This document is the final manual acceptance pass for the current public testnet candidate.
 
@@ -19,15 +19,15 @@ Source file / dataset / agent output
   -> auditable AI evidence memory
 ```
 
-The default path is **Mock + SQLite** so community testers can inspect the product loop without credentials. The real protocol proof path is **Shelby testnet browser-wallet upload**, which requires an Aptos testnet wallet, testnet APT, ShelbyUSD, and manual signing.
+The public hosted path is **Vercel + Postgres + Shelby testnet** so community reviewers can inspect a durable builder demo without running local infrastructure. The local fallback remains **Mock + SQLite** for development and zero-credential review. The real protocol proof path is **Shelby testnet browser-wallet upload**, which requires an Aptos testnet wallet, testnet APT, ShelbyUSD, and manual signing.
 
 ## Routes to inspect
 
 | Route | Acceptance target |
 |---|---|
 | `/` | Chinese-first product home with Shelby ecosystem positioning, evidence-flow board, core capability cards, product preview, developer band |
-| `/testnet` | Public testnet launch console with mode status, wallet readiness, upload entry, proof steps, and a persistent community handoff summary from browser cache plus SQLite |
-| `/dashboard` | Evidence registry with demo/local/SQLite/Shelby testnet records, search, filter, sort, user/testnet records, evidence cards, and first-Blob deep links |
+| `/testnet` | Public testnet launch console with mode status, wallet readiness, upload entry, proof steps, and a persistent community handoff summary from hosted records plus browser/local fallback |
+| `/dashboard` | Evidence registry with demo/local/Postgres/Shelby testnet records, search, filter, sort, user/testnet records, evidence cards, and first-Blob deep links |
 | `/upload` | Evidence intake flow with pack metadata, file hash computation, Mock + SQLite boundary, testnet wallet gating |
 | `/blob/blob-001` | Blob provenance inspector with Shelby ref, hash, source, size, MIME type, evidence pack link, tags, and protocol-proof boundary |
 | `/read-receipt/rr-001` | Read receipt with query, answer summary, run metadata, referenced blob identity, evidence pack link, and receipt-level proof boundary |
@@ -50,6 +50,7 @@ npm run build
 npm run verify-release-candidate
 npm run final-readiness
 npm run public-testnet-release-pack
+DEPLOYMENT_URL=https://shelby-ai-evidence-vault.vercel.app npm run verify-deployment-acceptance
 ```
 
 Expected:
@@ -59,6 +60,7 @@ Expected:
 - `verify-release-candidate` exits 0 with `Passed: 23`, `Failed: 0`, `Skipped: 0`.
 - `final-readiness` reports `Code candidate ready : yes`.
 - `public-testnet-release-pack` writes `artifacts/public-testnet-release/latest.json`.
+- `verify-deployment-acceptance` exits 0 with `Passed: 16`, `Failed: 0`, `Accepted: yes`.
 
 ## Manual product QA
 
@@ -89,7 +91,7 @@ Expected:
 - No private keys, seed phrases, or server signer are handled by the app.
 - No real LLM calls are performed.
 - No marketplace, token, payment, trading, or dataset-sale behavior is present.
-- Local SQLite plus browser cache is the current community experiment persistence layer, not a hosted production database.
+- Hosted Postgres is the current public builder-demo persistence layer; local SQLite plus browser cache remains the development fallback.
 
 ## Final acceptance statement
 
@@ -98,5 +100,5 @@ The product is ready for community experiment review when:
 - The automated gate is green.
 - The manual product QA path above passes.
 - The final Copilot review brief returns `merge-ready` or `needs-real-testnet-run` without code blockers.
-- The reviewer understands the distinction between Mock + SQLite preview, browser-cache fallback, and Shelby testnet proof.
-- No page presents the product as mainnet, production-hosted, or custody-bearing.
+- The reviewer understands the distinction between hosted Postgres records, Mock + SQLite preview, browser-cache fallback, and Shelby testnet proof.
+- No page presents the product as mainnet, official Shelby infrastructure, SLA-backed production storage, or custody-bearing.

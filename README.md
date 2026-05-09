@@ -260,7 +260,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 
 ---
 
-## Current features (X15 public testnet handoff)
+## Current features (X23 hosted public testnet builder demo)
 
 - Shelby-first evidence model: EvidencePack, BlobRecord identity, and ReadReceipt lineage
 - Chinese-first / English-toggleable product UI across the main routes
@@ -268,7 +268,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Working local preview upload: SHA-256 in-browser, mock Shelby refs, local persistence
 - Browser-wallet Shelby testnet upload path via `useShelbyUpload` hook (public participant path when deployed in testnet mode)
 - Dual-mode adapter: mock (default) / testnet (browser-wallet)
-- Evidence packs, blobs, and read receipts persisted to local SQLite, with browser localStorage retained as fallback/cache
+- Hosted evidence packs, blobs, and read receipts persisted to Postgres, with local SQLite and browser localStorage retained as fallback/cache paths
 - Read receipt created automatically after upload (mock or testnet); link shown on success screen
 - Read receipt page resolves blob identity from demo data, localStorage, or SQLite
 - BlobRecord identity fields surfaced on receipt page: shelbyRef, hash, source, accountAddress, blobName, network, storageStatus, explorerUrl, retrievalUrl
@@ -277,16 +277,17 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Data-source badge on blob/receipt detail (Demo / Local mock / Shelby testnet)
 - Opt-in Node.js smoke harness (`npm run smoke`) for RPC connectivity and retrieval verification
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
-- Dashboard shows built-in demo data, locally uploaded packs, SQLite records, and Shelby testnet uploads as first-class data sources; reset button clears browser cache only while SQLite records remain durable
+- Dashboard shows built-in demo data, locally uploaded packs, Postgres/SQLite records, and Shelby testnet uploads as first-class data sources; reset button clears browser cache only while persistent records remain durable
 - Mode indicator, wallet connect UI, and public testnet participation guide on upload page
 - Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, Aptos Testnet network status, and a persistent community test session summary
-- Testnet session ledger reads browser cache plus SQLite records, dedupes receipts/blobs, and preserves the participant summary even when browser cache is incomplete
+- Testnet session ledger reads hosted persistent records plus browser/local fallback records, dedupes receipts/blobs, and preserves the participant summary even when browser cache is incomplete
 - Public handoff JSON includes full app routes, receipt/blob proof URLs, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review
 - C12 release-candidate verifier: doctor checks, isolated SQLite, public handoff JSON contract, copied-handoff validator, production build, and route smoke checks
 - X18 final readiness artifact separates code-candidate readiness from the remaining manual real-testnet upload and Copilot final review gates
 - X19 public testnet release package turns the final readiness state into a single operator packet for wallet upload, handoff validation, and final review
+- X23 hosted deployment acceptance verifies the Vercel URL, health endpoint, testnet mode, browser API key configuration, Postgres persistence, and public route smoke checks
 - X3 product closeout status: release-candidate gate remained green after the UI/product pass
-- X15 public testnet handoff: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, durable session summary, and optional smoke retrieval
+- X23 hosted builder demo: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, durable session summary, Postgres-backed public persistence, and optional smoke retrieval
 
 ---
 
