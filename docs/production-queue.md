@@ -55,7 +55,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X18 final readiness artifact is merged: `scripts/final-readiness.mjs` writes `artifacts/final-readiness/latest.json` and separates code-candidate readiness from manual real-testnet/Copilot gates.
 - X19 public testnet release operator package is merged: `scripts/public-testnet-release-pack.mjs` writes `artifacts/public-testnet-release/latest.json` and gives the human operator one packet for wallet upload, handoff validation, and final Copilot review.
 - X20 Docker/Render style deployment package was reviewed but superseded before merge.
-- X21 Vercel Builder Demo is the active stage: Vercel hosts the website/API, Neon/Postgres stores evidence records, Shelby testnet stores real Blobs, and the product positioning is developer builder demo rather than official ecosystem launch.
+- X21 Vercel Builder Demo is merged: Vercel hosts the website/API, Neon/Postgres stores evidence records, Shelby testnet stores real Blobs, and the product positioning is developer builder demo rather than official ecosystem launch.
+- X22 Builder Demo presentation is complete locally: live UI copy, metadata, README, and release-candidate route markers now describe the project as a Shelby testnet builder demo for team/community review, not an official ecosystem/product launch.
 
 ## Stage Gate
 
@@ -474,12 +475,13 @@ Review C1 output before any real upload implementation starts.
 
 ## Immediate Next Action
 
-X4 final acceptance package is the current stage.
+X23 deployment acceptance and final showcase preparation is the current stage.
 
-After C12, do not continue expanding Copilot production tasks by default. X2 and X3 are merged; the product should now be checked as a community experiment candidate, not expanded with more small Copilot tasks.
+The product direction is now: Vercel website/API + Neon/Postgres evidence records + Shelby testnet Blob storage. Keep the positioning as a developer builder demo that can be shown to Shelby team/community members, not an official Shelby product, mainnet launch, or production storage service.
 
-- **X4 (Codex):** Final acceptance package. Lock the current product shape, demo path, manual QA checklist, and release gate evidence.
-- Further Copilot work should be avoided unless a concrete blocker appears in the Shelby testnet proof path.
+- **X23 (Codex):** Prepare the final deployment acceptance path: Vercel env checklist, Neon schema/readiness checks, Shelby testnet upload walkthrough, health endpoint verification, and final presentation handoff.
+- **Copilot:** Do not start another production implementation task unless deployment/real-upload review reveals a concrete blocker.
+- **Manual gates:** real wallet upload, copied handoff validation, and final external review remain human/operator steps.
 
 ### Task X4: Final product acceptance package
 

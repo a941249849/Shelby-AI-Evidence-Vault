@@ -44,7 +44,7 @@
  * ROUTES SMOKE-CHECKED (HTTP 200 + page marker):
  *   /                                      Evidence Vault (footer text)
  *   /dashboard                             Evidence index
- *   /testnet                               公开测试网参与控制台
+ *   /testnet                               开发者测试网演示控制台
  *   /upload                                Package files into a verifiable
  *   /blob/blob-001                         Shelby AI Evidence Vault
  *   /read-receipt/rr-001                   Shelby AI Evidence Vault
@@ -609,7 +609,7 @@ if (!buildSucceeded) {
 
       await smokeRoute('/', baseUrl, 'Evidence Vault');
       await smokeRoute('/dashboard', baseUrl, 'Evidence index');
-      await smokeRoute('/testnet', baseUrl, '公开测试网参与控制台');
+      await smokeRoute('/testnet', baseUrl, '开发者测试网演示控制台');
       await smokeRoute('/upload', baseUrl, 'Package files into a verifiable');
       await smokeRoute('/blob/blob-001', baseUrl, 'Shelby AI Evidence Vault');
       await smokeRoute('/read-receipt/rr-001', baseUrl, 'Shelby AI Evidence Vault');

@@ -1,6 +1,6 @@
 # Shelby AI Evidence Vault
 
-![Milestone](https://img.shields.io/badge/milestone-X15%20Public%20Testnet%20Handoff-violet?style=flat-square)
+![Milestone](https://img.shields.io/badge/milestone-X22%20Builder%20Demo-violet?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
@@ -17,8 +17,8 @@ Shelby AI Evidence Vault is a developer-built Shelby testnet demo for AI provena
 - **Read receipts** — auditable records of agent activity: what was uploaded, what evidence was consulted, and what was answered; bound to real `BlobRecord` identity
 - **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a development and review fallback, not the protocol endpoint
 - **Shelby testnet builder path** — when deployed with `SHELBY_MODE=testnet`, reviewers can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
-- **Testnet launch console** — `/testnet` gives community users a direct launch surface for mode status, wallet readiness, funding prerequisites, upload entry, and receipt verification
-- **Public testnet handoff artifact** — `/testnet` aggregates the latest testnet receipt, referenced Blobs, wallet status, full route URLs, smoke commands, and a copyable session summary from browser cache plus SQLite after a real upload
+- **Builder demo console** — `/testnet` gives Shelby team/community reviewers a direct surface for mode status, wallet readiness, funding prerequisites, upload entry, and receipt verification
+- **Testnet demo handoff artifact** — `/testnet` aggregates the latest testnet receipt, referenced Blobs, wallet status, full route URLs, smoke commands, and a copyable session summary from browser cache plus the configured persistent ledger after a real upload
 - **In-app proof verification** — testnet Blob detail and read receipt pages expose account/blobName/status/explorer/retrieval identity and can run safe server-side retrieval probes
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 - **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
@@ -31,7 +31,7 @@ Shelby AI Evidence Vault is a developer-built Shelby testnet demo for AI provena
 | Mode | How to activate | What it does |
 |---|---|---|
 | **Local mock (default)** | No env vars needed | Zero-credential preview: SHA-256 in-browser, `shelby://mock/blob/{id}` refs, local persistence, read receipt created automatically |
-| **Public testnet browser-wallet** | `SHELBY_MODE=testnet` + `NEXT_PUBLIC_SHELBY_NETWORK=testnet` + funded Aptos wallet | Real Shelby testnet upload via `@shelby-protocol/react` hook + browser wallet signing; requires testnet APT and ShelbyUSD |
+| **Builder demo browser-wallet** | `SHELBY_MODE=testnet` + `NEXT_PUBLIC_SHELBY_NETWORK=testnet` + funded Aptos wallet | Real Shelby testnet upload via `@shelby-protocol/react` hook + browser wallet signing; requires testnet APT and ShelbyUSD |
 | **Smoke harness** | `SHELBY_SMOKE=true` + `SHELBY_RPC_URL` + optional prior-upload address/blobName | Validates config, checks RPC connectivity, and verifies retrieval of a previously uploaded blob |
 
 > **Boundary:** This is a builder demo, not an official Shelby product or production storage service. No private keys, no server signer, no real LLM calls, no trading or marketplace features. `SHELBY_API_KEY` stays server-side only. Browser wallet signing is handled by the user's wallet extension — the app never has custody of signing material.
@@ -184,8 +184,8 @@ See `docs/vercel-builder-demo.md`.
 
 | Route | Description |
 |---|---|
-| `/` | Product home — Chinese-first Shelby ecosystem narrative, evidence flow, core capabilities, preview cards |
-| `/testnet` | Public Shelby testnet launch console: mode status, wallet readiness, funding prerequisites, community test session, upload and receipt path |
+| `/` | Builder demo home — Chinese-first Shelby testnet narrative, evidence flow, core capabilities, preview cards |
+| `/testnet` | Shelby testnet builder demo console: mode status, wallet readiness, funding prerequisites, demo session, upload and receipt path |
 | `/dashboard` | Evidence registry: browse, search, and filter built-in, local, SQLite, and testnet records |
 | `/upload` | Evidence intake: create Evidence Packs, compute SHA-256, drop files, show mode boundary and wallet connect in testnet mode |
 | `/blob/[id]` | Blob provenance inspector: Shelby ref, hash, source, metadata, data-source badge |
@@ -224,7 +224,7 @@ src/
     │   ├── status-map.ts         # Conservative evidence storage status utilities
     │   └── index.ts              # getAdapter() factory
     ├── testnet/
-    │   └── handoff.mjs           # Public testnet handoff JSON builder
+    │   └── handoff.mjs           # Testnet demo handoff JSON builder
     ├── store/
     │   └── local-store.ts        # localStorage: packs, blobs, and receipts
     ├── server/

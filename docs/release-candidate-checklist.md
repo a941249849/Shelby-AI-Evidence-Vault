@@ -112,7 +112,7 @@ The verifier starts the built Next.js app (`next start`) on an available local p
 |---|---|---|
 | `/` | 200 | `Evidence Vault` |
 | `/dashboard` | 200 | `Evidence index` |
-| `/testnet` | 200 | `公开测试网参与控制台` |
+| `/testnet` | 200 | `开发者测试网演示控制台` |
 | `/upload` | 200 | `Package files into a verifiable` |
 | `/blob/blob-001` | 200 | `Shelby AI Evidence Vault` |
 | `/read-receipt/rr-001` | 200 | `Shelby AI Evidence Vault` |

@@ -8,7 +8,7 @@ import UploadProviders from "@/app/upload/providers";
 export const metadata: Metadata = {
   title: "Shelby AI Evidence Vault",
   description:
-    "A Shelby ecosystem interface for verifiable AI evidence packs, Blob identity, and read receipts.",
+    "A Shelby testnet builder demo for verifiable AI evidence packs, Blob identity, and read receipts.",
 };
 
 export default function RootLayout({
