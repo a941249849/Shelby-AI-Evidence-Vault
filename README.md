@@ -1,6 +1,6 @@
 # Shelby AI Evidence Vault
 
-![Milestone](https://img.shields.io/badge/milestone-X3%20Product%20Closeout-violet?style=flat-square)
+![Milestone](https://img.shields.io/badge/milestone-X8%20Public%20Testnet%20Candidate-violet?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
@@ -15,8 +15,8 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 - **Cryptographic blob references** — every file gets a SHA-256 hash and a Shelby reference (`shelby://mock/blob/{id}` in local mode, `shelby://testnet/{account}/{blobName}` in testnet mode)
 - **Evidence packs** — structured groups of related blobs with metadata, tags, provenance, and status
 - **Read receipts** — auditable records of agent activity: what was uploaded, what evidence was consulted, and what was answered; bound to real `BlobRecord` identity
-- **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a community preview and development fallback, not the product endpoint
-- **Browser-wallet Shelby testnet path** — a testnet upload path is available behind a `SHELBY_MODE=testnet` gate using `@shelby-protocol/react`; requires operator prerequisites (funded Aptos testnet wallet, Shelby storage credits) and manual verification — no automated CI upload
+- **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a development and review fallback, not the protocol endpoint
+- **Public Shelby testnet participation path** — when deployed with `SHELBY_MODE=testnet`, community users can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 - **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
 - **Shelby-first product UI** — Chinese-first, English-toggleable product surface across landing, registry, upload, Blob detail, and read receipt pages
@@ -28,7 +28,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 | Mode | How to activate | What it does |
 |---|---|---|
 | **Local mock (default)** | No env vars needed | Zero-credential preview: SHA-256 in-browser, `shelby://mock/blob/{id}` refs, local persistence, read receipt created automatically |
-| **Testnet browser-wallet** | `SHELBY_MODE=testnet` + `NEXT_PUBLIC_SHELBY_NETWORK=testnet` + funded Aptos wallet | Real Shelby testnet upload via `@shelby-protocol/react` hook + browser wallet signing; requires operator prerequisites |
+| **Public testnet browser-wallet** | `SHELBY_MODE=testnet` + `NEXT_PUBLIC_SHELBY_NETWORK=testnet` + funded Aptos wallet | Real Shelby testnet upload via `@shelby-protocol/react` hook + browser wallet signing; requires testnet APT and ShelbyUSD |
 | **Smoke harness** | `SHELBY_SMOKE=true` + `SHELBY_RPC_URL` + optional prior-upload address/blobName | Validates config, checks RPC connectivity, and verifies retrieval of a previously uploaded blob |
 
 > **Security boundary:** No private keys, no server signer, no real LLM calls, no production database, no trading or marketplace features. `SHELBY_API_KEY` stays server-side only. Browser wallet signing is handled by the user's wallet extension — the app never has custody of signing material.
@@ -128,7 +128,7 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | `SHELBY_SMOKE_ACCOUNT_ADDRESS` | — | Aptos account address from a prior manual upload |
 | `SHELBY_SMOKE_BLOB_NAME` | — | Shelby blob name from a prior manual upload |
 
-> **Testnet operator prerequisites:** Real Shelby testnet upload requires a connected Aptos browser wallet (e.g. Petra), testnet APT for gas fees, and Shelby storage credits (ShelbyUSD or SHEL). CI does not perform real uploads — the browser-wallet path requires an interactive browser session. See `docs/c3-smoke-test-guide.md` for manual verification steps.
+> **Public testnet prerequisites:** Real Shelby testnet upload requires a connected Aptos browser wallet (e.g. Petra) on Aptos Testnet, testnet APT for gas fees, and ShelbyUSD for Shelby storage operations. CI does not perform real uploads — the browser-wallet path requires an interactive browser session. See `docs/public-testnet-participation.md` for the participant path and `docs/c3-smoke-test-guide.md` for retrieval smoke checks.
 
 ---
 
@@ -206,13 +206,13 @@ Built-in demo data lives in `src/lib/demo-data/`:
 
 ---
 
-## Current features (X3 product closeout)
+## Current features (X8 public testnet candidate)
 
 - Shelby-first evidence model: EvidencePack, BlobRecord identity, and ReadReceipt lineage
 - Chinese-first / English-toggleable product UI across the main routes
 - Shelby brand-aligned visual system for the home page, evidence registry, upload flow, Blob detail, read receipt, and footer
 - Working local preview upload: SHA-256 in-browser, mock Shelby refs, local persistence
-- Browser-wallet Shelby testnet upload path via `useShelbyUpload` hook (operator-funded wallets only)
+- Browser-wallet Shelby testnet upload path via `useShelbyUpload` hook (public participant path when deployed in testnet mode)
 - Dual-mode adapter: mock (default) / testnet (browser-wallet)
 - Evidence packs, blobs, and read receipts persisted to local SQLite, with browser localStorage retained as fallback/cache
 - Read receipt created automatically after upload (mock or testnet); link shown on success screen
@@ -222,23 +222,23 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Opt-in Node.js smoke harness (`npm run smoke`) for RPC connectivity and retrieval verification
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
 - Dashboard shows built-in demo data + locally uploaded packs; reset button clears browser cache only while SQLite records remain durable
-- Mode indicator and wallet connect UI on upload page
+- Mode indicator, wallet connect UI, and public testnet participation guide on upload page
 - C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
-- X3 product closeout status: release-candidate gate remains green after the UI/product pass
-- X4 final acceptance package: manual product QA path, demo route checklist, and boundary review
+- X3 product closeout status: release-candidate gate remained green after the UI/product pass
+- X8 public testnet candidate: UI/docs now describe the real community path from wallet connection to Shelby testnet proof and receipt verification
 
 ---
 
-## Known operator prerequisites for testnet upload
+## Public testnet participation prerequisites
 
 The following are required for a real Shelby testnet upload — they are **not** provided by this demo:
 
 - A connected Aptos browser wallet (e.g. [Petra](https://petra.app/)) on Aptos Testnet
 - Testnet APT for transaction gas fees (from [Aptos testnet faucet](https://aptoslabs.com/testnet-faucet))
-- Shelby storage credits (ShelbyUSD or SHEL) on the connected account
+- ShelbyUSD on the connected account for Shelby file uploads
 - `NEXT_PUBLIC_SHELBY_NETWORK=testnet` set in `.env.local`
 
-CI does not run real uploads. All real-upload paths are operator-dependent and documented in `docs/c3-smoke-test-guide.md`.
+CI does not run real uploads. The participant path is documented in `docs/public-testnet-participation.md`; retrieval smoke checks are documented in `docs/c3-smoke-test-guide.md`.
 
 ---
 
@@ -261,7 +261,8 @@ CI does not run real uploads. All real-upload paths are operator-dependent and d
 | `docs/architecture.md` | System design, data flow, security boundaries |
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
-| `docs/final-product-acceptance.md` | X4 final manual acceptance path for community experiment review |
+| `docs/public-testnet-participation.md` | X8 public Shelby testnet participant and deployment path |
+| `docs/final-product-acceptance.md` | X4 manual acceptance snapshot for the earlier community experiment review |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |
 | `docs/release-candidate-checklist.md` | C12 release-candidate verification gate |
 | `docs/c3-smoke-test-guide.md` | Smoke harness setup and manual testnet verification |

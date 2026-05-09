@@ -4,7 +4,7 @@
 
 Date: 2026-05-08
 
-This runbook is for operators who want to run Shelby AI Evidence Vault against the real Shelby testnet using the browser-wallet upload path. It is not required for local/mock usage — the community experiment path works with zero credentials.
+This runbook is for operators who want to run Shelby AI Evidence Vault against the real Shelby testnet using the browser-wallet upload path. It is not required for local/mock usage — the review fallback works with zero credentials. For the participant-facing path, see `docs/public-testnet-participation.md`.
 
 ---
 
@@ -61,7 +61,7 @@ Before attempting a real testnet upload, you must have:
 | `npm install` done | All SDK packages installed |
 | **Aptos wallet extension** | e.g. [Petra](https://petra.app/) — required for browser wallet signing |
 | **Testnet APT** | For on-chain commitment registration gas fees — from the [Aptos testnet faucet](https://aptoslabs.com/testnet-faucet) |
-| **Shelby storage credits** | ShelbyUSD or SHEL tokens on your connected wallet account — required for Shelby storage operations. Verify current token/funding requirements with official Shelby docs |
+| **Shelby storage credits** | ShelbyUSD on your connected wallet account — required for Shelby storage operations in the current browser upload docs. Verify current token/funding requirements with official Shelby docs |
 | **Shelby API key** | Required if the Shelby RPC requires authenticated requests. Verify with official Shelby docs |
 | **`.env.local`** | Created from `.env.example` with real (non-secret) testnet values |
 
@@ -230,7 +230,7 @@ Your wallet must be connected to the Aptos testnet. In Petra: Settings → Netwo
 5. The SDK:
    - Computes the blob commitment.
    - Registers the commitment on-chain (requires testnet APT for gas).
-   - Uploads the blob to the Shelby RPC (requires Shelby storage credits).
+   - Uploads the blob to the Shelby RPC (requires ShelbyUSD).
 6. On success, the upload page shows:
    - The blob detail link (e.g. `/blob/<your-id>`)
    - The Shelby testnet reference: `shelby://testnet/{account}/{blobName}`
@@ -364,7 +364,7 @@ Ensure your Aptos wallet extension is installed, unlocked, and connected to Apto
 
 ### Upload fails: "insufficient funds" or "transaction rejected"
 
-Your wallet needs testnet APT for gas fees. Use the [Aptos testnet faucet](https://aptoslabs.com/testnet-faucet). You also need Shelby storage credits — verify the current funding path with official Shelby docs.
+Your wallet needs testnet APT for gas fees. Use the [Aptos testnet faucet](https://aptoslabs.com/testnet-faucet). You also need ShelbyUSD — verify the current funding path with official Shelby docs.
 
 ### Upload succeeds but `storageStatus` stays "registered" (not "ready")
 
@@ -408,7 +408,7 @@ The following items require manual verification against current official Shelby 
 
 3. **API key requirement**: The doctor checks for the presence of `SHELBY_API_KEY`. Confirm whether the current Shelby testnet RPC requires an API key for blob upload and/or retrieval.
 
-4. **Storage token requirements**: The amount of ShelbyUSD or SHEL tokens required per upload is not documented in this codebase. Verify with official Shelby docs before attempting uploads.
+4. **Storage token requirements**: The amount of ShelbyUSD required per upload is not documented in this codebase. Verify with official Shelby docs before attempting uploads.
 
 5. **Coordination contract address**: The `SHELBY_DEPLOYER` contract address (`0x85fdb9a176ab8ef1d9d9c1b60d60b3924f0800ac1de1cc2085fb0b8bb4988e6a`) is used internally by the SDK. Verify it is current against the official Shelby Networks page or explorer.
 

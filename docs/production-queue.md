@@ -1,6 +1,6 @@
 # Production Queue
 
-Date: 2026-05-08
+Date: 2026-05-09
 
 This document is the working production queue for Shelby AI Evidence Vault after the M1A official-docs audit. It converts the product roadmap into large, stage-level tasks. It is intentionally not a list of small fixes.
 
@@ -38,10 +38,11 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - C10 evidence index search/filter/sort is merged: `src/components/dashboard-client.tsx`.
 - C11 Shelby testnet readiness doctor is merged: `scripts/shelby-doctor.mjs`, `docs/shelby-testnet-operator-runbook.md`.
 - C12 release-candidate acceptance harness is merged: `scripts/verify-release-candidate.mjs`, `docs/release-candidate-checklist.md`.
-- Backend/protocol/product QA gates are stable enough for final community experiment review.
+- Backend/protocol/product QA gates are stable enough for public testnet candidate review.
 - X2 Shelby-first bilingual product UI is merged in PR #30.
 - X3 product closeout docs are merged in PR #31.
-- X4 final acceptance package is the active Codex-owned stage.
+- X4-X7 acceptance/doc consistency stages are merged.
+- X8 public Shelby testnet participation is the active Codex-owned stage: upload-page participant onboarding, public testnet docs, and current official-doc alignment.
 
 ## Stage Gate
 

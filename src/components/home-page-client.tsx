@@ -7,11 +7,13 @@ import {
   CheckCircle2,
   CloudUpload,
   Database,
+  ExternalLink,
   FileArchive,
   FolderOpen,
   GitBranch,
   ReceiptText,
   ShieldCheck,
+  Wallet,
 } from 'lucide-react';
 import { useLanguage, type Language } from '@/components/language-state';
 import { evidencePacks } from '@/lib/demo-data';
@@ -50,6 +52,15 @@ const copy = {
       ['回执证明', '每个回答都会从回答追溯到存储证据的来源链路。', 'Read Receipt'],
       ['可验证 & 可审计', '让证据在产品界面中流动，支持审计、复现与长期追溯。', 'Verifiable'],
     ],
+    testnet: {
+      label: 'PUBLIC TESTNET PATH',
+      title: '面向社区的 Shelby 测试网参与入口',
+      body:
+        '部署方开启 testnet 后，用户连接 Aptos 钱包、准备测试网 APT 与 ShelbyUSD，即可把证据包写入 Shelby 测试网并生成可追溯回执。',
+      points: ['钱包签名', 'Shelby Blob 注册', '回执可审计'],
+      cta: '进入上传',
+      docs: '查看接入文档',
+    },
     preview: '产品预览',
     previewBody: '从上传到回执，体验完整的证据流',
     previewCards: [
@@ -93,6 +104,15 @@ const copy = {
       ['Receipt proof', 'Every answer can be traced back to the evidence stored underneath it.', 'Read Receipt'],
       ['Verifiable & auditable', 'Evidence moves through the product surface for audit, replay, and long-term provenance.', 'Verifiable'],
     ],
+    testnet: {
+      label: 'PUBLIC TESTNET PATH',
+      title: 'A community entry point for Shelby testnet participation',
+      body:
+        'When deployed with testnet mode enabled, users connect an Aptos wallet, prepare testnet APT and ShelbyUSD, upload evidence to Shelby testnet, and receive traceable receipts.',
+      points: ['Wallet signing', 'Shelby Blob registration', 'Auditable receipts'],
+      cta: 'Start upload',
+      docs: 'Read integration docs',
+    },
     preview: 'Product preview',
     previewBody: 'Walk the flow from upload to receipt',
     previewCards: [
@@ -164,6 +184,55 @@ function StatCard({
       </div>
       <span>{body}</span>
     </article>
+  );
+}
+
+function TestnetParticipationBand({ language }: { language: Language }) {
+  const t = copy[language].testnet;
+
+  return (
+    <section className="mx-auto mt-10 max-w-[1320px] px-5 sm:px-8">
+      <div className="grid gap-6 border border-[#2f1f12]/12 bg-[#2f1f12] p-6 text-[#fffaf4] md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <p className="font-mono text-xs font-bold uppercase tracking-normal text-[#ff77c9]">
+            {t.label}
+          </p>
+          <h2 className="mt-3 max-w-2xl text-2xl font-black">{t.title}</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#d8d0c4]">{t.body}</p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {t.points.map((point, index) => (
+              <span
+                key={point}
+                className="inline-flex items-center gap-2 border border-white/12 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-[#fffaf4]"
+              >
+                {index === 0 && <Wallet size={14} />}
+                {index === 1 && <Box size={14} />}
+                {index === 2 && <ReceiptText size={14} />}
+                {point}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3 md:justify-end">
+          <Link href="/upload" className="shelby-primary-button">
+            <CloudUpload size={18} />
+            {t.cta}
+            <span className="button-arrow">
+              <ArrowRight size={19} />
+            </span>
+          </Link>
+          <a
+            href="https://docs.shelby.xyz/sdks/react/mutations/use-upload-blobs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shelby-secondary-button border-white/18 bg-white/[0.06] text-[#fffaf4] hover:border-[#ff77c9]/60 hover:text-[#ff77c9]"
+          >
+            {t.docs}
+            <ExternalLink size={15} />
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -258,6 +327,8 @@ export default function HomePageClient() {
           })}
         </div>
       </section>
+
+      <TestnetParticipationBand language={language} />
 
       <section className="preview-section">
         <div className="section-heading">

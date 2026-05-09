@@ -1,6 +1,6 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **X3 community experiment candidate** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **X8 public Shelby testnet candidate** to stakeholders or the community.
 
 > **Current scope:**
 > - The product UI is Chinese-first with a top-nav English toggle.
@@ -8,7 +8,7 @@ A step-by-step walkthrough for demonstrating the **X3 community experiment candi
 > - Browser-wallet Shelby testnet upload path exists for operators with funded wallets.
 > - Built-in demo data uses illustrative `shelby://demo/blob/` references.
 > - Local uploads get `shelby://mock/blob/{id}` references.
-> - Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require operator prerequisites.
+> - Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require a participant wallet with testnet APT and ShelbyUSD.
 > - The C8 agent-run script (`npm run generate-agent-run`) produces a deterministic evidence pack, blobs, and read receipt with zero credentials.
 
 ## Prerequisites
@@ -267,14 +267,14 @@ Key message: "Mock mode is the default and requires zero configuration. The brow
 
 ---
 
-## Testnet mode operator demo (advanced — requires prerequisites)
+## Testnet mode public participant demo (advanced — requires prerequisites)
 
-> **Honest prerequisites:** This path requires an Aptos testnet wallet, testnet APT for gas fees, Shelby storage credits, and manual browser interaction. CI does not and cannot run this path. Do not claim CI performed a real upload.
+> **Honest prerequisites:** This path requires an Aptos testnet wallet, testnet APT for gas fees, ShelbyUSD for upload costs, and manual browser interaction. CI does not and cannot run this path. Do not claim CI performed a real upload.
 
 ### Prerequisites
 - [Petra wallet](https://petra.app/) or compatible Aptos wallet browser extension
 - Testnet APT (from [Aptos testnet faucet](https://aptoslabs.com/testnet-faucet))
-- Shelby storage credits on the connected account
+- ShelbyUSD on the connected account
 - `.env.local` with:
   ```env
   SHELBY_MODE=testnet
