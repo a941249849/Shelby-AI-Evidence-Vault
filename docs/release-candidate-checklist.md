@@ -1,10 +1,10 @@
 # Release-Candidate Checklist — Shelby AI Evidence Vault
 
-**Stage: C12/X11 — Release-candidate gate plus testnet proof verification QA**
+**Stage: C12/X12 — Release-candidate gate plus receipt-level testnet audit QA**
 
 This document describes the release-candidate validation gate for Shelby AI Evidence Vault. The gate is zero-credential, mock-safe by default, and is designed to verify the complete product loop in a single deterministic command.
 
-X11 keeps this command as the hard automated gate, then adds a manual public-testnet pass for wallet readiness, upload, Blob proof verification, and read-receipt inspection.
+X12 keeps this command as the hard automated gate, then adds a manual public-testnet pass for wallet readiness, upload, Blob proof verification, and receipt-level proof aggregation.
 
 > **This is a public testnet candidate, not a mainnet claim.** Mock/local references (e.g. `shelby://mock/blob/…`) are deterministic local identifiers used for review; Shelby proof requires `SHELBY_MODE=testnet`, a wallet, testnet APT, ShelbyUSD, and manual signing.
 
@@ -158,7 +158,7 @@ Manual checks:
 | Testnet | `/testnet` launch console shows mode status, wallet detection/connect readiness, funding prerequisites, upload entry, and product boundaries |
 | Upload | Mock + SQLite path is clear; public testnet path is gated by wallet, Aptos Testnet, testnet APT, and ShelbyUSD |
 | Blob detail | Shows provenance, Shelby ref, SHA-256 hash, source, metadata, pack relationship, and testnet proof verification panel |
-| Read receipt | Shows query, answer summary, run metadata, referenced Blob identity, and evidence pack links |
+| Read receipt | Shows query, answer summary, run metadata, referenced Blob identity, evidence pack links, and a receipt-level testnet audit panel |
 | Boundaries | No UI implies mainnet readiness, token trading, marketplace behavior, or server-side wallet custody |
 
 ---

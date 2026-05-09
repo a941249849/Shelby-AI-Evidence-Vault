@@ -1,6 +1,6 @@
 # Shelby AI Evidence Vault
 
-![Milestone](https://img.shields.io/badge/milestone-X11%20Testnet%20Proof%20Verification-violet?style=flat-square)
+![Milestone](https://img.shields.io/badge/milestone-X12%20Receipt%20Audit%20Closure-violet?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
@@ -18,7 +18,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 - **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a development and review fallback, not the protocol endpoint
 - **Public Shelby testnet participation path** — when deployed with `SHELBY_MODE=testnet`, community users can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
 - **Testnet launch console** — `/testnet` gives community users a direct launch surface for mode status, wallet readiness, funding prerequisites, upload entry, and receipt verification
-- **In-app proof verification** — testnet Blob detail pages expose account/blobName/status/explorer/retrieval identity and can run a safe server-side retrieval probe
+- **In-app proof verification** — testnet Blob detail and read receipt pages expose account/blobName/status/explorer/retrieval identity and can run safe server-side retrieval probes
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 - **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
 - **Shelby-first product UI** — Chinese-first, English-toggleable product surface across landing, registry, upload, Blob detail, and read receipt pages
@@ -143,7 +143,7 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | `/dashboard` | Evidence registry: browse, search, and filter built-in, local, SQLite, and testnet records |
 | `/upload` | Evidence intake: create Evidence Packs, compute SHA-256, drop files, show mode boundary and wallet connect in testnet mode |
 | `/blob/[id]` | Blob provenance inspector: Shelby ref, hash, source, metadata, data-source badge |
-| `/read-receipt/[id]` | Read receipt: run ID, query, answer, resolved Blob identity and pack links |
+| `/read-receipt/[id]` | Read receipt: run ID, query, answer, resolved Blob identity, pack links, and receipt-level testnet proof aggregation |
 
 ---
 
@@ -164,7 +164,7 @@ src/
 ├── components/                   # Shared UI components
 │   ├── dashboard-client.tsx      # Merges demo + localStorage + SQLite packs
 │   ├── blob-detail-client.tsx    # Resolves demo + localStorage + SQLite blobs
-│   └── read-receipt-client.tsx   # Resolves receipts from demo/local/SQLite data
+│   └── read-receipt-client.tsx   # Resolves receipts and aggregates testnet proof checks
 └── lib/
     ├── demo-data/                # Static demo data (5 packs, 6 blobs, 4 receipts)
     ├── evidence/                 # Service layer (reads demo-data)
@@ -210,7 +210,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 
 ---
 
-## Current features (X11 testnet proof verification)
+## Current features (X12 receipt audit closure)
 
 - Shelby-first evidence model: EvidencePack, BlobRecord identity, and ReadReceipt lineage
 - Chinese-first / English-toggleable product UI across the main routes
@@ -223,6 +223,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Read receipt page resolves blob identity from demo data, localStorage, or SQLite
 - BlobRecord identity fields surfaced on receipt page: shelbyRef, hash, source, accountAddress, blobName, network, storageStatus, explorerUrl, retrievalUrl
 - Testnet Blob detail proof panel: account, blobName, storage status, explorer/retrieval links, and safe retrieval verification action
+- Receipt-level testnet audit panel: aggregates every verifiable Shelby testnet Blob referenced by a receipt, runs retrieval checks, and summarizes verified/failed state
 - Data-source badge on blob/receipt detail (Demo / Local mock / Shelby testnet)
 - Opt-in Node.js smoke harness (`npm run smoke`) for RPC connectivity and retrieval verification
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
@@ -231,7 +232,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, and Aptos Testnet network status
 - C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
 - X3 product closeout status: release-candidate gate remained green after the UI/product pass
-- X11 testnet proof verification: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, read receipt, and optional smoke retrieval
+- X12 receipt audit closure: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, and optional smoke retrieval
 
 ---
 

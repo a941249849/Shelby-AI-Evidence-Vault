@@ -1,7 +1,7 @@
 # Ecosystem Submission Pack — Shelby AI Evidence Vault
 
 Date: 2026-05-09
-Milestone: X11 — Testnet Proof Verification Candidate
+Milestone: X12 — Receipt Audit Closure Candidate
 
 ---
 
@@ -9,7 +9,7 @@ Milestone: X11 — Testnet Proof Verification Candidate
 
 **Shelby AI Evidence Vault** is an AI evidence and read-receipt layer built for Shelby. It demonstrates how AI pipelines can turn datasets, agent run outputs, and documents into verifiable evidence records with Shelby Blob identity — then produce auditable receipts that trace every answer back to the evidence that informed it.
 
-It ships as a complete, runnable open-source testnet proof verification candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, inspect Blob identity, run an in-app retrieval verification probe, and review read receipts. An opt-in smoke harness still provides CLI-level RPC connectivity and blob retrieval verification, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
+It ships as a complete, runnable open-source receipt audit candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, inspect Blob identity, run an in-app retrieval verification probe, and verify the generated read receipt as an aggregate audit bundle. An opt-in smoke harness still provides CLI-level RPC connectivity and blob retrieval verification, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
 
 **What it is:**
 - A Shelby ecosystem application layer for AI evidence storage using Shelby blob references and on-chain registration
@@ -31,7 +31,7 @@ It ships as a complete, runnable open-source testnet proof verification candidat
 
 **Shelby AI 证据库（Shelby AI Evidence Vault）** 是一个构建在 Shelby 之上的 AI 证据与读取回执应用层。它展示了 AI 流水线如何把数据集、智能体运行产出及文档转化为带有 Shelby Blob 身份的可验证证据记录，并生成可审计的回执，将每一次回答与所依据的证据关联起来。
 
-该项目作为完整、可运行的测试网证明验证候选版本发布。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径从 `/testnet` 开始，社区用户可以检测并连接 Aptos 钱包、确认 Aptos Testnet 状态，再通过浏览器钱包签名上传至 Shelby 测试网，检查 Blob 身份，运行产品内检索验证，并查看读取回执。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
+该项目作为完整、可运行的回执审计候选版本发布。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径从 `/testnet` 开始，社区用户可以检测并连接 Aptos 钱包、确认 Aptos Testnet 状态，再通过浏览器钱包签名上传至 Shelby 测试网，检查 Blob 身份，运行产品内检索验证，并在读取回执页面聚合验证所有引用的测试网 Blob。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
 
 **产品定位：**
 - 使用 Shelby Blob 引用和链上注册的 AI 证据应用层
@@ -74,11 +74,11 @@ Refresh the page. Navigate to `/read-receipt/local-rr-{uuid}`. The receipt resol
 
 **Testnet path — public participant demo (60 seconds)**
 
-Deploy with `SHELBY_MODE=testnet` and `NEXT_PUBLIC_SHELBY_NETWORK=testnet`, open `/upload`, connect Petra wallet on Aptos Testnet, and upload. The upload uses `@shelby-protocol/react` `useUploadBlobs` — the browser wallet signs the transaction. On success you get a real `shelby://testnet/{account}/{blobName}` reference, a `storageStatus: registered`, and an explorer URL. Run `npm run smoke` with the returned address and blobName to verify retrieval from the Shelby RPC.
+Deploy with `SHELBY_MODE=testnet` and `NEXT_PUBLIC_SHELBY_NETWORK=testnet`, open `/upload`, connect Petra wallet on Aptos Testnet, and upload. The upload uses `@shelby-protocol/react` `useUploadBlobs` — the browser wallet signs the transaction. On success you get a real `shelby://testnet/{account}/{blobName}` reference, a `storageStatus: registered`, and an explorer URL. Open the Blob detail proof panel, then open the generated read receipt and run the aggregate receipt verification. Run `npm run smoke` with the returned address and blobName for CLI-level confirmation.
 
 **Read receipts — the audit trail (30 seconds)**
 
-Every upload — mock or testnet — creates a read receipt that binds to real BlobRecord identity. The receipt page shows the blob's Shelby ref, hash, data-source badge, account address (testnet), network, and storage status. Receipts survive refresh. A real AI agent can produce the same receipts for every query it answers. That's the evidence chain.
+Every upload — mock or testnet — creates a read receipt that binds to real BlobRecord identity. The receipt page shows the blob's Shelby ref, hash, data-source badge, account address (testnet), network, and storage status. For Shelby testnet receipts, it also aggregates every referenced Blob into a verification panel with checked, verified, and failed states. Receipts survive refresh. A real AI agent can produce the same receipts for every query it answers. That's the evidence chain.
 
 ---
 
@@ -105,7 +105,8 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | X8 | Merged | Public Shelby testnet participation path, participant docs, upload-page onboarding |
 | X9 | Merged | Navigation-level `/testnet` launch console for community participation |
 | X10 | Merged | Wallet readiness panel on `/testnet`: detect/connect wallet, show account and Aptos Testnet status |
-| X11 | Current | In-app testnet Blob proof verification: explorer/retrieval identity and server-side retrieval probe |
+| X11 | Merged | In-app testnet Blob proof verification: explorer/retrieval identity and server-side retrieval probe |
+| X12 | Current | Receipt-level testnet audit aggregation: verify all referenced Shelby testnet blobs from the read receipt |
 
 ---
 

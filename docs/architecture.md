@@ -285,6 +285,8 @@ The read receipt page uses `ReadReceiptClient` (`src/components/read-receipt-cli
       4. Resolves referenced blobs: localStorage → demo → SQLite
       5. Renders full identity surface per blob: shelbyRef, hash, source,
          accountAddress, blobName, network, storageStatus, explorerUrl, retrievalUrl
+      6. Aggregates testnet blobs into a receipt-level proof panel
+      7. verifyShelbyRetrievalAction() [server action] checks retrieval endpoints
 ```
 
 ---
