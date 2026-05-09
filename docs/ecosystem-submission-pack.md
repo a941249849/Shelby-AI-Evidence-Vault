@@ -108,7 +108,7 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | X11 | Merged | In-app testnet Blob proof verification: explorer/retrieval identity and server-side retrieval probe |
 | X12 | Merged | Receipt-level testnet audit aggregation: verify all referenced Shelby testnet blobs from the read receipt |
 | X13 | Merged | Community testnet session: `/testnet` aggregates latest testnet receipt/blob records and copies a participant summary |
-| X14 | Current | Persistent testnet session ledger: `/testnet` merges browser-cache and SQLite testnet receipts/blobs |
+| X14 | Current | Persistent testnet session ledger: `/testnet` merges browser-cache and SQLite testnet receipts/blobs; `/dashboard` indexes Shelby testnet packs as first-class records |
 
 ---
 

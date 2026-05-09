@@ -9,7 +9,7 @@ export interface EvidencePack {
   status: 'active' | 'archived' | 'pending';
   description: string;
   /** Indicates the origin of this record. Undefined means built-in demo data. */
-  dataSource?: 'demo' | 'local';
+  dataSource?: 'demo' | 'local' | 'shelby-testnet';
 }
 
 export const evidencePacks: EvidencePack[] = [

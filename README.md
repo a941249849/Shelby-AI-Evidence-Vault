@@ -228,7 +228,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Data-source badge on blob/receipt detail (Demo / Local mock / Shelby testnet)
 - Opt-in Node.js smoke harness (`npm run smoke`) for RPC connectivity and retrieval verification
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
-- Dashboard shows built-in demo data + locally uploaded packs; reset button clears browser cache only while SQLite records remain durable
+- Dashboard shows built-in demo data, locally uploaded packs, SQLite records, and Shelby testnet uploads as first-class data sources; reset button clears browser cache only while SQLite records remain durable
 - Mode indicator, wallet connect UI, and public testnet participation guide on upload page
 - Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, Aptos Testnet network status, and a persistent community test session summary
 - Testnet session ledger reads browser cache plus SQLite records, dedupes receipts/blobs, and preserves the participant summary even when browser cache is incomplete
@@ -271,7 +271,7 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
 | `docs/public-testnet-participation.md` | X8 public Shelby testnet participant and deployment path |
-| `docs/final-product-acceptance.md` | X4 manual acceptance snapshot for the earlier community experiment review |
+| `docs/final-product-acceptance.md` | X14 public testnet candidate acceptance package |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |
 | `docs/release-candidate-checklist.md` | C12 release-candidate verification gate |
 | `docs/c3-smoke-test-guide.md` | Smoke harness setup and manual testnet verification |

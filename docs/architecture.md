@@ -384,6 +384,7 @@ npm run verify-community-demo
   → search state: searchQuery, filterCategory, filterSourceType, filterStatus, filterDataSource, sortBy
   → applyFilters(packs): text search across title/description/category/sourceType/status/tags/dataSource
                           then category/sourceType/status/dataSource dropdown filters
+                          dataSource includes demo, local, and shelby-testnet records
                           then sortPacks() by selected sort key
   → filteredUserPacks = applyFilters(allUserPacks)
   → filteredDemoPacks = applyFilters(demoPacks)
@@ -408,4 +409,4 @@ npm run verify-community-demo
 - **Tailwind v4.** Uses CSS-first configuration (`@import "tailwindcss"` in globals.css). No `tailwind.config.js` needed.
 - **Conservative status mapping.** `status-map.ts` defines `registered → ready → failed → unknown`. The React SDK hook returns `void` on success, so `storageStatus` is `registered` until a retrieval check confirms `ready`.
 - **C8 deterministic script.** `scripts/generate-agent-run.mjs` is the canonical agent-run example — runs with zero credentials, uses `better-sqlite3` directly (same schema as `lib/server/db.ts`), and is idempotent via `INSERT OR REPLACE`. Stable IDs (`c8-*`) ensure the generated receipt URL is predictable.
-- **C10/X6 client-side search/filter/sort and evidence-card deep links.** Search, filter, and sort logic in `DashboardClient` is pure client-side state. `useMemo` wraps filter/sort computation and Blob deep-link lookup so it only recomputes when inputs change. Sorting uses `localeCompare` for deterministic, locale-aware ordering. The local/SQLite user-created evidence and built-in corpus section split is preserved; sections become invisible only when their filtered result set is empty. Evidence cards use localized category/source/status labels and open the first Blob provenance page when a BlobRecord is available.
+- **C10/X14 client-side search/filter/sort and evidence-card deep links.** Search, filter, and sort logic in `DashboardClient` is pure client-side state. `useMemo` wraps filter/sort computation and Blob deep-link lookup so it only recomputes when inputs change. Sorting uses `localeCompare` for deterministic, locale-aware ordering. The user/testnet evidence and built-in corpus section split is preserved; sections become invisible only when their filtered result set is empty. Evidence cards use localized category/source/status/data-source labels and open the first Blob provenance page when a BlobRecord is available.

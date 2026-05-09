@@ -48,7 +48,7 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X11 testnet proof verification is merged: in-app Blob proof panel, safe Shelby retrieval probe, and docs/acceptance alignment.
 - X12 receipt audit closure is merged: read receipts aggregate all referenced Shelby testnet Blob verification checks into one audit panel.
 - X13 community testnet session is merged: `/testnet` aggregates the latest testnet receipt/blob records and provides a copyable participant summary.
-- X14 persistent testnet session ledger is the active Codex-owned stage: `/testnet` merges browser-cache and SQLite testnet receipts/blobs so participant summaries survive incomplete browser cache state.
+- X14 persistent testnet session ledger is the active Codex-owned stage: `/testnet` merges browser-cache and SQLite testnet receipts/blobs, and `/dashboard` treats Shelby testnet packs as first-class indexed records.
 
 ## Stage Gate
 
@@ -682,7 +682,7 @@ Make the evidence index usable for community testers and operators once the vaul
 
 Scope:
 
-- `src/components/dashboard-client.tsx` — search input covering title, description, category, sourceType, status, tags, and dataSource; dropdown filters for category, source type, status, and data source (demo/local); sort controls (newest first, oldest first, title A–Z, most blobs); clear/reset filters button; filtered result counts on metric bar and section headers; empty state with reset control.
+- `src/components/dashboard-client.tsx` — search input covering title, description, category, sourceType, status, tags, and dataSource; dropdown filters for category, source type, status, and data source (demo/local/shelby-testnet); sort controls (newest first, oldest first, title A-Z, most blobs); clear/reset filters button; filtered result counts on metric bar and section headers; empty state with reset control.
 - `docs/demo-script.md` — new Step 7.5 covering the dashboard operator search/filter/sort workflow.
 - `docs/community-experiment-runbook.md` — new section on search/filter/sort for community testers.
 - `docs/architecture.md` — C10 entry added.

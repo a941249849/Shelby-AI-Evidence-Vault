@@ -26,14 +26,15 @@ interface DashboardClientProps {
 }
 
 type SortKey = 'newest' | 'oldest' | 'title-az' | 'blobs';
+type DataSourceFilter = NonNullable<EvidencePack['dataSource']> | '';
 
 const dashboardCopy = {
   zh: {
     chip: '证据索引',
     title: 'AI 证据的可检查存储状态。',
-    subtitle: 'Demo 语料、本地浏览器记录与 SQLite 持久化上传统一汇入一个证据索引。',
+    subtitle: 'Demo 语料、本地浏览器记录、SQLite 持久化上传与 Shelby 测试网记录统一汇入一个证据索引。',
     runtime: '运行边界',
-    runtimeValue: '本地 + SQLite',
+    runtimeValue: '本地 + SQLite + Shelby testnet',
     newPack: '新建证据包',
     metrics: ['已索引证据包', '活跃证据包', '已追踪 Blob', '用户证据包'],
     search: '搜索与筛选',
@@ -51,11 +52,11 @@ const dashboardCopy = {
     noBody: '调整搜索词或筛选条件，或重置查看完整索引。',
     resetFilters: '重置筛选',
     userChip: '用户创建记录',
-    localWorkspace: '本地工作区',
+    localWorkspace: '用户 / 测试网记录',
     shown: '已显示',
     resetCache: '重置浏览器缓存',
     resetCacheConfirm: '再次点击确认重置',
-    noLocal: '当前筛选条件下没有本地记录。',
+    noLocal: '当前筛选条件下没有用户或测试网记录。',
     demoChip: '内置语料',
     demoEvidence: 'Demo 证据',
     packs: '证据包',
@@ -65,9 +66,9 @@ const dashboardCopy = {
     chip: 'Evidence index',
     title: 'Inspectable storage state for AI evidence.',
     subtitle:
-      'Demo corpus, browser-local records, and SQLite-persisted uploads resolve through one evidence index.',
+      'Demo corpus, browser-local records, SQLite-persisted uploads, and Shelby testnet records resolve through one evidence index.',
     runtime: 'Runtime boundary',
-    runtimeValue: 'Local + SQLite',
+    runtimeValue: 'Local + SQLite + Shelby testnet',
     newPack: 'New evidence pack',
     metrics: ['Packs indexed', 'Active packs', 'Blobs tracked', 'User packs'],
     search: 'Search & filter',
@@ -85,11 +86,11 @@ const dashboardCopy = {
     noBody: 'Try adjusting your search query or filters, or reset to see the full index.',
     resetFilters: 'Reset filters',
     userChip: 'User-created records',
-    localWorkspace: 'Local workspace',
+    localWorkspace: 'User / testnet records',
     shown: 'shown',
     resetCache: 'Reset browser cache',
     resetCacheConfirm: 'Click again to reset browser cache',
-    noLocal: 'No local records match the current filters.',
+    noLocal: 'No user or testnet records match the current filters.',
     demoChip: 'Built-in corpus',
     demoEvidence: 'Demo evidence',
     packs: 'packs',
@@ -159,7 +160,7 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
   const [filterCategory, setFilterCategory] = useState<EvidencePack['category'] | ''>('');
   const [filterSourceType, setFilterSourceType] = useState<EvidencePack['sourceType'] | ''>('');
   const [filterStatus, setFilterStatus] = useState<EvidencePack['status'] | ''>('');
-  const [filterDataSource, setFilterDataSource] = useState<'demo' | 'local' | ''>('');
+  const [filterDataSource, setFilterDataSource] = useState<DataSourceFilter>('');
   const [sortBy, setSortBy] = useState<SortKey>('newest');
 
   useEffect(() => {
@@ -383,12 +384,13 @@ export default function DashboardClient({ demoPacks, demoBlobs }: DashboardClien
             {/* Data source filter */}
             <select
               value={filterDataSource}
-              onChange={(e) => setFilterDataSource(e.target.value as 'demo' | 'local' | '')}
+              onChange={(e) => setFilterDataSource(e.target.value as DataSourceFilter)}
               aria-label="Filter by data source"
               className={selectClass}
             >
               <option value="">{t.allSources}</option>
               <option value="local">{language === 'zh' ? '本地 / 已上传' : 'Local / uploaded'}</option>
+              <option value="shelby-testnet">Shelby {language === 'zh' ? '测试网' : 'testnet'}</option>
               <option value="demo">{language === 'zh' ? 'Demo 语料' : 'Demo corpus'}</option>
             </select>
 

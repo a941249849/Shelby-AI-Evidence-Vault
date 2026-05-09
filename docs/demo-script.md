@@ -202,7 +202,7 @@ The dashboard toolbar lets reviewers quickly narrow the full evidence index with
 **Empty state:**
 - If no packs match the current filters, a bilingual empty state appears with a **重置筛选 / Reset filters** button.
 
-**Important:** Filters and sort are client-side — they do not modify any stored data. The browser-cache reset button still only clears browser-cached local records; SQLite-persisted packs remain.
+**Important:** Filters and sort are client-side — they do not modify any stored data. The data-source filter covers Demo, Local/SQLite, and Shelby testnet records. The browser-cache reset button still only clears browser-cached local records; SQLite-persisted packs remain.
 
 ---
 

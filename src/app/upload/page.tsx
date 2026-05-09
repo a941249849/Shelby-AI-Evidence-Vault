@@ -678,6 +678,7 @@ function UploadPageContent() {
         tags,
         description: form.description,
         blobCount: files.length,
+        dataSource: mode === 'testnet' ? 'shelby-testnet' : 'local',
       });
 
       const blobIds: string[] = [];
