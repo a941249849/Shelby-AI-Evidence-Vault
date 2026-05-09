@@ -43,7 +43,7 @@ npm run verify-release-candidate
 Expected release-candidate result:
 
 ```txt
-Passed  : 22
+Passed  : 23
 Failed  : 0
 Skipped : 0
 ```
@@ -56,6 +56,7 @@ The verifier must include:
 - Community demo DB harness.
 - C8 deterministic agent-run IDs and idempotency.
 - X15 public testnet handoff JSON contract.
+- `verify-testnet-handoff` accepts a copied handoff JSON file.
 - Production build.
 - Route smoke checks for `/`, `/dashboard`, `/testnet`, `/upload`, `/blob/blob-001`, `/read-receipt/rr-001`, and `/read-receipt/c8-rr-agent-sentinel-v1`.
 
@@ -99,7 +100,8 @@ Manual proof path:
 6. Open the generated read receipt and run receipt-level verification.
 7. Return to `/testnet` and copy the handoff JSON.
 8. Confirm the handoff JSON includes `routes`, `latestReceipt.url`, `blobs[].url`, `explorerUrl`, `retrievalUrl`, `smokeCommands`, and `acceptanceStatus`.
-9. Run the generated smoke command if operator credentials and endpoint access are available.
+9. Save the JSON locally and run `npm run verify-testnet-handoff -- path/to/handoff.json`.
+10. Run the generated smoke command if operator credentials and endpoint access are available.
 
 ## Files To Inspect Closely
 
@@ -109,7 +111,7 @@ Manual proof path:
 | Browser-wallet upload | `src/app/upload/page.tsx`, `src/lib/shelby/use-shelby-upload.ts`, `src/lib/shelby/browser-client.ts` |
 | Proof verification | `src/components/blob-detail-client.tsx`, `src/components/read-receipt-client.tsx`, `src/app/actions/verify.ts` |
 | Persistence | `src/app/actions/persist.ts`, `src/lib/server/evidence-store.ts`, `src/lib/server/db.ts`, `src/lib/store/local-store.ts` |
-| Acceptance gates | `scripts/verify-release-candidate.mjs`, `scripts/shelby-doctor.mjs`, `scripts/shelby-smoke.mjs` |
+| Acceptance gates | `scripts/verify-release-candidate.mjs`, `scripts/verify-testnet-handoff.mjs`, `scripts/shelby-doctor.mjs`, `scripts/shelby-smoke.mjs` |
 | Product boundaries | `README.md`, `docs/final-product-acceptance.md`, `docs/public-testnet-participation.md` |
 
 ## Security Boundaries

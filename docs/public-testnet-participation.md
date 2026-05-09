@@ -120,7 +120,13 @@ Manual testnet gate:
 11. Run the receipt-level proof verification and confirm each referenced testnet Blob reports a checked status.
 12. Return to `/testnet`, confirm the community test session shows the latest receipt and referenced Blob records from browser cache plus SQLite, then copy the session summary.
 13. Confirm the copied handoff JSON contains `routes`, `latestReceipt.url`, `blobs[].url`, `smokeCommands`, and `acceptanceStatus`.
-14. Run the opt-in smoke retrieval check with the returned account and blobName, or use the generated command from the handoff JSON:
+14. Save the copied handoff JSON locally and validate it:
+
+```bash
+npm run verify-testnet-handoff -- path/to/handoff.json
+```
+
+15. Run the opt-in smoke retrieval check with the returned account and blobName, or use the generated command from the handoff JSON:
 
 ```bash
 SHELBY_SMOKE=true \

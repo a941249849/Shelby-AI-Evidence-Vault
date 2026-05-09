@@ -109,7 +109,9 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | X12 | Merged | Receipt-level testnet audit aggregation: verify all referenced Shelby testnet blobs from the read receipt |
 | X13 | Merged | Community testnet session: `/testnet` aggregates latest testnet receipt/blob records and copies a participant summary |
 | X14 | Merged | Persistent testnet session ledger: `/testnet` merges browser-cache and SQLite testnet receipts/blobs; `/dashboard` indexes Shelby testnet packs as first-class records |
-| X15 | Current | Public testnet handoff artifact: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags |
+| X15 | Merged | Public testnet handoff artifact: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags |
+| X16 | Merged | Final Copilot review brief: fixed merge-readiness scope, gates, real-testnet path, and security boundaries |
+| X17 | Current | Copied handoff validator: `npm run verify-testnet-handoff -- path/to/handoff.json` validates real-upload handoff JSON |
 
 ---
 

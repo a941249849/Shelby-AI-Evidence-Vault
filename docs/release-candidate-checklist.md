@@ -82,7 +82,16 @@ npm run verify-release-candidate
 - **Expect:** copied handoff JSON includes X15 milestone, full route URLs, receipt/blob proof URLs, explorer/retrieval identity, smoke command, and acceptance-status flags.
 - **Why:** Confirms the public testnet handoff is a stable product contract, not only UI copy.
 
-### 7. Production build
+### 7. Handoff file validator
+
+```bash
+npm run verify-testnet-handoff -- path/to/handoff.json
+```
+
+- **Expect:** exit 0 for a real copied `/testnet` handoff with testnet mode, wallet readiness, receipt/blob proof URLs, smoke command, and acceptance-status flags.
+- **Why:** Gives operators and reviewers a direct post-upload validation command for the copied community handoff.
+
+### 8. Production build
 
 ```bash
 npm run build
@@ -91,7 +100,7 @@ npm run build
 - **Expect:** exit 0
 - **Why:** Confirms the full Next.js production build succeeds. This is the artefact that is served in the route smoke checks.
 
-### 8. Route smoke checks
+### 9. Route smoke checks
 
 The verifier starts the built Next.js app (`next start`) on an available local port with `SHELBY_MODE=mock` and the isolated temp database, then fetches the following routes:
 
@@ -248,15 +257,18 @@ npm run dev
 [rc] ── 6. testnet handoff summary contract ──────────────────────────────
   ✓  testnet handoff summary contract
 
-[rc] ── 7. npm run build ─────────────────────────────────────────────────
+[rc] ── 7. verify-testnet-handoff ────────────────────────────────────────
+  ✓  npm run verify-testnet-handoff: exit 0
+
+[rc] ── 8. npm run build ─────────────────────────────────────────────────
   ✓  npm run build: exit 0
 
-[rc] ── 8. Start built app + route smoke checks ─────────────────────────
+[rc] ── 9. Start built app + route smoke checks ─────────────────────────
   → Using port 34821
   → Waiting for server at http://127.0.0.1:34821/…
   ✓  Server started and ready at :34821
 
-[rc] ── 8a. Route smoke checks ───────────────────────────────────────────
+[rc] ── 9a. Route smoke checks ───────────────────────────────────────────
   ✓  GET /: HTTP 200 + marker found
   ✓  GET /dashboard: HTTP 200 + marker found
   ✓  GET /testnet: HTTP 200 + marker found
@@ -266,7 +278,7 @@ npm run dev
   ✓  GET /read-receipt/c8-rr-agent-sentinel-v1: HTTP 200 + marker found
 
 [rc] ── Summary ──────────────────────────────────────────────────────────
-  Passed  : 22
+  Passed  : 23
   Failed  : 0
   Skipped : 0
 

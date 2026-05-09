@@ -22,11 +22,12 @@
  *   4. verify-community-demo: zero-credential DB-level harness; requires success.
  *   5. generate-agent-run: runs against isolated temp DB; verifies C8 IDs.
  *   6. testnet handoff summary contract: verifies copied JSON structure.
- *   7. npm run build: production Next.js build; requires exit 0.
- *   8. Start built app (next start) on available local port with isolated DB
+ *   7. verify-testnet-handoff: validates a handoff JSON file.
+ *   8. npm run build: production Next.js build; requires exit 0.
+ *   9. Start built app (next start) on available local port with isolated DB
  *      and SHELBY_MODE=mock; smoke-fetch key routes.
- *   9. Shut server down cleanly.
- *   10. Write JSON artifact to artifacts/release-candidate/latest.json.
+ *   10. Shut server down cleanly.
+ *   11. Write JSON artifact to artifacts/release-candidate/latest.json.
  *
  * WHAT THIS SCRIPT DOES NOT DO:
  *   - Make any real Shelby network calls.
@@ -333,6 +334,8 @@ function verifyHandoffSummaryContract() {
   } else {
     fail('testnet-handoff-contract', 'testnet handoff summary contract', `failed fields: ${failures.join(', ')}`);
   }
+
+  return summary;
 }
 
 // ── Write artifact ────────────────────────────────────────────────────────────
@@ -527,10 +530,22 @@ if (!generatorFailed) {
 // ── Check 6: Testnet handoff summary contract ────────────────────────────────
 section('6. testnet handoff summary contract');
 
-verifyHandoffSummaryContract();
+const handoffFixture = verifyHandoffSummaryContract();
 
-// ── Check 7: npm run build ────────────────────────────────────────────────────
-section('7. npm run build');
+// ── Check 7: verify-testnet-handoff ──────────────────────────────────────────
+section('7. verify-testnet-handoff');
+
+const handoffFixturePath = join(tmpDir, 'handoff-fixture.json');
+writeFileSync(handoffFixturePath, JSON.stringify(handoffFixture, null, 2) + '\n', 'utf-8');
+runCheck(
+  'verify-testnet-handoff',
+  'npm run verify-testnet-handoff',
+  [NPM, 'run', 'verify-testnet-handoff', '--', handoffFixturePath],
+  { env: {}, expectedExit: 0 }
+);
+
+// ── Check 8: npm run build ────────────────────────────────────────────────────
+section('8. npm run build');
 
 const buildResult = runCheck(
   'build',
@@ -540,8 +555,8 @@ const buildResult = runCheck(
 );
 const buildSucceeded = buildResult.exitCode === 0;
 
-// ── Check 8: Start server + route smoke ───────────────────────────────────────
-section('8. Start built app + route smoke checks');
+// ── Check 9: Start server + route smoke ───────────────────────────────────────
+section('9. Start built app + route smoke checks');
 
 if (!buildSucceeded) {
   skip('server-start', 'Server start (skipped — build failed)');
@@ -589,7 +604,7 @@ if (!buildSucceeded) {
       pass('server-start', `Server started and ready at :${port}`);
 
       // Route smoke checks
-      section('8a. Route smoke checks');
+      section('9a. Route smoke checks');
 
       await smokeRoute('/', baseUrl, 'Evidence Vault');
       await smokeRoute('/dashboard', baseUrl, 'Evidence index');
@@ -635,6 +650,7 @@ if (failCount > 0) {
   console.log('    community-demo : zero-credential DB harness');
   console.log('    generate-agent-run: C8 IDs persisted, idempotent');
   console.log('    testnet handoff: copied JSON contract verified');
+  console.log('    handoff validator: copied JSON file accepted');
   console.log('    npm run build  : production build succeeded');
   console.log('    route smoke    : /, /dashboard, /testnet, /upload, /blob, /read-receipt');
   console.log('');

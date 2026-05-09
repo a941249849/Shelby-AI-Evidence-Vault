@@ -11,6 +11,7 @@
     "smoke": "node scripts/shelby-smoke.mjs",
     "generate-agent-run": "node scripts/generate-agent-run.mjs",
     "verify-community-demo": "node scripts/verify-community-demo.mjs",
+    "verify-testnet-handoff": "node scripts/verify-testnet-handoff.mjs",
     "verify-release-candidate": "node scripts/verify-release-candidate.mjs"
   },
   "dependencies": {

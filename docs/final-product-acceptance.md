@@ -54,7 +54,7 @@ Expected:
 
 - `lint` exits 0.
 - `build` exits 0.
-- `verify-release-candidate` exits 0 with `Passed: 22`, `Failed: 0`, `Skipped: 0`.
+- `verify-release-candidate` exits 0 with `Passed: 23`, `Failed: 0`, `Skipped: 0`.
 
 ## Manual product QA
 
@@ -74,7 +74,8 @@ Expected:
 9. Open the generated read receipt link and confirm receipt-level proof aggregation appears with the correct mock/testnet boundary.
 10. Refresh the receipt page and confirm it still resolves from SQLite.
 11. Return to `/testnet` after a real testnet upload and confirm copied handoff JSON contains full route URLs, receipt/blob URLs, explorer/retrieval identity, smoke commands, and acceptance-status flags.
-12. Run `npm run generate-agent-run`, then open `/read-receipt/c8-rr-agent-sentinel-v1`.
+12. Save the copied handoff JSON locally and run `npm run verify-testnet-handoff -- path/to/handoff.json`.
+13. Run `npm run generate-agent-run`, then open `/read-receipt/c8-rr-agent-sentinel-v1`.
 
 ## Boundaries that must remain clear
 

@@ -75,6 +75,7 @@ npm run lint                    # ESLint check — must pass before any PR
 npm run build                   # Next.js production build — must pass
 npm run shelby-doctor           # C11: mock-mode readiness check (zero credentials, always passes)
 npm run verify-community-demo   # C9: 35 DB-level assertions, zero credentials
+npm run verify-testnet-handoff -- path/to/handoff.json # Validate copied /testnet handoff after real upload
 npm run verify-release-candidate # C12: full release-candidate gate (build + routes + doctor)
 npm run smoke                   # Opt-in Shelby testnet smoke harness (requires SHELBY_SMOKE=true)
 ```
@@ -235,7 +236,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, Aptos Testnet network status, and a persistent community test session summary
 - Testnet session ledger reads browser cache plus SQLite records, dedupes receipts/blobs, and preserves the participant summary even when browser cache is incomplete
 - Public handoff JSON includes full app routes, receipt/blob proof URLs, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review
-- C12 release-candidate verifier: doctor checks, isolated SQLite, public handoff JSON contract, production build, and route smoke checks
+- C12 release-candidate verifier: doctor checks, isolated SQLite, public handoff JSON contract, copied-handoff validator, production build, and route smoke checks
 - X3 product closeout status: release-candidate gate remained green after the UI/product pass
 - X15 public testnet handoff: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, durable session summary, and optional smoke retrieval
 

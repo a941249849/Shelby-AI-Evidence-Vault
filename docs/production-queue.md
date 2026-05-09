@@ -50,7 +50,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X13 community testnet session is merged: `/testnet` aggregates the latest testnet receipt/blob records and provides a copyable participant summary.
 - X14 persistent testnet session ledger is merged: `/testnet` merges browser-cache and SQLite testnet receipts/blobs, and `/dashboard` treats Shelby testnet packs as first-class indexed records.
 - X15 public testnet handoff is merged: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review.
-- X16 final Copilot review package is the active stage: `docs/final-copilot-review-brief.md` defines the final review scope, gates, real-testnet acceptance path, security boundaries, and expected review output.
+- X16 final Copilot review package is merged: `docs/final-copilot-review-brief.md` defines the final review scope, gates, real-testnet acceptance path, security boundaries, and expected review output.
+- X17 testnet handoff validator is the active stage: `scripts/verify-testnet-handoff.mjs` validates copied `/testnet` handoff JSON after a real Shelby testnet upload.
 
 ## Stage Gate
 
@@ -518,7 +519,7 @@ Turn the current community experiment into a release-candidate style package wit
 
 Scope:
 
-- `scripts/verify-release-candidate.mjs` — zero-credential, zero-network RC acceptance harness. Runs shelby-doctor (mock PASS, testnet fail-closed, public-key guard), verify-community-demo, generate-agent-run (with isolated DB, C8 ID assertions), npm run build, starts next start on an available local port, smoke-fetches 6 routes (HTTP 200 + page marker), and shuts down cleanly.
+- `scripts/verify-release-candidate.mjs` — zero-credential, zero-network RC acceptance harness. Runs shelby-doctor (mock PASS, testnet fail-closed, public-key guard), verify-community-demo, generate-agent-run (with isolated DB, C8 ID assertions), public handoff contract validation, copied-handoff file validation, npm run build, starts next start on an available local port, smoke-fetches 7 routes (HTTP 200 + page marker), and shuts down cleanly.
 - `package.json` — `verify-release-candidate` script added.
 - `.gitignore` — `artifacts/release-candidate/` added.
 - `docs/release-candidate-checklist.md` — release-candidate checklist and expected output.
