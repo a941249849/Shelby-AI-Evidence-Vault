@@ -142,6 +142,7 @@ const uploadCopy = {
     successTestnetBody: '已注册到 Shelby 测试网，并保存真实账号与 blob 元数据。',
     readReceipt: '读取回执',
     blobPages: 'Blob 详情页',
+    sessionConsole: '返回测试会话',
     viewIndex: '查看证据索引',
     uploadAnother: '继续上传证据包',
     computingHash: '正在计算 SHA-256',
@@ -242,6 +243,7 @@ const uploadCopy = {
       'Registered on Shelby testnet and saved locally with real account and blob metadata.',
     readReceipt: 'Read receipt',
     blobPages: 'Blob detail pages',
+    sessionConsole: 'Back to test session',
     viewIndex: 'View evidence index',
     uploadAnother: 'Upload another pack',
     computingHash: 'Computing SHA-256',
@@ -871,6 +873,15 @@ function UploadPageContent() {
                 {t.viewIndex}
                 <ChevronRight className="h-4 w-4" />
               </Link>
+              {isTestnet && (
+                <Link
+                  href="/testnet"
+                  className="ui-button ui-button-secondary shelby-cut-sm"
+                >
+                  {t.sessionConsole}
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              )}
               <button
                 onClick={() => setUploadResult(null)}
                 className="ui-button ui-button-secondary shelby-cut-sm"

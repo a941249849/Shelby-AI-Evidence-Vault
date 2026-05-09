@@ -1,4 +1,4 @@
-# X12 Public Shelby Testnet Receipt Audit
+# X13 Public Shelby Testnet Session
 
 Last verified against official Shelby docs: 2026-05-09.
 
@@ -6,7 +6,7 @@ Last verified against official Shelby docs: 2026-05-09.
 
 Shelby AI Evidence Vault is no longer framed only as a local community experiment. The public target is:
 
-> A Shelby ecosystem app where community users can connect an Aptos wallet, upload evidence to Shelby testnet, inspect Blob identity, and verify the resulting read receipt as an audit bundle.
+> A Shelby ecosystem app where community users can connect an Aptos wallet, upload evidence to Shelby testnet, inspect Blob identity, verify the resulting read receipt as an audit bundle, and copy a session summary for community participation.
 
 Local mock mode remains the zero-credential development and review fallback. It is not the final protocol path.
 
@@ -50,6 +50,7 @@ Official references:
 12. Open the generated Blob detail page and run the in-app retrieval verification panel.
 13. Open the generated read receipt page.
 14. Run the receipt-level verification panel to aggregate all referenced Shelby testnet Blob checks.
+15. Return to `/testnet` and copy the community test session summary.
 
 ## Deployment Switch
 
@@ -80,6 +81,7 @@ Implemented:
 - Local SQLite persistence plus browser cache/fallback.
 - Blob and receipt pages resolve testnet records after upload.
 - Public `/testnet` launch console with mode status, wallet detection, connect/disconnect, account/network readiness, prerequisites, upload entry, and acceptance boundaries.
+- Community test session panel on `/testnet` that reads local testnet receipts/blobs and produces a copyable JSON summary.
 - Public testnet participation guide on `/upload`.
 - Testnet proof panel on `/blob/{id}` with account, blobName, status, explorer/retrieval links, and a safe server-side retrieval probe.
 - Receipt-level proof panel on `/read-receipt/{id}` with aggregate verified/failed counts across referenced Shelby testnet blobs.
@@ -115,7 +117,8 @@ Manual testnet gate:
 9. Open the generated `/blob/{id}` page and run the in-app proof verification.
 10. Open the generated `/read-receipt/{id}` page.
 11. Run the receipt-level proof verification and confirm each referenced testnet Blob reports a checked status.
-12. Run the opt-in smoke retrieval check with the returned account and blobName:
+12. Return to `/testnet`, confirm the community test session shows the latest receipt and referenced Blob records, then copy the session summary.
+13. Run the opt-in smoke retrieval check with the returned account and blobName:
 
 ```bash
 SHELBY_SMOKE=true \
