@@ -16,10 +16,10 @@ import TestnetProofSummary from '@/components/testnet-proof-summary';
 
 const copy = {
   zh: {
-    eyebrow: '为持久而建，为流动而生。',
-    title: '面向 AI Agent 的可验证记忆。',
+    eyebrow: 'Shelby testnet builder demo',
+    title: '给 AI Agent 的可验证证据记忆演示。',
     body:
-      '将源文件封装成证据包，绑定为 Shelby-ready Blob，并把每次回答引用的证据沉淀为可追溯回执。',
+      '一个开发者展示版：把源文件封装成证据包，绑定为 Shelby testnet Blob，并把回答引用沉淀为可追溯回执。',
     actions: {
       wallet: '连接钱包测试',
       upload: '上传证据',
@@ -42,7 +42,7 @@ const copy = {
       ['当前存储', '上传记录可跨浏览器查看和保留。'],
     ],
     section: '核心能力',
-    sectionBody: '构建 AI 时代的可验证数据基础设施',
+    sectionBody: '展示 Shelby Blob 如何承载 AI 证据与回执链路',
     capabilities: [
       ['结构化证据包', '源材料会带上分类、标签、哈希和持久化状态，形成可理解的证据集。', 'Evidence Pack'],
       ['Blob 身份', 'Demo、Mock、Testnet 记录保持视图区分，同时不掩盖协议事实。', 'Shelby Blob'],
@@ -50,29 +50,29 @@ const copy = {
       ['可验证 & 可审计', '让证据在产品界面中流动，支持审计、复现与长期追溯。', 'Verifiable'],
     ],
     testnet: {
-      label: 'PUBLIC TESTNET PATH',
-      title: '面向社区的 Shelby 测试网参与入口',
+      label: 'BUILDER DEMO PATH',
+      title: '面向 Shelby 团队与社区的开发者演示入口',
       body:
-        '部署方开启 testnet 后，用户连接 Aptos 钱包、准备测试网 APT 与 ShelbyUSD，即可把证据包写入 Shelby 测试网并生成可追溯回执。',
+        '部署到 Vercel 后，感兴趣的成员可以连接 Aptos 钱包、准备测试网 APT 与 ShelbyUSD，试跑一次 Shelby testnet Blob 上传与回执验证。',
       points: ['钱包签名', 'Shelby Blob 注册', '回执可审计'],
       cta: '连接钱包',
       docs: '查看接入文档',
     },
-    preview: '产品预览',
+    preview: '演示预览',
     previewBody: '从上传到回执，体验完整的证据流',
     previewCards: [
       ['证据索引', '浏览所有证据包、Blob 身份与状态'],
       ['上传证据', '选择文件、计算哈希、生成证据包'],
       ['读取回执', '追溯一次回答引用了哪些证据'],
     ],
-    footerCta: '切换运行模式',
+    footerCta: '查看运行模式',
     footerStatus: 'Mock 模式',
   },
   en: {
-    eyebrow: 'Built for persistence. Designed for flow.',
-    title: 'Verifiable memory for AI agents.',
+    eyebrow: 'Shelby testnet builder demo',
+    title: 'A verifiable evidence-memory demo for AI agents.',
     body:
-      'Package source files into Evidence Packs, bind them as Shelby-ready Blobs, and turn every referenced answer into an auditable Read Receipt.',
+      'A developer showcase that packages source files into Evidence Packs, binds them as Shelby testnet Blobs, and turns referenced answers into auditable Read Receipts.',
     actions: {
       wallet: 'Connect wallet',
       upload: 'Upload evidence',
@@ -95,7 +95,7 @@ const copy = {
       ['Current store', 'Uploads remain inspectable across browser sessions.'],
     ],
     section: 'Core capability',
-    sectionBody: 'A verifiable data foundation for agent-era applications',
+    sectionBody: 'A concrete demo of Shelby Blob identity for AI evidence and receipts',
     capabilities: [
       ['Structured evidence packs', 'Sources carry category, tags, hashes, and persistence state as readable evidence sets.', 'Evidence Pack'],
       ['Blob identity', 'Demo, Mock, and Testnet records stay distinct without hiding protocol facts.', 'Shelby Blob'],
@@ -103,22 +103,22 @@ const copy = {
       ['Verifiable & auditable', 'Evidence moves through the product surface for audit, replay, and long-term provenance.', 'Verifiable'],
     ],
     testnet: {
-      label: 'PUBLIC TESTNET PATH',
-      title: 'A community entry point for Shelby testnet participation',
+      label: 'BUILDER DEMO PATH',
+      title: 'A developer demo entry point for the Shelby team and community',
       body:
-        'When deployed with testnet mode enabled, users connect an Aptos wallet, prepare testnet APT and ShelbyUSD, upload evidence to Shelby testnet, and receive traceable receipts.',
+        'When deployed on Vercel, interested reviewers can connect an Aptos wallet, prepare testnet APT and ShelbyUSD, upload evidence to Shelby testnet, and inspect traceable receipts.',
       points: ['Wallet signing', 'Shelby Blob registration', 'Auditable receipts'],
       cta: 'Connect wallet',
       docs: 'Read integration docs',
     },
-    preview: 'Product preview',
+    preview: 'Demo preview',
     previewBody: 'Walk the flow from upload to receipt',
     previewCards: [
       ['Evidence registry', 'Browse evidence packs, Blob identity, and status'],
       ['Upload evidence', 'Select files, compute hashes, and create a pack'],
       ['Read receipt', 'Trace which evidence informed one answer'],
     ],
-    footerCta: 'Switch runtime mode',
+    footerCta: 'View runtime mode',
     footerStatus: 'Mock mode',
   },
 };
@@ -228,8 +228,8 @@ export default function HomePageClient() {
             </p>
             {language === 'zh' ? (
               <h1>
-                面向 AI Agent 的
-                <span>可验证记忆。</span>
+                AI Agent 的
+                <span>可验证证据记忆。</span>
               </h1>
             ) : (
               <h1>{t.title}</h1>

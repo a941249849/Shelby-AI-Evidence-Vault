@@ -15,7 +15,8 @@
     "verify-release-candidate": "node scripts/verify-release-candidate.mjs",
     "final-readiness": "node scripts/final-readiness.mjs",
     "public-testnet-release-pack": "node scripts/public-testnet-release-pack.mjs",
-    "verify-vercel-builder-demo": "node scripts/verify-vercel-builder-demo.mjs"
+    "verify-vercel-builder-demo": "node scripts/verify-vercel-builder-demo.mjs",
+    "verify-deployment-acceptance": "node scripts/verify-deployment-acceptance.mjs"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^6.3.1",

@@ -45,7 +45,7 @@ export default function SiteFooter() {
           </a>
           <span>SDK</span>
           <span>API</span>
-          <span>{language === 'zh' ? '生态' : 'Ecosystem'}</span>
+          <span>{language === 'zh' ? 'Builder Demo' : 'Builder Demo'}</span>
           <span>{language === 'zh' ? '隐私政策' : 'Privacy'}</span>
         </div>
         <div className="flex items-center gap-4">

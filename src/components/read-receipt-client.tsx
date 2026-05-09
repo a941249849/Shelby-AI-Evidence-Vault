@@ -63,7 +63,7 @@ const receiptCopy = {
       '将这张回执引用的 Shelby testnet Blob 聚合验证：账号命名空间、blobName、检索端点与 HTTP 响应会一起进入审计视图。',
     auditBoundaryTitle: '这张回执不是测试网证明',
     auditBoundaryBody:
-      'Demo 与本地 Mock 回执只用于产品预览；真实社区测试必须由钱包上传生成 shelby-testnet 回执后再运行这里的验证。',
+      'Demo 与本地 Mock 回执只用于产品预览；真实 Shelby testnet 演示必须由钱包上传生成 shelby-testnet 回执后再运行这里的验证。',
     testnetBlobs: '可验证 Blob',
     verifiedBlobs: '已通过',
     failedBlobs: '失败',
@@ -105,7 +105,7 @@ const receiptCopy = {
       'Aggregates every Shelby testnet Blob referenced by this receipt: account namespace, blobName, retrieval endpoint, and HTTP response all become part of the audit view.',
     auditBoundaryTitle: 'This receipt is not a testnet proof',
     auditBoundaryBody:
-      'Demo and local mock receipts are product previews only. Real community testing must create a shelby-testnet receipt through wallet upload, then run verification here.',
+      'Demo and local mock receipts are product previews only. A real Shelby testnet demo must create a shelby-testnet receipt through wallet upload, then run verification here.',
     testnetBlobs: 'Verifiable blobs',
     verifiedBlobs: 'Verified',
     failedBlobs: 'Failed',

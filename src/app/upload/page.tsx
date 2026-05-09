@@ -89,11 +89,11 @@ const uploadCopy = {
     protocolPreviewBody: '用于封装证据包、计算哈希、生成 Mock Shelby 引用与读取回执；不声称真实 Shelby 存储。',
     protocolTestnetTitle: 'Shelby 证明路径',
     protocolTestnetBody: '切换 testnet 并连接钱包后，BlobRecord 会记录 accountAddress、blobName、网络、状态和 explorer 链接。',
-    participationTitle: '公开测试网参与路径',
+    participationTitle: 'Builder demo 测试网路径',
     participationBadgeMock: '待部署方开启 testnet',
     participationBadgeTestnet: 'Shelby testnet-ready',
     participationBody:
-      '面向社区测试的真实路径：钱包在 Aptos Testnet 签名，文件注册为 Shelby Blob，回执记录账号、blobName、哈希、读取链路与 explorer 入口。',
+      '面向 Shelby 团队与社区查看的真实演示路径：钱包在 Aptos Testnet 签名，文件注册为 Shelby Blob，回执记录账号、blobName、哈希、读取链路与 explorer 入口。',
     participationSteps: [
       ['连接钱包', '安装 Petra 或兼容 Aptos 钱包，并切换到 Aptos Testnet。', 'Petra', 'https://petra.app/'],
       ['准备资产', '测试网 APT 用于 gas，ShelbyUSD 用于 Shelby 文件上传。', 'Aptos Faucet', 'https://aptoslabs.com/testnet-faucet'],
@@ -211,11 +211,11 @@ const uploadCopy = {
     protocolTestnetTitle: 'Shelby proof path',
     protocolTestnetBody:
       'With testnet mode and a connected wallet, each BlobRecord captures accountAddress, blobName, network, status, and explorer link.',
-    participationTitle: 'Public testnet participation path',
+    participationTitle: 'Builder demo testnet path',
     participationBadgeMock: 'Waiting for testnet deploy',
     participationBadgeTestnet: 'Shelby testnet-ready',
     participationBody:
-      'The real community path: the wallet signs on Aptos Testnet, files become Shelby Blobs, and receipts keep account, blobName, hash, retrieval, and explorer evidence visible.',
+      'The real demo path for Shelby team and community review: the wallet signs on Aptos Testnet, files become Shelby Blobs, and receipts keep account, blobName, hash, retrieval, and explorer evidence visible.',
     participationSteps: [
       ['Connect wallet', 'Install Petra or a compatible Aptos wallet and switch to Aptos Testnet.', 'Petra', 'https://petra.app/'],
       ['Prepare assets', 'Testnet APT pays gas; ShelbyUSD pays Shelby file upload costs.', 'Aptos Faucet', 'https://aptoslabs.com/testnet-faucet'],
