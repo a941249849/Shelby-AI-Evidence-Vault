@@ -275,6 +275,7 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
 | `docs/public-testnet-participation.md` | X8 public Shelby testnet participant and deployment path |
 | `docs/final-product-acceptance.md` | X15 public testnet candidate acceptance package |
+| `docs/final-copilot-review-brief.md` | X16 final Copilot review and merge-readiness handoff |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |
 | `docs/release-candidate-checklist.md` | C12 release-candidate verification gate |
 | `docs/c3-smoke-test-guide.md` | Smoke harness setup and manual testnet verification |

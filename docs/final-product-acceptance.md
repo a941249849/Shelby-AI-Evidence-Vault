@@ -92,5 +92,6 @@ The product is ready for community experiment review when:
 
 - The automated gate is green.
 - The manual product QA path above passes.
+- The final Copilot review brief returns `merge-ready` or `needs-real-testnet-run` without code blockers.
 - The reviewer understands the distinction between Mock + SQLite preview, browser-cache fallback, and Shelby testnet proof.
 - No page presents the product as mainnet, production-hosted, or custody-bearing.
