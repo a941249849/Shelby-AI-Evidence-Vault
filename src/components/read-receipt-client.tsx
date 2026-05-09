@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
+  AlertTriangle,
   ArrowLeft,
   Braces,
   CalendarClock,
+  CheckCircle2,
   Cpu,
   Database,
   ExternalLink,
@@ -13,6 +15,7 @@ import {
   Hash,
   MessageSquareText,
   ReceiptText,
+  RefreshCw,
   ShieldCheck,
   Tag,
 } from 'lucide-react';
@@ -23,6 +26,10 @@ import { formatDateTime } from '@/lib/utils';
 import { getLocalReadReceiptById, getLocalBlobById, getLocalPackById } from '@/lib/store/local-store';
 import { getReadReceiptById, getBlobById, getEvidencePackById } from '@/lib/evidence/service';
 import { getPersistedReceiptAction, getPersistedBlobAction, getPersistedPackAction } from '@/app/actions/persist';
+import {
+  verifyShelbyRetrievalAction,
+  type VerifyShelbyRetrievalResult,
+} from '@/app/actions/verify';
 import { useLanguage } from '@/components/language-state';
 
 interface ReadReceiptClientProps {
@@ -51,6 +58,25 @@ const receiptCopy = {
     agentVersion: 'Agent 版本',
     mode: '回执模式',
     packs: '证据包',
+    auditTitle: '回执级测试网验证',
+    auditBody:
+      '将这张回执引用的 Shelby testnet Blob 聚合验证：账号命名空间、blobName、检索端点与 HTTP 响应会一起进入审计视图。',
+    auditBoundaryTitle: '这张回执不是测试网证明',
+    auditBoundaryBody:
+      'Demo 与本地 Mock 回执只用于产品预览；真实社区测试必须由钱包上传生成 shelby-testnet 回执后再运行这里的验证。',
+    testnetBlobs: '可验证 Blob',
+    verifiedBlobs: '已通过',
+    failedBlobs: '失败',
+    verifyAll: '验证全部',
+    checking: '验证中',
+    verified: '已验证',
+    failed: '未通过',
+    pending: '待验证',
+    noTestnetBlobs: '没有可验证的 Shelby testnet Blob。',
+    httpStatus: 'HTTP',
+    checkedAt: '检查时间',
+    retrieval: '检索端点',
+    unavailable: '不可用',
   },
   en: {
     notFound: 'Read receipt not found',
@@ -74,8 +100,31 @@ const receiptCopy = {
     agentVersion: 'Agent version',
     mode: 'Receipt mode',
     packs: 'Evidence packs',
+    auditTitle: 'Receipt-level testnet verification',
+    auditBody:
+      'Aggregates every Shelby testnet Blob referenced by this receipt: account namespace, blobName, retrieval endpoint, and HTTP response all become part of the audit view.',
+    auditBoundaryTitle: 'This receipt is not a testnet proof',
+    auditBoundaryBody:
+      'Demo and local mock receipts are product previews only. Real community testing must create a shelby-testnet receipt through wallet upload, then run verification here.',
+    testnetBlobs: 'Verifiable blobs',
+    verifiedBlobs: 'Verified',
+    failedBlobs: 'Failed',
+    verifyAll: 'Verify all',
+    checking: 'Checking',
+    verified: 'Verified',
+    failed: 'Failed',
+    pending: 'Pending',
+    noTestnetBlobs: 'No verifiable Shelby testnet blobs.',
+    httpStatus: 'HTTP',
+    checkedAt: 'Checked at',
+    retrieval: 'Retrieval endpoint',
+    unavailable: 'Unavailable',
   },
 };
+
+type ReceiptCopy = (typeof receiptCopy)['zh'];
+
+type VerificationMap = Record<string, VerifyShelbyRetrievalResult>;
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -155,6 +204,140 @@ function MonoBlock({ children }: { children: React.ReactNode }) {
     <code className="block break-all rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-xs text-[#f4f0e8]">
       {children}
     </code>
+  );
+}
+
+function isTestnetBlob(blob: BlobRecord): boolean {
+  return blob.dataSource === 'shelby-testnet' || blob.uploadMode === 'testnet' || blob.network === 'testnet';
+}
+
+function canVerifyBlob(blob: BlobRecord): boolean {
+  return isTestnetBlob(blob) && Boolean(blob.retrievalUrl || (blob.accountAddress && blob.blobName));
+}
+
+function ProofMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="shelby-cut border border-white/10 bg-white/[0.04] p-3">
+      <p className="text-xs font-semibold uppercase text-[#9d9a92]">{label}</p>
+      <p className="mt-1 text-2xl font-semibold text-[#f4f0e8]">{value}</p>
+    </div>
+  );
+}
+
+function ReceiptProofPanel({
+  blobs,
+  results,
+  verifying,
+  onVerifyAll,
+  copy,
+}: {
+  blobs: BlobRecord[];
+  results: VerificationMap;
+  verifying: boolean;
+  onVerifyAll: () => void;
+  copy: ReceiptCopy;
+}) {
+  const testnetBlobs = blobs.filter(isTestnetBlob);
+  const verifiableBlobs = blobs.filter(canVerifyBlob);
+  const verifiedCount = verifiableBlobs.filter((blob) => results[blob.id]?.ok).length;
+  const failedCount = verifiableBlobs.filter((blob) => results[blob.id] && !results[blob.id].ok).length;
+  const hasTestnetProof = testnetBlobs.length > 0;
+
+  return (
+    <div className="shelby-cut shelby-surface p-5 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="max-w-2xl">
+          <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-[#9d9a92]">
+            <ShieldCheck className="h-4 w-4 text-[#9fe878]" />
+            {copy.auditTitle}
+          </div>
+          <h2 className="text-xl font-semibold text-[#f4f0e8]">
+            {hasTestnetProof ? copy.auditTitle : copy.auditBoundaryTitle}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[#9d9a92]">
+            {hasTestnetProof ? copy.auditBody : copy.auditBoundaryBody}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onVerifyAll}
+          disabled={!verifiableBlobs.length || verifying}
+          className="inline-flex items-center gap-2 shelby-cut bg-[#111217] px-4 py-2.5 text-sm font-semibold text-[#f4f0e8] transition hover:bg-[#1c1d25] disabled:cursor-not-allowed disabled:opacity-45"
+        >
+          <RefreshCw className={`h-4 w-4 ${verifying ? 'animate-spin' : ''}`} />
+          {verifying ? copy.checking : copy.verifyAll}
+        </button>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        <ProofMetric label={copy.testnetBlobs} value={verifiableBlobs.length} />
+        <ProofMetric label={copy.verifiedBlobs} value={verifiedCount} />
+        <ProofMetric label={copy.failedBlobs} value={failedCount} />
+      </div>
+
+      <div className="mt-5 space-y-3">
+        {verifiableBlobs.length > 0 ? (
+          verifiableBlobs.map((blob) => {
+            const result = results[blob.id];
+            const ok = result?.ok;
+            return (
+              <div key={blob.id} className="rounded-md border border-white/10 bg-white/[0.04] p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Link
+                    href={`/blob/${blob.id}`}
+                    className="font-mono text-xs font-semibold text-[#f4f0e8] transition hover:text-[#de8aff]"
+                  >
+                    {blob.id}
+                  </Link>
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                      result
+                        ? ok
+                          ? 'border border-[#9fe878]/35 bg-[#dfffcc] text-[#21351a]'
+                          : 'border border-[#fd8565]/45 bg-[#ffdcd9] text-[#4b2419]'
+                        : 'border border-white/10 bg-white/[0.04] text-[#9d9a92]'
+                    }`}
+                  >
+                    {result ? (
+                      ok ? (
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                      ) : (
+                        <AlertTriangle className="h-3.5 w-3.5" />
+                      )
+                    ) : (
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                    )}
+                    {result ? (ok ? copy.verified : copy.failed) : copy.pending}
+                  </span>
+                </div>
+                <div className="mt-3 grid gap-2 text-xs text-[#9d9a92] sm:grid-cols-3">
+                  <p>
+                    {copy.httpStatus}: <span className="font-mono text-[#f4f0e8]">{result?.httpStatus ?? copy.unavailable}</span>
+                  </p>
+                  <p>
+                    {copy.checkedAt}:{' '}
+                    <span className="font-mono text-[#f4f0e8]">
+                      {result?.checkedAt ? formatDateTime(result.checkedAt) : copy.unavailable}
+                    </span>
+                  </p>
+                  <p className="break-all">
+                    {copy.retrieval}:{' '}
+                    <span className="font-mono text-[#f4f0e8]">
+                      {result?.retrievalUrl ?? blob.retrievalUrl ?? copy.unavailable}
+                    </span>
+                  </p>
+                </div>
+                {result?.detail && <p className="mt-2 text-xs leading-5 text-[#9d9a92]">{result.detail}</p>}
+              </div>
+            );
+          })
+        ) : (
+          <div className="rounded-md border border-white/10 bg-white/[0.04] p-3 text-sm text-[#9d9a92]">
+            {copy.noTestnetBlobs}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -298,6 +481,8 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
   const { language } = useLanguage();
   const t = receiptCopy[language];
   const [resolved, setResolved] = useState<ResolvedReceiptData | null | undefined>(undefined);
+  const [verificationResults, setVerificationResults] = useState<VerificationMap>({});
+  const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
     // Try demo data first (handles rr-001 through rr-004)
@@ -425,6 +610,32 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
 
   const { receipt, blobs: resolvedBlobs, packs: resolvedPacks } = resolved;
 
+  const handleVerifyAll = async () => {
+    const verifiableBlobs = resolvedBlobs.filter(canVerifyBlob);
+    if (!verifiableBlobs.length || isVerifying) return;
+
+    setIsVerifying(true);
+    try {
+      const checks = await Promise.all(
+        verifiableBlobs.map(async (blob) => {
+          const result = await verifyShelbyRetrievalAction({
+            accountAddress: blob.accountAddress,
+            blobName: blob.blobName,
+            retrievalUrl: blob.retrievalUrl,
+          });
+          return [blob.id, result] as const;
+        })
+      );
+
+      setVerificationResults((current) => ({
+        ...current,
+        ...Object.fromEntries(checks),
+      }));
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   return (
     <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -545,6 +756,14 @@ export default function ReadReceiptClient({ id }: ReadReceiptClientProps) {
                 </div>
               )}
             </div>
+
+            <ReceiptProofPanel
+              blobs={resolvedBlobs}
+              results={verificationResults}
+              verifying={isVerifying}
+              onVerifyAll={handleVerifyAll}
+              copy={t}
+            />
           </section>
 
           <aside className="space-y-4">

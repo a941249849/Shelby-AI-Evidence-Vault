@@ -1,6 +1,6 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **X11 testnet proof verification candidate** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **X12 receipt audit closure candidate** to stakeholders or the community.
 
 > **Current scope:**
 > - The product UI is Chinese-first with a top-nav English toggle.
@@ -9,6 +9,7 @@ A step-by-step walkthrough for demonstrating the **X11 testnet proof verificatio
 > - Built-in demo data uses illustrative `shelby://demo/blob/` references.
 > - Local uploads get `shelby://mock/blob/{id}` references.
 > - Real testnet uploads get `shelby://testnet/{account}/{blobName}` references and require a participant wallet with testnet APT and ShelbyUSD.
+> - Real testnet read receipts include a receipt-level verification panel that aggregates every referenced Shelby testnet Blob.
 > - The C8 agent-run script (`npm run generate-agent-run`) produces a deterministic evidence pack, blobs, and read receipt with zero credentials.
 
 ## Prerequisites
@@ -98,6 +99,7 @@ Navigate to `/read-receipt/rr-001`.
 - The **生成结果** block: what the agent found
 - **运行 ID**: the unique agent run identifier
 - **引用 Blob**: clickable links to `/blob/blob-003` — trace from answer back to source; shows Shelby ref, SHA-256 hash, and data-source badge
+- **回执级测试网验证**: demo/local receipts explicitly say they are not testnet proofs; real Shelby testnet receipts expose a verify-all audit panel
 - **证据包**: link to the pack that was consulted
 - **Agent 版本**: `shelby-agent/0.3.0 gpt-4o-2024-01-25`
 
@@ -141,6 +143,7 @@ The success screen shows a **读取回执 / Read receipt** link. Click it (or na
 - The **回执模式 / Receipt mode** badge: local demo upload
 - The **用户问题 / Query** block: the upload description you entered
 - **引用 Blob / Referenced blobs** section: shows the blob's Shelby ref, SHA-256 hash, source, and local mock data-source badge
+- **回执级测试网验证 / Receipt-level testnet verification** section: local mock receipts show the boundary; Shelby testnet receipts can verify all referenced retrieval endpoints
 - **Run ID**: `upload-{packId}` — tied to the upload that created this receipt
 
 **Refresh the page** — the receipt must still resolve from SQLite, with browser cache as a local fallback. This demonstrates that read receipts survive browser refresh.

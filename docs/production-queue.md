@@ -45,7 +45,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X8 public Shelby testnet participation is merged: upload-page participant onboarding, public testnet docs, and current official-doc alignment.
 - X9 testnet launch console is merged: a navigation-level `/testnet` entry for mode status, participant prerequisites, launch acceptance, and product boundaries.
 - X10 public testnet readiness is merged: wallet detection/connect readiness on `/testnet`, account/network status, docs alignment, and launch QA.
-- X11 testnet proof verification is the active Codex-owned stage: in-app Blob proof panel, safe Shelby retrieval probe, and docs/acceptance alignment.
+- X11 testnet proof verification is merged: in-app Blob proof panel, safe Shelby retrieval probe, and docs/acceptance alignment.
+- X12 receipt audit closure is the active Codex-owned stage: read receipts aggregate all referenced Shelby testnet Blob verification checks into one audit panel.
 
 ## Stage Gate
 
