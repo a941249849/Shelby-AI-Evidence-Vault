@@ -220,6 +220,7 @@ After the release-candidate gate passes, manually inspect the community product 
 | Route | Product check |
 |-----|-----|
 | `/` | Chinese-first Shelby ecosystem home, evidence-flow board, core capability cards, product preview |
+| `/testnet` | Public testnet launch console with mode status, wallet/funding prerequisites, upload entry, and boundaries |
 | `/dashboard` | Evidence registry with search/filter/sort and bilingual labels |
 | `/upload` | Evidence intake flow with clear Mock + SQLite vs Shelby testnet boundary |
 | `/blob/blob-001` | Blob provenance inspector with Shelby ref, hash, source, metadata, pack link |

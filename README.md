@@ -17,6 +17,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 - **Read receipts** — auditable records of agent activity: what was uploaded, what evidence was consulted, and what was answered; bound to real `BlobRecord` identity
 - **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a development and review fallback, not the protocol endpoint
 - **Public Shelby testnet participation path** — when deployed with `SHELBY_MODE=testnet`, community users can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
+- **Testnet launch console** — `/testnet` gives community users a direct launch surface for mode status, wallet/funding prerequisites, upload entry, and receipt verification
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 - **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
 - **Shelby-first product UI** — Chinese-first, English-toggleable product surface across landing, registry, upload, Blob detail, and read receipt pages
@@ -137,6 +138,7 @@ Shelby integration spans two distinct planes plus browser-side public config. Se
 | Route | Description |
 |---|---|
 | `/` | Product home — Chinese-first Shelby ecosystem narrative, evidence flow, core capabilities, preview cards |
+| `/testnet` | Public Shelby testnet launch console: mode status, wallet/funding prerequisites, upload and receipt path |
 | `/dashboard` | Evidence registry: browse, search, and filter built-in, local, SQLite, and testnet records |
 | `/upload` | Evidence intake: create Evidence Packs, compute SHA-256, drop files, show mode boundary and wallet connect in testnet mode |
 | `/blob/[id]` | Blob provenance inspector: Shelby ref, hash, source, metadata, data-source badge |
@@ -223,6 +225,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Conservative storage status mapping (`status-map.ts`): registered → ready → failed → unknown
 - Dashboard shows built-in demo data + locally uploaded packs; reset button clears browser cache only while SQLite records remain durable
 - Mode indicator, wallet connect UI, and public testnet participation guide on upload page
+- Navigation-level `/testnet` launch console for public testnet participation
 - C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
 - X3 product closeout status: release-candidate gate remained green after the UI/product pass
 - X8 public testnet candidate: UI/docs now describe the real community path from wallet connection to Shelby testnet proof and receipt verification

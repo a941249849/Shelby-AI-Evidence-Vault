@@ -58,7 +58,7 @@ const copy = {
       body:
         '部署方开启 testnet 后，用户连接 Aptos 钱包、准备测试网 APT 与 ShelbyUSD，即可把证据包写入 Shelby 测试网并生成可追溯回执。',
       points: ['钱包签名', 'Shelby Blob 注册', '回执可审计'],
-      cta: '进入上传',
+      cta: '进入测试网',
       docs: '查看接入文档',
     },
     preview: '产品预览',
@@ -110,7 +110,7 @@ const copy = {
       body:
         'When deployed with testnet mode enabled, users connect an Aptos wallet, prepare testnet APT and ShelbyUSD, upload evidence to Shelby testnet, and receive traceable receipts.',
       points: ['Wallet signing', 'Shelby Blob registration', 'Auditable receipts'],
-      cta: 'Start upload',
+      cta: 'Open testnet',
       docs: 'Read integration docs',
     },
     preview: 'Product preview',
@@ -214,7 +214,7 @@ function TestnetParticipationBand({ language }: { language: Language }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-3 md:justify-end">
-          <Link href="/upload" className="shelby-primary-button">
+          <Link href="/testnet" className="shelby-primary-button">
             <CloudUpload size={18} />
             {t.cta}
             <span className="button-arrow">

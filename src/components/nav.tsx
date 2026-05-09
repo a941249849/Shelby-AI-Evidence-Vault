@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Database, FileUp, GitBranch, Languages, ReceiptText, ShieldCheck } from 'lucide-react';
+import { Database, FileUp, FlaskConical, GitBranch, Languages, ReceiptText, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/components/language-state';
 
 const copy = {
   zh: {
     subtitle: 'AI 证据回执层',
     product: '产品',
+    testnet: '测试网',
     registry: '索引',
     create: '上传',
     receipt: '回执',
@@ -16,6 +17,7 @@ const copy = {
   en: {
     subtitle: 'AI evidence receipt layer',
     product: 'Product',
+    testnet: 'Testnet',
     registry: 'Registry',
     create: 'Upload',
     receipt: 'Receipt',
@@ -28,6 +30,7 @@ export default function Nav() {
   const t = copy[language];
   const links = [
     { href: '/#product', label: t.product, icon: ShieldCheck },
+    { href: '/testnet', label: t.testnet, icon: FlaskConical },
     { href: '/dashboard', label: t.registry, icon: Database },
     { href: '/upload', label: t.create, icon: FileUp },
     { href: '/read-receipt/rr-001', label: t.receipt, icon: ReceiptText },

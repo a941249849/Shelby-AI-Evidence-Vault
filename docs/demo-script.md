@@ -34,12 +34,25 @@ Open `http://localhost:3000`.
 - The three primary actions: **上传证据**, **打开证据索引**, **查看回执**
 - The stats cards: Evidence Pack count, Shelby Blob count, receipt count, SQLite storage boundary
 - The **核心能力** cards: structured evidence packs, Blob identity, receipt proof, verifiable audit
+- The public testnet band links into the dedicated `/testnet` launch console
 - The **产品预览** cards: registry, upload, read receipt
 - Toggle English in the top nav and confirm the product surface switches language
 
 ---
 
-## Step 2 — Dashboard (`/dashboard`)
+## Step 2 — Testnet launch console (`/testnet`)
+
+Click **测试网 / Testnet** or navigate to `/testnet`.
+
+**Point out:**
+- This is the public entry point for community testnet participation.
+- The runtime card shows whether the current deployment is still `mock` or has `SHELBY_MODE=testnet` enabled.
+- The four participant steps are explicit: connect wallet, prepare test assets, upload evidence, inspect receipt.
+- The product boundary section is honest: no mainnet claim, no private-key custody, no server signer, no token purchase flow.
+
+---
+
+## Step 3 — Dashboard (`/dashboard`)
 
 Click **索引** or navigate to `/dashboard`.
 
@@ -56,7 +69,7 @@ After you upload a pack (Step 5), come back here to see the local/SQLite records
 
 ---
 
-## Step 3 — Blob detail (`/blob/blob-001`)
+## Step 4 — Blob detail (`/blob/blob-001`)
 
 Navigate to `/blob/blob-001`.
 
@@ -73,7 +86,7 @@ Navigate to `/blob/blob-001`.
 
 ---
 
-## Step 4 — Read receipt (`/read-receipt/rr-001`)
+## Step 5 — Read receipt (`/read-receipt/rr-001`)
 
 Navigate to `/read-receipt/rr-001`.
 
@@ -90,7 +103,7 @@ Explain: "Every time an agent runs, we can produce this receipt. It's a full aud
 
 ---
 
-## Step 5 — Upload page (`/upload`) — local mock demo
+## Step 6 — Upload page (`/upload`) — local mock demo
 
 Navigate to `/upload`.
 
@@ -118,7 +131,7 @@ Navigate to `/upload`.
 
 ---
 
-## Step 6 — Verify the read receipt
+## Step 7 — Verify the read receipt
 
 The success screen shows a **读取回执 / Read receipt** link. Click it (or navigate to `/read-receipt/local-rr-{uuid}`).
 
@@ -132,7 +145,7 @@ The success screen shows a **读取回执 / Read receipt** link. Click it (or na
 
 ---
 
-## Step 7 — Return to Dashboard (`/dashboard`)
+## Step 8 — Return to Dashboard (`/dashboard`)
 
 Navigate back to `/dashboard`.
 
@@ -146,7 +159,7 @@ Navigate back to `/dashboard`.
 
 ---
 
-## Step 7.5 — Evidence registry search, filter, and sort
+## Step 8.5 — Evidence registry search, filter, and sort
 
 The dashboard toolbar lets reviewers quickly narrow the full evidence index without leaving the page.
 
@@ -186,7 +199,7 @@ The dashboard toolbar lets reviewers quickly narrow the full evidence index with
 
 ---
 
-## Step 8 — C8 agent-run example (scripted end-to-end)
+## Step 9 — C8 agent-run example (scripted end-to-end)
 
 This step shows the full product story — `source evidence → agent run → EvidencePack → BlobRecord → ReadReceipt` — with zero credentials using the deterministic C8 script.
 
@@ -229,7 +242,7 @@ The script is idempotent — running it again produces the same IDs via `INSERT 
 
 ---
 
-## Step 9 — Code walkthrough (optional, for technical audience)
+## Step 10 — Code walkthrough (optional, for technical audience)
 
 Open the repo in your editor.
 
