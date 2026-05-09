@@ -1,10 +1,10 @@
 # Release-Candidate Checklist — Shelby AI Evidence Vault
 
-**Stage: C12/X15 — Release-candidate gate plus public testnet handoff QA**
+**Stage: C12/X19 — Release-candidate gate plus public testnet release package**
 
 This document describes the release-candidate validation gate for Shelby AI Evidence Vault. The gate is zero-credential, mock-safe by default, and is designed to verify the complete product loop in a single deterministic command.
 
-X15 keeps this command as the hard automated gate, then adds a manual public-testnet pass for wallet readiness, upload, Blob proof verification, receipt-level proof aggregation, and a copyable community handoff output backed by browser cache plus SQLite.
+X19 keeps this command as the hard automated gate, then adds final-readiness and public-release package commands so the operator has one packet for wallet readiness, upload, Blob proof verification, receipt-level proof aggregation, copied handoff validation, and final Copilot review.
 
 > **This is a public testnet candidate, not a mainnet claim.** Mock/local references (e.g. `shelby://mock/blob/…`) are deterministic local identifiers used for review; Shelby proof requires `SHELBY_MODE=testnet`, a wallet, testnet APT, ShelbyUSD, and manual signing.
 
@@ -14,9 +14,13 @@ X15 keeps this command as the hard automated gate, then adds a manual public-tes
 
 ```bash
 npm run verify-release-candidate
+npm run final-readiness
+npm run public-testnet-release-pack
 ```
 
 This command runs the complete acceptance harness from a clean checkout with zero Shelby credentials. It is safe to run on any machine and does not modify the operator's normal local database.
+
+`final-readiness` reads the release-candidate artifact and confirms the code candidate is ready. `public-testnet-release-pack` reads that final readiness artifact and writes the operator packet for the real wallet upload and review pass.
 
 ---
 
@@ -135,6 +139,14 @@ This file is gitignored and never committed. It contains:
 - `localServerPort` — port the Next.js server ran on
 - `routes` — route smoke results (status code, marker found, errors)
 - `overallStatus` — `"pass"` or `"fail"`
+
+The final release package command writes:
+
+```
+artifacts/public-testnet-release/latest.json
+```
+
+This file is also gitignored. It contains the local gate commands, required and forbidden environment variables, public routes to inspect, manual testnet run sequence, final review pointer, and hard product boundaries.
 
 ---
 

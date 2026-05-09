@@ -39,6 +39,7 @@ npm run lint
 npm run build
 npm run verify-release-candidate
 npm run final-readiness
+npm run public-testnet-release-pack
 ```
 
 Expected release-candidate result:
@@ -61,6 +62,7 @@ The verifier must include:
 - Production build.
 - Route smoke checks for `/`, `/dashboard`, `/testnet`, `/upload`, `/blob/blob-001`, `/read-receipt/rr-001`, and `/read-receipt/c8-rr-agent-sentinel-v1`.
 - `final-readiness` writes `artifacts/final-readiness/latest.json` and reports code-candidate readiness separately from manual gates.
+- `public-testnet-release-pack` writes `artifacts/public-testnet-release/latest.json` for the operator wallet-upload and final-review run.
 
 ## Manual Product Review
 
@@ -113,7 +115,7 @@ Manual proof path:
 | Browser-wallet upload | `src/app/upload/page.tsx`, `src/lib/shelby/use-shelby-upload.ts`, `src/lib/shelby/browser-client.ts` |
 | Proof verification | `src/components/blob-detail-client.tsx`, `src/components/read-receipt-client.tsx`, `src/app/actions/verify.ts` |
 | Persistence | `src/app/actions/persist.ts`, `src/lib/server/evidence-store.ts`, `src/lib/server/db.ts`, `src/lib/store/local-store.ts` |
-| Acceptance gates | `scripts/verify-release-candidate.mjs`, `scripts/verify-testnet-handoff.mjs`, `scripts/final-readiness.mjs`, `scripts/shelby-doctor.mjs`, `scripts/shelby-smoke.mjs` |
+| Acceptance gates | `scripts/verify-release-candidate.mjs`, `scripts/verify-testnet-handoff.mjs`, `scripts/final-readiness.mjs`, `scripts/public-testnet-release-pack.mjs`, `scripts/shelby-doctor.mjs`, `scripts/shelby-smoke.mjs` |
 | Product boundaries | `README.md`, `docs/final-product-acceptance.md`, `docs/public-testnet-participation.md` |
 
 ## Security Boundaries

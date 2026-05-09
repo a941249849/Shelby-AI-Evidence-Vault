@@ -46,9 +46,11 @@ const requiredFiles = [
   'docs/final-copilot-review-brief.md',
   'docs/final-product-acceptance.md',
   'docs/public-testnet-participation.md',
+  'docs/public-testnet-release-playbook.md',
   'scripts/verify-release-candidate.mjs',
   'scripts/verify-testnet-handoff.mjs',
   'src/lib/testnet/handoff.mjs',
+  'scripts/public-testnet-release-pack.mjs',
 ];
 
 const missingFiles = requiredFiles.filter((file) => !existsSync(join(ROOT, file)));

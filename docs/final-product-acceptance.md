@@ -1,7 +1,7 @@
 # Final Product Acceptance — Shelby AI Evidence Vault
 
 Date: 2026-05-09
-Status: X15 public testnet handoff acceptance package
+Status: X19 public testnet release operator package
 
 This document is the final manual acceptance pass for the current public testnet candidate.
 
@@ -48,6 +48,8 @@ Run from a clean main branch:
 npm run lint
 npm run build
 npm run verify-release-candidate
+npm run final-readiness
+npm run public-testnet-release-pack
 ```
 
 Expected:
@@ -55,6 +57,8 @@ Expected:
 - `lint` exits 0.
 - `build` exits 0.
 - `verify-release-candidate` exits 0 with `Passed: 23`, `Failed: 0`, `Skipped: 0`.
+- `final-readiness` reports `Code candidate ready : yes`.
+- `public-testnet-release-pack` writes `artifacts/public-testnet-release/latest.json`.
 
 ## Manual product QA
 

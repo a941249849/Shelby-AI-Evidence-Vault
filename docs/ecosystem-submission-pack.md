@@ -111,7 +111,9 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | X14 | Merged | Persistent testnet session ledger: `/testnet` merges browser-cache and SQLite testnet receipts/blobs; `/dashboard` indexes Shelby testnet packs as first-class records |
 | X15 | Merged | Public testnet handoff artifact: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags |
 | X16 | Merged | Final Copilot review brief: fixed merge-readiness scope, gates, real-testnet path, and security boundaries |
-| X17 | Current | Copied handoff validator: `npm run verify-testnet-handoff -- path/to/handoff.json` validates real-upload handoff JSON |
+| X17 | Merged | Copied handoff validator: `npm run verify-testnet-handoff -- path/to/handoff.json` validates real-upload handoff JSON |
+| X18 | Merged | Final readiness artifact: `npm run final-readiness` separates code-candidate readiness from real testnet and review gates |
+| X19 | Current | Public testnet release operator package: `npm run public-testnet-release-pack` writes the wallet-upload and final-review packet |
 
 ---
 
@@ -157,6 +159,7 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | Production queue | `docs/production-queue.md` |
 | Release-candidate checklist | `docs/release-candidate-checklist.md` |
 | Public testnet participation | `docs/public-testnet-participation.md` |
+| Public testnet release playbook | `docs/public-testnet-release-playbook.md` |
 | Smoke test guide | `docs/c3-smoke-test-guide.md` |
 | M4 read receipt binding | `docs/m4-read-receipt-binding.md` |
 | M2–M4 architecture plan | `docs/m2-m4-product-architecture-plan.md` |
