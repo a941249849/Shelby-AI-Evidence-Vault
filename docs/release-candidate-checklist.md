@@ -1,10 +1,10 @@
 # Release-Candidate Checklist — Shelby AI Evidence Vault
 
-**Stage: C12/X14 — Release-candidate gate plus persistent testnet session ledger QA**
+**Stage: C12/X15 — Release-candidate gate plus public testnet handoff QA**
 
 This document describes the release-candidate validation gate for Shelby AI Evidence Vault. The gate is zero-credential, mock-safe by default, and is designed to verify the complete product loop in a single deterministic command.
 
-X14 keeps this command as the hard automated gate, then adds a manual public-testnet pass for wallet readiness, upload, Blob proof verification, receipt-level proof aggregation, and a copyable community session output backed by browser cache plus SQLite.
+X15 keeps this command as the hard automated gate, then adds a manual public-testnet pass for wallet readiness, upload, Blob proof verification, receipt-level proof aggregation, and a copyable community handoff output backed by browser cache plus SQLite.
 
 > **This is a public testnet candidate, not a mainnet claim.** Mock/local references (e.g. `shelby://mock/blob/…`) are deterministic local identifiers used for review; Shelby proof requires `SHELBY_MODE=testnet`, a wallet, testnet APT, ShelbyUSD, and manual signing.
 
@@ -155,7 +155,7 @@ Manual checks:
 | Language | Default surface is Chinese; top-nav language toggle switches the main product routes to English |
 | Home | Shelby ecosystem positioning, evidence-flow board, core capability cards, product preview, testnet entry |
 | Registry | Evidence packs from demo/local/SQLite/Shelby testnet are visible; search, filters, sort, data-source badges, and cards remain usable |
-| Testnet | `/testnet` launch console shows mode status, wallet detection/connect readiness, funding prerequisites, persistent community test session, upload entry, and product boundaries |
+| Testnet | `/testnet` launch console shows mode status, wallet detection/connect readiness, funding prerequisites, persistent community test session, copyable handoff JSON, upload entry, and product boundaries |
 | Upload | Mock + SQLite path is clear; public testnet path is gated by wallet, Aptos Testnet, testnet APT, and ShelbyUSD |
 | Blob detail | Shows provenance, Shelby ref, SHA-256 hash, source, metadata, pack relationship, and testnet proof verification panel |
 | Read receipt | Shows query, answer summary, run metadata, referenced Blob identity, evidence pack links, and a receipt-level testnet audit panel |

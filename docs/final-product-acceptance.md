@@ -1,7 +1,7 @@
 # Final Product Acceptance — Shelby AI Evidence Vault
 
 Date: 2026-05-09
-Status: X14 persistent testnet session ledger acceptance package
+Status: X15 public testnet handoff acceptance package
 
 This document is the final manual acceptance pass for the current public testnet candidate.
 
@@ -26,7 +26,7 @@ The default path is **Mock + SQLite** so community testers can inspect the produ
 | Route | Acceptance target |
 |---|---|
 | `/` | Chinese-first product home with Shelby ecosystem positioning, evidence-flow board, core capability cards, product preview, developer band |
-| `/testnet` | Public testnet launch console with mode status, wallet readiness, upload entry, proof steps, and a persistent community session summary from browser cache plus SQLite |
+| `/testnet` | Public testnet launch console with mode status, wallet readiness, upload entry, proof steps, and a persistent community handoff summary from browser cache plus SQLite |
 | `/dashboard` | Evidence registry with demo/local/SQLite/Shelby testnet records, search, filter, sort, user/testnet records, evidence cards, and first-Blob deep links |
 | `/upload` | Evidence intake flow with pack metadata, file hash computation, Mock + SQLite boundary, testnet wallet gating |
 | `/blob/blob-001` | Blob provenance inspector with Shelby ref, hash, source, size, MIME type, evidence pack link, tags, and protocol-proof boundary |
@@ -67,13 +67,14 @@ Expected:
 2. Open `http://localhost:3000`.
 3. Inspect the home page at desktop width.
 4. Toggle English and Chinese once from the top nav.
-5. Visit `/testnet`, confirm wallet readiness, upload entry, proof steps, empty or populated community session state, and copyable session summary behavior.
+5. Visit `/testnet`, confirm wallet readiness, upload entry, proof steps, empty or populated community session state, and copyable handoff summary behavior.
 6. Visit `/dashboard`, search `benchmark`, clear filters, then filter data source by Demo, Local, and Shelby testnet.
 7. Visit `/upload`, add metadata, select a small local file, confirm SHA-256 appears, and save locally.
 8. Open the generated blob detail link and confirm the proof panel states the correct mock/testnet boundary.
 9. Open the generated read receipt link and confirm receipt-level proof aggregation appears with the correct mock/testnet boundary.
 10. Refresh the receipt page and confirm it still resolves from SQLite.
-11. Run `npm run generate-agent-run`, then open `/read-receipt/c8-rr-agent-sentinel-v1`.
+11. Return to `/testnet` after a real testnet upload and confirm copied handoff JSON contains full route URLs, receipt/blob URLs, explorer/retrieval identity, smoke commands, and acceptance-status flags.
+12. Run `npm run generate-agent-run`, then open `/read-receipt/c8-rr-agent-sentinel-v1`.
 
 ## Boundaries that must remain clear
 

@@ -48,7 +48,8 @@ Copilot should not be used for small copy edits, one-file cleanup, tiny refactor
 - X11 testnet proof verification is merged: in-app Blob proof panel, safe Shelby retrieval probe, and docs/acceptance alignment.
 - X12 receipt audit closure is merged: read receipts aggregate all referenced Shelby testnet Blob verification checks into one audit panel.
 - X13 community testnet session is merged: `/testnet` aggregates the latest testnet receipt/blob records and provides a copyable participant summary.
-- X14 persistent testnet session ledger is the active Codex-owned stage: `/testnet` merges browser-cache and SQLite testnet receipts/blobs, and `/dashboard` treats Shelby testnet packs as first-class indexed records.
+- X14 persistent testnet session ledger is merged: `/testnet` merges browser-cache and SQLite testnet receipts/blobs, and `/dashboard` treats Shelby testnet packs as first-class indexed records.
+- X15 public testnet handoff is the active Codex-owned stage: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review.
 
 ## Stage Gate
 

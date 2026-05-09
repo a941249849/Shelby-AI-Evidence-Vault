@@ -1,7 +1,7 @@
 # Ecosystem Submission Pack — Shelby AI Evidence Vault
 
 Date: 2026-05-09
-Milestone: X14 — Persistent Testnet Session Ledger Candidate
+Milestone: X15 — Public Testnet Handoff Candidate
 
 ---
 
@@ -9,7 +9,7 @@ Milestone: X14 — Persistent Testnet Session Ledger Candidate
 
 **Shelby AI Evidence Vault** is an AI evidence and read-receipt layer built for Shelby. It demonstrates how AI pipelines can turn datasets, agent run outputs, and documents into verifiable evidence records with Shelby Blob identity — then produce auditable receipts that trace every answer back to the evidence that informed it.
 
-It ships as a complete, runnable open-source persistent testnet session ledger candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, inspect Blob identity, run an in-app retrieval verification probe, verify the generated read receipt as an aggregate audit bundle, and copy a durable session summary for community participation. The session ledger reads both browser cache and SQLite records. An opt-in smoke harness still provides CLI-level RPC connectivity and blob retrieval verification, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
+It ships as a complete, runnable open-source public testnet handoff candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, inspect Blob identity, run an in-app retrieval verification probe, verify the generated read receipt as an aggregate audit bundle, and copy a durable session handoff for community participation. The session ledger reads both browser cache and SQLite records, and the handoff JSON includes route URLs, receipt/blob proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags. An opt-in smoke harness still provides CLI-level RPC connectivity and blob retrieval verification, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
 
 **What it is:**
 - A Shelby ecosystem application layer for AI evidence storage using Shelby blob references and on-chain registration
@@ -108,7 +108,8 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | X11 | Merged | In-app testnet Blob proof verification: explorer/retrieval identity and server-side retrieval probe |
 | X12 | Merged | Receipt-level testnet audit aggregation: verify all referenced Shelby testnet blobs from the read receipt |
 | X13 | Merged | Community testnet session: `/testnet` aggregates latest testnet receipt/blob records and copies a participant summary |
-| X14 | Current | Persistent testnet session ledger: `/testnet` merges browser-cache and SQLite testnet receipts/blobs; `/dashboard` indexes Shelby testnet packs as first-class records |
+| X14 | Merged | Persistent testnet session ledger: `/testnet` merges browser-cache and SQLite testnet receipts/blobs; `/dashboard` indexes Shelby testnet packs as first-class records |
+| X15 | Current | Public testnet handoff artifact: `/testnet` copies full route URLs, proof links, explorer/retrieval identity, smoke commands, and acceptance-status flags |
 
 ---
 

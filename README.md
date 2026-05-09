@@ -1,6 +1,6 @@
 # Shelby AI Evidence Vault
 
-![Milestone](https://img.shields.io/badge/milestone-X14%20Persistent%20Testnet%20Session%20Ledger-violet?style=flat-square)
+![Milestone](https://img.shields.io/badge/milestone-X15%20Public%20Testnet%20Handoff-violet?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
 
@@ -18,7 +18,7 @@ Shelby AI Evidence Vault is a Shelby ecosystem application layer for AI provenan
 - **Local/mock preview flow** — SHA-256 computed in-browser, evidence packs and receipts persisted locally, no wallet or API keys required; this is a development and review fallback, not the protocol endpoint
 - **Public Shelby testnet participation path** — when deployed with `SHELBY_MODE=testnet`, community users can connect an Aptos wallet, upload evidence through `@shelby-protocol/react`, and receive real `shelby://testnet/{account}/{blobName}` receipts
 - **Testnet launch console** — `/testnet` gives community users a direct launch surface for mode status, wallet readiness, funding prerequisites, upload entry, and receipt verification
-- **Persistent community test session** — `/testnet` aggregates the latest testnet receipt, referenced Blobs, wallet status, and a copyable session summary from browser cache plus SQLite after a real upload
+- **Public testnet handoff artifact** — `/testnet` aggregates the latest testnet receipt, referenced Blobs, wallet status, full route URLs, smoke commands, and a copyable session summary from browser cache plus SQLite after a real upload
 - **In-app proof verification** — testnet Blob detail and read receipt pages expose account/blobName/status/explorer/retrieval identity and can run safe server-side retrieval probes
 - **Opt-in smoke harness** — `npm run smoke` verifies Shelby RPC connectivity and retrieval for a blob uploaded via the browser wallet path
 - **Release-candidate gate** — `npm run verify-release-candidate` verifies the zero-credential product loop, build, and key routes in one command
@@ -211,7 +211,7 @@ Built-in demo data lives in `src/lib/demo-data/`:
 
 ---
 
-## Current features (X14 persistent testnet session ledger)
+## Current features (X15 public testnet handoff)
 
 - Shelby-first evidence model: EvidencePack, BlobRecord identity, and ReadReceipt lineage
 - Chinese-first / English-toggleable product UI across the main routes
@@ -232,9 +232,10 @@ Built-in demo data lives in `src/lib/demo-data/`:
 - Mode indicator, wallet connect UI, and public testnet participation guide on upload page
 - Navigation-level `/testnet` launch console for public testnet participation, including wallet detection, connect/disconnect, account, Aptos Testnet network status, and a persistent community test session summary
 - Testnet session ledger reads browser cache plus SQLite records, dedupes receipts/blobs, and preserves the participant summary even when browser cache is incomplete
+- Public handoff JSON includes full app routes, receipt/blob proof URLs, explorer/retrieval identity, smoke commands, and acceptance-status flags for community review
 - C12 release-candidate verifier: doctor checks, isolated SQLite, production build, and route smoke checks
 - X3 product closeout status: release-candidate gate remained green after the UI/product pass
-- X14 persistent testnet session ledger: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, durable session summary, and optional smoke retrieval
+- X15 public testnet handoff: UI/docs now describe the real community path from wallet readiness to Shelby upload, Blob proof verification, receipt-level proof aggregation, durable session summary, and optional smoke retrieval
 
 ---
 
@@ -271,7 +272,7 @@ CI does not run real uploads. The participant path is documented in `docs/public
 | `docs/demo-script.md` | Step-by-step demo walkthrough for stakeholders |
 | `docs/ecosystem-submission-pack.md` | Public-facing product positioning and milestone matrix |
 | `docs/public-testnet-participation.md` | X8 public Shelby testnet participant and deployment path |
-| `docs/final-product-acceptance.md` | X14 public testnet candidate acceptance package |
+| `docs/final-product-acceptance.md` | X15 public testnet candidate acceptance package |
 | `docs/production-queue.md` | Stage gates and Copilot/Codex task queue |
 | `docs/release-candidate-checklist.md` | C12 release-candidate verification gate |
 | `docs/c3-smoke-test-guide.md` | Smoke harness setup and manual testnet verification |

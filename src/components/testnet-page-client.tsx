@@ -81,11 +81,17 @@ const copy = {
     copied: '已复制',
     refreshSession: '刷新会话',
     ledgerSource: '数据来源',
-    ledgerSourceValue: '浏览器缓存 + SQLite',
     sessionMode: '会话模式',
     generatedAt: '生成时间',
     proofPath: '证明链路',
     proofPathValue: '钱包 → 上传 → Blob 证明 → 回执聚合 → smoke 可选验证',
+    storageStatus: '存储状态',
+    explorer: 'Explorer',
+    retrieval: '检索端点',
+    smokeCommand: 'Smoke 命令',
+    sourceBrowser: '浏览器缓存',
+    sourceSqlite: 'SQLite 账本',
+    sourceMixed: '浏览器缓存 + SQLite',
     acceptance: [
       '自动门禁：lint、build、release-candidate verifier 必须全绿。',
       '真实测试：连接 Aptos Testnet 钱包，完成一次小文件上传。',
@@ -153,11 +159,17 @@ const copy = {
     copied: 'Copied',
     refreshSession: 'Refresh session',
     ledgerSource: 'Data source',
-    ledgerSourceValue: 'browser cache + SQLite',
     sessionMode: 'Session mode',
     generatedAt: 'Generated at',
     proofPath: 'Proof path',
     proofPathValue: 'wallet → upload → Blob proof → receipt aggregation → optional smoke check',
+    storageStatus: 'Storage status',
+    explorer: 'Explorer',
+    retrieval: 'Retrieval endpoint',
+    smokeCommand: 'Smoke command',
+    sourceBrowser: 'browser cache',
+    sourceSqlite: 'SQLite ledger',
+    sourceMixed: 'browser cache + SQLite',
     acceptance: [
       'Automated gate: lint, build, and release-candidate verifier must stay green.',
       'Real test: connect an Aptos Testnet wallet and upload one small file.',
@@ -216,11 +228,17 @@ const copy = {
     copied: string;
     refreshSession: string;
     ledgerSource: string;
-    ledgerSourceValue: string;
     sessionMode: string;
     generatedAt: string;
     proofPath: string;
     proofPathValue: string;
+    storageStatus: string;
+    explorer: string;
+    retrieval: string;
+    smokeCommand: string;
+    sourceBrowser: string;
+    sourceSqlite: string;
+    sourceMixed: string;
     acceptance: string[];
     boundaryTitle: string;
     boundaries: string[];
@@ -657,21 +675,35 @@ function buildSessionSummary({
   accountAddress,
   walletNetwork,
   session,
+  origin,
 }: {
   mode: 'mock' | 'testnet';
   walletReady: boolean;
   accountAddress: string | null;
   walletNetwork: string | null;
   session: CommunitySession;
+  origin: string;
 }) {
   const proofBlobs = session.latestReceiptBlobs.length > 0 ? session.latestReceiptBlobs : session.blobs;
+  const route = (path: string) => (origin ? `${origin}${path}` : path);
+  const smokeCommands = proofBlobs
+    .filter((blob) => blob.accountAddress && blob.blobName)
+    .map((blob) => ({
+      blobId: blob.id,
+      command: `SHELBY_SMOKE=true SHELBY_SMOKE_ACCOUNT_ADDRESS=${blob.accountAddress} SHELBY_SMOKE_BLOB_NAME=${blob.blobName} npm run smoke`,
+    }));
 
   return {
     product: 'Shelby AI Evidence Vault',
-    milestone: 'X14 persistent testnet session ledger',
+    milestone: 'X15 public testnet handoff artifact',
     generatedAt: new Date().toISOString(),
     runtimeMode: mode,
     ledgerSource: session.source,
+    routes: {
+      testnetConsole: route('/testnet'),
+      upload: route('/upload'),
+      dashboard: route('/dashboard'),
+    },
     wallet: {
       ready: walletReady,
       accountAddress,
@@ -683,7 +715,7 @@ function buildSessionSummary({
           runId: session.latestReceipt.runId,
           timestamp: session.latestReceipt.timestamp,
           receiptMode: session.latestReceipt.receiptMode,
-          url: `/read-receipt/${session.latestReceipt.id}`,
+          url: route(`/read-receipt/${session.latestReceipt.id}`),
         }
       : null,
     blobs: proofBlobs.map((blob) => ({
@@ -695,8 +727,16 @@ function buildSessionSummary({
       storageStatus: blob.storageStatus,
       explorerUrl: blob.explorerUrl,
       retrievalUrl: blob.retrievalUrl,
-      url: `/blob/${blob.id}`,
+      url: route(`/blob/${blob.id}`),
     })),
+    smokeCommands,
+    acceptanceStatus: {
+      runtimeModeReady: mode === 'testnet',
+      walletReady,
+      testnetReceiptPresent: Boolean(session.latestReceipt),
+      testnetBlobPresent: proofBlobs.length > 0,
+      smokeCommandReady: smokeCommands.length > 0,
+    },
     acceptancePath: [
       'connect Aptos Testnet wallet',
       'upload evidence through Shelby browser-wallet flow',
@@ -724,7 +764,17 @@ function TestnetSessionPanel({
   const [session, setSession] = useState<CommunitySession>(loadBrowserCommunitySession);
   const [copied, setCopied] = useState(false);
   const proofBlobs = session.latestReceiptBlobs.length > 0 ? session.latestReceiptBlobs : session.blobs;
+  const smokeBlob = proofBlobs.find((blob) => blob.accountAddress && blob.blobName);
+  const smokeCommand = smokeBlob
+    ? `SHELBY_SMOKE=true SHELBY_SMOKE_ACCOUNT_ADDRESS=${smokeBlob.accountAddress} SHELBY_SMOKE_BLOB_NAME=${smokeBlob.blobName} npm run smoke`
+    : null;
   const hasSession = Boolean(session.latestReceipt || session.blobs.length > 0);
+  const sourceLabel =
+    session.source === 'mixed'
+      ? t.sourceMixed
+      : session.source === 'sqlite'
+        ? t.sourceSqlite
+        : t.sourceBrowser;
 
   const refreshSession = async () => {
     const nextSession = await loadLedgerCommunitySession();
@@ -760,6 +810,7 @@ function TestnetSessionPanel({
       accountAddress,
       walletNetwork,
       session,
+      origin: typeof window === 'undefined' ? '' : window.location.origin,
     });
     await navigator.clipboard.writeText(JSON.stringify(summary, null, 2));
     setCopied(true);
@@ -802,7 +853,7 @@ function TestnetSessionPanel({
         <SessionMetric label={t.sessionMode} value={mode} ok={mode === 'testnet'} />
         <SessionMetric label={t.latestReceipt} value={session.latestReceipt?.id ?? t.noReceipt} ok={Boolean(session.latestReceipt)} />
         <SessionMetric label={t.linkedBlobs} value={String(proofBlobs.length)} ok={proofBlobs.length > 0} />
-        <SessionMetric label={t.ledgerSource} value={t.ledgerSourceValue} ok={session.source !== 'browser' || hasSession} />
+        <SessionMetric label={t.ledgerSource} value={sourceLabel} ok={session.source !== 'browser' || hasSession} />
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -828,6 +879,32 @@ function TestnetSessionPanel({
                   <div className="mt-2 grid gap-2 text-xs text-[#6d5f55] sm:grid-cols-2">
                     <span className="break-all">account: {blob.accountAddress ?? '-'}</span>
                     <span className="break-all">blobName: {blob.blobName ?? '-'}</span>
+                    <span className="break-all">
+                      {t.storageStatus}: {blob.storageStatus ?? '-'}
+                    </span>
+                    <span className="break-all">network: {blob.network ?? '-'}</span>
+                  </div>
+                  <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+                    {blob.explorerUrl ? (
+                      <a
+                        href={blob.explorerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 font-bold text-[#de5cff]"
+                      >
+                        {t.explorer}
+                        <ExternalLink size={13} />
+                      </a>
+                    ) : (
+                      <span className="text-[#b29e92]">{t.explorer}: -</span>
+                    )}
+                    {blob.retrievalUrl ? (
+                      <span className="break-all font-mono text-[#6d5f55]">
+                        {t.retrieval}: {blob.retrievalUrl}
+                      </span>
+                    ) : (
+                      <span className="text-[#b29e92]">{t.retrieval}: -</span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -856,6 +933,14 @@ function TestnetSessionPanel({
               {t.openReceipt}
               <ArrowRight size={15} />
             </Link>
+          )}
+          {smokeCommand && (
+            <div className="mt-4 border border-[#eadfd6] bg-white/55 p-3">
+              <p className="font-mono text-xs font-bold uppercase text-[#7b695d]">{t.smokeCommand}</p>
+              <p className="mt-2 break-all font-mono text-xs leading-5 text-[#6d5f55]">
+                {smokeCommand}
+              </p>
+            </div>
           )}
         </aside>
       </div>
