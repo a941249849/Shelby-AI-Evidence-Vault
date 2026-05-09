@@ -336,7 +336,8 @@ npm run generate-agent-run
   → ReadReceipt built     (id: c8-rr-agent-sentinel-v1, receiptMode: 'local')
   → All three persisted to SQLite via INSERT OR REPLACE (idempotent)
   → /read-receipt/c8-rr-agent-sentinel-v1 resolves via SQLite path in ReadReceiptClient
-  → /dashboard shows c8-pack-agent-sentinel-v1 in Local workspace under User-created records
+  → /dashboard shows c8-pack-agent-sentinel-v1 in the local/SQLite user-created evidence section
+  → evidence card can deep-link to /blob/c8-blob-input-v1
 ```
 
 ### Verification flow (C9 harness)
@@ -356,16 +357,19 @@ npm run verify-community-demo
 ```
 /dashboard (DashboardClient — client component)
   → useEffect: loads localPacks (localStorage) + persistedPacks (SQLite via getPersistedPacksAction)
+  → loads persistedBlobs for SQLite packs via getPersistedBlobsByPackAction
   → merges: allUserPacks = [localPacks..., dedupedPersistedPacks...]
   → merges: allPacks = [allUserPacks..., demoPacks...]
+  → builds primaryBlobByPackId from demo, browser-local, and SQLite BlobRecord sources
   → search state: searchQuery, filterCategory, filterSourceType, filterStatus, filterDataSource, sortBy
   → applyFilters(packs): text search across title/description/category/sourceType/status/tags/dataSource
                           then category/sourceType/status/dataSource dropdown filters
                           then sortPacks() by selected sort key
   → filteredUserPacks = applyFilters(allUserPacks)
   → filteredDemoPacks = applyFilters(demoPacks)
-  → "Local workspace" section: visible when filteredUserPacks.length > 0 OR (no filter active AND allUserPacks.length > 0)
+  → local/SQLite user-created evidence section: visible when filteredUserPacks.length > 0 OR (no filter active AND allUserPacks.length > 0)
   → "Demo evidence" section: visible when filteredDemoPacks.length > 0 OR no filter active
+  → card CTA opens the first Blob provenance page when a BlobRecord is available
   → empty state: shown when filter is active AND totalFiltered === 0
   → "Clear filters" button: resets all state to defaults; also shown in empty state as "Reset filters"
   → Metric bar "Packs indexed": shows "N / total" when filtered
@@ -384,4 +388,4 @@ npm run verify-community-demo
 - **Tailwind v4.** Uses CSS-first configuration (`@import "tailwindcss"` in globals.css). No `tailwind.config.js` needed.
 - **Conservative status mapping.** `status-map.ts` defines `registered → ready → failed → unknown`. The React SDK hook returns `void` on success, so `storageStatus` is `registered` until a retrieval check confirms `ready`.
 - **C8 deterministic script.** `scripts/generate-agent-run.mjs` is the canonical agent-run example — runs with zero credentials, uses `better-sqlite3` directly (same schema as `lib/server/db.ts`), and is idempotent via `INSERT OR REPLACE`. Stable IDs (`c8-*`) ensure the generated receipt URL is predictable.
-- **C10 client-side search/filter/sort.** All search, filter, and sort logic in `DashboardClient` is pure client-side state with no server round-trips. `useMemo` wraps the filter/sort computation so it only recomputes when inputs change. Sorting uses `localeCompare` for deterministic, locale-aware ordering. The existing Local workspace / Built-in corpus section split is preserved; sections become invisible only when their filtered result set is empty.
+- **C10/X6 client-side search/filter/sort and evidence-card deep links.** Search, filter, and sort logic in `DashboardClient` is pure client-side state. `useMemo` wraps filter/sort computation and Blob deep-link lookup so it only recomputes when inputs change. Sorting uses `localeCompare` for deterministic, locale-aware ordering. The local/SQLite user-created evidence and built-in corpus section split is preserved; sections become invisible only when their filtered result set is empty. Evidence cards use localized category/source/status labels and open the first Blob provenance page when a BlobRecord is available.
