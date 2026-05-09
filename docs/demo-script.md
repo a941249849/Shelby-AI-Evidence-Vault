@@ -1,6 +1,6 @@
 # Demo Script — Shelby AI Evidence Vault
 
-A step-by-step walkthrough for demonstrating the **X8 public Shelby testnet candidate** to stakeholders or the community.
+A step-by-step walkthrough for demonstrating the **X10 public Shelby testnet readiness candidate** to stakeholders or the community.
 
 > **Current scope:**
 > - The product UI is Chinese-first with a top-nav English toggle.
@@ -47,6 +47,7 @@ Click **测试网 / Testnet** or navigate to `/testnet`.
 **Point out:**
 - This is the public entry point for community testnet participation.
 - The runtime card shows whether the current deployment is still `mock` or has `SHELBY_MODE=testnet` enabled.
+- The wallet readiness panel detects Aptos wallets, supports connect/disconnect, and shows account plus network status.
 - The four participant steps are explicit: connect wallet, prepare test assets, upload evidence, inspect receipt.
 - The product boundary section is honest: no mainnet claim, no private-key custody, no server signer, no token purchase flow.
 

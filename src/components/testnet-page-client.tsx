@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
+  AlertTriangle,
   CheckCircle2,
   CloudUpload,
   ExternalLink,
@@ -11,7 +13,11 @@ import {
   ReceiptText,
   ShieldCheck,
   Wallet,
+  WifiOff,
 } from 'lucide-react';
+import { Network } from '@aptos-labs/ts-sdk';
+import { useWallet } from '@aptos-labs/wallet-adapter-react';
+import type { AdapterNotDetectedWallet, AdapterWallet } from '@aptos-labs/wallet-adapter-react';
 import { useLanguage, type Language } from '@/components/language-state';
 
 const copy = {
@@ -24,6 +30,23 @@ const copy = {
     start: '开始上传',
     docs: 'Shelby React SDK',
     status: '运行状态',
+    connected: '已连接',
+    disconnected: '未连接',
+    wrongNetwork: '网络错误',
+    ready: '钱包就绪',
+    walletTitle: '钱包 readiness',
+    walletBody:
+      '公开测试前先在这里检查钱包扩展、连接状态和 Aptos Testnet 网络。真实上传仍在 /upload 完成。',
+    walletBlocked:
+      '当前部署仍是 Mock 预览；可以检查钱包，但公开测试网实传需要 SHELBY_MODE=testnet。',
+    walletMissing: '未检测到 Aptos 钱包。请安装 Petra 或兼容钱包后刷新页面。',
+    detectedWallets: '检测到的钱包',
+    notInstalled: '可安装的钱包',
+    connect: '连接',
+    disconnect: '断开连接',
+    account: '账号',
+    network: '网络',
+    continueUpload: '进入上传页',
     enabled: 'Testnet 已启用',
     enabledBody: '当前部署已开启 Shelby 测试网参与路径。',
     mock: 'Mock 预览',
@@ -59,6 +82,23 @@ const copy = {
     start: 'Start upload',
     docs: 'Shelby React SDK',
     status: 'Runtime status',
+    connected: 'Connected',
+    disconnected: 'Disconnected',
+    wrongNetwork: 'Wrong network',
+    ready: 'Wallet ready',
+    walletTitle: 'Wallet readiness',
+    walletBody:
+      'Before public testing, check wallet extension detection, connection state, and Aptos Testnet alignment here. Real upload still happens on /upload.',
+    walletBlocked:
+      'This deployment is still in Mock preview. Wallet readiness can be checked, but real public testnet upload requires SHELBY_MODE=testnet.',
+    walletMissing: 'No Aptos wallet detected. Install Petra or a compatible wallet extension, then refresh.',
+    detectedWallets: 'Detected wallets',
+    notInstalled: 'Installable wallets',
+    connect: 'Connect',
+    disconnect: 'Disconnect',
+    account: 'Account',
+    network: 'Network',
+    continueUpload: 'Open upload',
     enabled: 'Testnet enabled',
     enabledBody: 'This deployment has enabled the Shelby testnet participation path.',
     mock: 'Mock preview',
@@ -94,6 +134,21 @@ const copy = {
     start: string;
     docs: string;
     status: string;
+    connected: string;
+    disconnected: string;
+    wrongNetwork: string;
+    ready: string;
+    walletTitle: string;
+    walletBody: string;
+    walletBlocked: string;
+    walletMissing: string;
+    detectedWallets: string;
+    notInstalled: string;
+    connect: string;
+    disconnect: string;
+    account: string;
+    network: string;
+    continueUpload: string;
     enabled: string;
     enabledBody: string;
     mock: string;
@@ -117,13 +172,42 @@ export default function TestnetPageClient({ mode }: { mode: 'mock' | 'testnet' }
   const { language } = useLanguage();
   const t = copy[language];
   const enabled = mode === 'testnet';
+  const wallet = useWallet();
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const accountAddress = wallet.account?.address?.toString() ?? null;
+  const walletNetwork = wallet.network?.name ? String(wallet.network.name) : null;
+  const walletReady = wallet.connected && walletNetwork === Network.TESTNET;
+  const walletStatus = walletReady
+    ? t.ready
+    : wallet.connected
+      ? t.wrongNetwork
+      : t.disconnected;
 
   const launchChecks: Array<{ label: string; value: string; ok: boolean }> = [
     { label: 'SHELBY_MODE', value: enabled ? 'testnet' : 'mock', ok: enabled },
     { label: 'NEXT_PUBLIC_SHELBY_NETWORK', value: 'testnet', ok: true },
+    { label: 'Wallet', value: walletStatus, ok: walletReady },
     { label: 'Wallet custody', value: 'browser wallet only', ok: true },
     { label: 'Mainnet claim', value: 'none', ok: true },
   ];
+
+  async function connectWallet(name: string) {
+    setWalletError(null);
+    try {
+      await wallet.connect(name);
+    } catch (err) {
+      setWalletError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  async function disconnectWallet() {
+    setWalletError(null);
+    try {
+      await wallet.disconnect();
+    } catch (err) {
+      setWalletError(err instanceof Error ? err.message : String(err));
+    }
+  }
 
   return (
     <div className="kinetic-grid min-h-[calc(100vh-4rem)] px-4 py-10 sm:px-6 lg:px-10">
@@ -226,11 +310,207 @@ export default function TestnetPageClient({ mode }: { mode: 'mock' | 'testnet' }
           })}
         </section>
 
+        <WalletReadinessPanel
+          mode={mode}
+          wallets={wallet.wallets}
+          notDetectedWallets={wallet.notDetectedWallets}
+          connected={wallet.connected}
+          walletName={wallet.wallet?.name ?? null}
+          accountAddress={accountAddress}
+          walletNetwork={walletNetwork}
+          walletReady={walletReady}
+          walletError={walletError}
+          connectWallet={connectWallet}
+          disconnectWallet={disconnectWallet}
+          language={language}
+        />
+
         <section className="mt-8 grid gap-5 lg:grid-cols-2">
           <InfoPanel icon={FileCheck2} title={t.acceptanceTitle} items={t.acceptance} />
           <InfoPanel icon={ShieldCheck} title={t.boundaryTitle} items={t.boundaries} green />
         </section>
       </div>
+    </div>
+  );
+}
+
+function WalletReadinessPanel({
+  mode,
+  wallets,
+  notDetectedWallets,
+  connected,
+  walletName,
+  accountAddress,
+  walletNetwork,
+  walletReady,
+  walletError,
+  connectWallet,
+  disconnectWallet,
+  language,
+}: {
+  mode: 'mock' | 'testnet';
+  wallets: ReadonlyArray<AdapterWallet>;
+  notDetectedWallets: ReadonlyArray<AdapterNotDetectedWallet>;
+  connected: boolean;
+  walletName: string | null;
+  accountAddress: string | null;
+  walletNetwork: string | null;
+  walletReady: boolean;
+  walletError: string | null;
+  connectWallet: (name: string) => Promise<void>;
+  disconnectWallet: () => Promise<void>;
+  language: Language;
+}) {
+  const t = copy[language];
+  const modeEnabled = mode === 'testnet';
+  const noWallets = wallets.length === 0 && notDetectedWallets.length === 0;
+
+  return (
+    <section className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="shelby-surface shelby-cut p-6">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="font-mono text-xs font-bold uppercase text-[#ff4faf]">{t.walletTitle}</p>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6d5f55]">{t.walletBody}</p>
+          </div>
+          <span
+            className={`inline-flex w-fit items-center gap-2 border px-3 py-1.5 font-mono text-xs font-bold ${
+              walletReady
+                ? 'border-[#317c24]/20 bg-[#dff5d7] text-[#317c24]'
+                : connected
+                  ? 'border-[#fd8565]/35 bg-[#fff0ea] text-[#9a361f]'
+                  : 'border-[#d8c7bb] bg-[#fffdf9] text-[#6d5f55]'
+            }`}
+          >
+            {walletReady ? <CheckCircle2 size={14} /> : connected ? <WifiOff size={14} /> : <Wallet size={14} />}
+            {walletReady ? t.ready : connected ? t.wrongNetwork : t.disconnected}
+          </span>
+        </div>
+
+        {!modeEnabled && (
+          <div className="mb-5 flex gap-3 border border-[#fd8565]/35 bg-[#fff0ea]/85 px-4 py-3 text-sm text-[#7d2a15]">
+            <FlaskConical className="mt-0.5 h-4 w-4 flex-none" />
+            <p>{t.walletBlocked}</p>
+          </div>
+        )}
+
+        {walletError && (
+          <div className="mb-5 flex gap-3 border border-red-400/35 bg-red-50 px-4 py-3 text-sm text-red-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 flex-none" />
+            <p>{walletError}</p>
+          </div>
+        )}
+
+        {connected ? (
+          <div className="grid gap-3 md:grid-cols-2">
+            <StatusLine label={t.account} value={accountAddress ?? 'unknown'} ok={Boolean(accountAddress)} />
+            <StatusLine label={t.network} value={walletNetwork ?? 'unknown'} ok={walletNetwork === Network.TESTNET} />
+            <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3 border border-[#eadfd6] bg-white/50 px-4 py-3">
+              <span className="text-sm font-semibold text-[#2f1f12]">
+                {walletName ?? 'Wallet'} {t.connected}
+              </span>
+              <button
+                type="button"
+                onClick={disconnectWallet}
+                className="border border-[#d8c7bb] px-3 py-1.5 text-sm font-bold text-[#6d5f55] transition hover:border-[#fd8565]/60 hover:text-[#9a361f]"
+              >
+                {t.disconnect}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            {noWallets && (
+              <p className="mb-4 text-sm leading-6 text-[#6d5f55]">
+                {t.walletMissing}{' '}
+                <a
+                  href="https://petra.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[#de5cff] underline"
+                >
+                  Petra
+                </a>
+              </p>
+            )}
+
+            {wallets.length > 0 && (
+              <div>
+                <p className="mb-3 font-mono text-xs font-bold uppercase text-[#7b695d]">{t.detectedWallets}</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {wallets.map((candidate) => (
+                    <button
+                      key={candidate.name}
+                      type="button"
+                      onClick={() => connectWallet(candidate.name)}
+                      className="flex items-center justify-between gap-3 border border-[#eadfd6] bg-white/55 px-3 py-2.5 text-left text-sm font-bold text-[#2f1f12] transition hover:border-[#de8aff]/50 hover:text-[#de5cff]"
+                    >
+                      <span className="flex min-w-0 items-center gap-2">
+                        {candidate.icon && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={candidate.icon} alt={candidate.name} className="h-5 w-5 flex-none rounded" />
+                        )}
+                        <span className="truncate">{candidate.name}</span>
+                      </span>
+                      <span className="font-mono text-xs">{t.connect}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {notDetectedWallets.length > 0 && (
+              <div className="mt-5">
+                <p className="mb-3 font-mono text-xs font-bold uppercase text-[#7b695d]">{t.notInstalled}</p>
+                <div className="flex flex-wrap gap-2">
+                  {notDetectedWallets.map((candidate) => (
+                    <a
+                      key={candidate.name}
+                      href={candidate.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 border border-[#eadfd6] bg-white/55 px-3 py-2 text-sm font-semibold text-[#6d5f55] hover:border-[#de8aff]/50 hover:text-[#de5cff]"
+                    >
+                      {candidate.name}
+                      <ExternalLink size={14} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="shelby-surface-soft shelby-cut p-6">
+        <p className="font-mono text-xs font-bold uppercase text-[#6d5f55]">
+          {language === 'zh' ? '下一步' : 'Next step'}
+        </p>
+        <h2 className="mt-3 text-2xl font-black text-[#2f1f12]">{t.continueUpload}</h2>
+        <p className="mt-3 text-sm leading-6 text-[#6d5f55]">
+          {language === 'zh'
+            ? '钱包 readiness 通过后，进入上传页创建证据包。上传页会继续执行网络校验，并在真实签名后生成 Blob 与回执。'
+            : 'After wallet readiness passes, open the upload flow to create an evidence pack. The upload page still enforces network checks and creates Blob/receipt records after real signing.'}
+        </p>
+        <Link href="/upload" className="shelby-primary-button mt-5 w-full">
+          <CloudUpload size={18} />
+          {t.continueUpload}
+          <span className="button-arrow">
+            <ArrowRight size={19} />
+          </span>
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function StatusLine({ label, value, ok }: { label: string; value: string; ok: boolean }) {
+  return (
+    <div className="border border-[#eadfd6] bg-white/50 px-4 py-3">
+      <p className="font-mono text-xs font-bold uppercase text-[#7b695d]">{label}</p>
+      <p className={`mt-1 break-all text-sm font-semibold ${ok ? 'text-[#317c24]' : 'text-[#9a361f]'}`}>
+        {value}
+      </p>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 # Ecosystem Submission Pack — Shelby AI Evidence Vault
 
 Date: 2026-05-09
-Milestone: X8 — Public Shelby Testnet Candidate
+Milestone: X10 — Public Shelby Testnet Readiness Candidate
 
 ---
 
@@ -9,7 +9,7 @@ Milestone: X8 — Public Shelby Testnet Candidate
 
 **Shelby AI Evidence Vault** is an AI evidence and read-receipt layer built for Shelby. It demonstrates how AI pipelines can turn datasets, agent run outputs, and documents into verifiable evidence records with Shelby Blob identity — then produce auditable receipts that trace every answer back to the evidence that informed it.
 
-It ships as a complete, runnable open-source public testnet candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, then moves into the browser-wallet Shelby testnet upload flow: users connect an Aptos Testnet wallet, sign through the wallet, upload to Shelby testnet, and inspect Blob identity plus read receipts. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
+It ships as a complete, runnable open-source public testnet readiness candidate. Local mock mode works with zero configuration as a development and review fallback. The real community path starts at `/testnet`, where users can detect and connect an Aptos wallet, verify Aptos Testnet readiness, then move into the browser-wallet Shelby testnet upload flow: sign through the wallet, upload to Shelby testnet, and inspect Blob identity plus read receipts. An opt-in smoke harness verifies RPC connectivity and blob retrieval against the live testnet, and the release-candidate verifier provides a one-command acceptance gate. The product surface is Chinese-first with an English toggle, matching the community-facing Shelby ecosystem positioning.
 
 **What it is:**
 - A Shelby ecosystem application layer for AI evidence storage using Shelby blob references and on-chain registration
@@ -31,7 +31,7 @@ It ships as a complete, runnable open-source public testnet candidate. Local moc
 
 **Shelby AI 证据库（Shelby AI Evidence Vault）** 是一个构建在 Shelby 之上的 AI 证据与读取回执应用层。它展示了 AI 流水线如何把数据集、智能体运行产出及文档转化为带有 Shelby Blob 身份的可验证证据记录，并生成可审计的回执，将每一次回答与所依据的证据关联起来。
 
-该项目作为完整、可运行的公开测试网候选版本发布。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径从 `/testnet` 开始，社区用户连接 Aptos Testnet 钱包，通过浏览器钱包签名上传至 Shelby 测试网，并检查 Blob 身份与读取回执。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
+该项目作为完整、可运行的公开测试网 readiness 候选版本发布。本地模拟模式无需任何配置即可使用，但它只是开发与评审 fallback；真实协议证明路径从 `/testnet` 开始，社区用户可以检测并连接 Aptos 钱包、确认 Aptos Testnet 状态，再通过浏览器钱包签名上传至 Shelby 测试网，并检查 Blob 身份与读取回执。此外还提供可选冒烟测试工具和一键验收命令，用于验证 RPC 连通性、Blob 检索和公开测试链路。产品界面默认中文，并提供英文切换，面向 Shelby 生态社区展示。
 
 **产品定位：**
 - 使用 Shelby Blob 引用和链上注册的 AI 证据应用层
@@ -103,7 +103,8 @@ Every upload — mock or testnet — creates a read receipt that binds to real B
 | X2 | Merged | Shelby-first bilingual product UI: home, registry, upload, Blob detail, read receipt, footer |
 | X3 | Merged | Product closeout docs, community experiment framing, final QA package |
 | X8 | Merged | Public Shelby testnet participation path, participant docs, upload-page onboarding |
-| X9 | Current | Navigation-level `/testnet` launch console for community participation |
+| X9 | Merged | Navigation-level `/testnet` launch console for community participation |
+| X10 | Current | Wallet readiness panel on `/testnet`: detect/connect wallet, show account and Aptos Testnet status |
 
 ---
 

@@ -1,4 +1,4 @@
-# X8 Public Shelby Testnet Participation
+# X10 Public Shelby Testnet Readiness
 
 Last verified against official Shelby docs: 2026-05-09.
 
@@ -32,11 +32,11 @@ Official references:
 1. Open the deployed app.
 2. Go to `/testnet`.
 3. Confirm the runtime status and public testnet boundaries.
-4. Continue to `/upload`.
-5. Connect Petra or another compatible Aptos wallet.
-6. Switch the wallet to Aptos Testnet.
-7. Ensure the wallet has testnet APT for gas.
-8. Ensure the wallet has ShelbyUSD for Shelby file upload cost.
+4. Use the wallet readiness panel to detect Petra or another compatible Aptos wallet.
+5. Connect the wallet and confirm it is on Aptos Testnet.
+6. Ensure the wallet has testnet APT for gas.
+7. Ensure the wallet has ShelbyUSD for Shelby file upload cost.
+8. Continue to `/upload`.
 9. Upload one or more evidence files.
 10. Approve the wallet transaction.
 11. Inspect the success state:
@@ -77,7 +77,7 @@ Implemented:
 - Fail-closed upload page when wallet is missing or on the wrong network.
 - Local SQLite persistence plus browser cache/fallback.
 - Blob and receipt pages resolve testnet records after upload.
-- Public `/testnet` launch console with mode status, prerequisites, upload entry, and acceptance boundaries.
+- Public `/testnet` launch console with mode status, wallet detection, connect/disconnect, account/network readiness, prerequisites, upload entry, and acceptance boundaries.
 - Public testnet participation guide on `/upload`.
 - Chinese and English product copy for the participant path.
 
@@ -102,10 +102,10 @@ Manual testnet gate:
 
 1. Deploy with `SHELBY_MODE=testnet` and `NEXT_PUBLIC_SHELBY_NETWORK=testnet`.
 2. Open `/testnet`.
-3. Confirm the mode status, launch checks, and public testnet boundaries are visible.
-4. Open `/upload`.
-5. Confirm the wallet connector and public testnet guide are visible.
-6. Connect a wallet on Aptos Testnet.
+3. Confirm the mode status, launch checks, wallet readiness panel, and public testnet boundaries are visible.
+4. Connect a wallet from `/testnet` and confirm account plus Aptos Testnet status.
+5. Open `/upload`.
+6. Confirm the upload page still enforces wallet and network readiness.
 7. Upload a small file.
 8. Confirm the returned record contains real testnet identity fields.
 9. Open the generated `/blob/{id}` and `/read-receipt/{id}` pages.
