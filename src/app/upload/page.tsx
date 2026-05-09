@@ -6,7 +6,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   ChevronRight,
-  ExternalLink,
   FileText,
   FileUp,
   Hash,
@@ -551,66 +550,6 @@ function StepLabel({
   );
 }
 
-const participationIcons = [Wallet, HardDrive, UploadCloud, ShieldCheck];
-
-function PublicTestnetGuide({ mode }: { mode: 'mock' | 'testnet' | null }) {
-  const { language } = useLanguage();
-  const t = uploadCopy[language];
-  const isTestnet = mode === 'testnet';
-
-  return (
-    <section className="mb-8 shelby-surface shelby-cut p-5">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="font-mono text-xs font-semibold uppercase text-[#ff77c9]">
-            {t.participationTitle}
-          </p>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-[#f4f0e8]">
-            {t.participationBody}
-          </p>
-        </div>
-        <span
-          className={`inline-flex w-fit items-center gap-2 border px-3 py-1.5 font-mono text-xs font-semibold ${
-            isTestnet
-              ? 'border-[#9fe878]/35 bg-[#9fe878]/10 text-[#9fe878]'
-              : 'border-[#de8aff]/35 bg-[#de8aff]/10 text-[#e7b6ff]'
-          }`}
-        >
-          <span className={`h-2 w-2 rounded-full ${isTestnet ? 'bg-[#9fe878]' : 'bg-[#de8aff]'}`} />
-          {isTestnet ? t.participationBadgeTestnet : t.participationBadgeMock}
-        </span>
-      </div>
-
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {t.participationSteps.map(([title, body, label, href], index) => {
-          const Icon = participationIcons[index];
-          return (
-            <article key={title} className="border border-white/10 bg-white/[0.045] p-4">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <span className="grid h-9 w-9 place-items-center border border-[#9fe878]/25 bg-[#9fe878]/10 text-[#9fe878]">
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span className="font-mono text-xs font-bold text-[#6f716d]">0{index + 1}</span>
-              </div>
-              <h3 className="text-sm font-semibold text-[#f4f0e8]">{title}</h3>
-              <p className="mt-2 min-h-16 text-sm leading-6 text-[#9d9a92]">{body}</p>
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[#de8aff] hover:text-[#ff77c9]"
-              >
-                {label}
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            </article>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
 function UploadProgressPanel({
   stage,
   isTestnet,
@@ -1108,25 +1047,6 @@ function UploadPageContent() {
           walletAddress={shelbyUpload.walletAddress}
           walletNetwork={shelbyUpload.walletNetwork}
         />
-
-        <PublicTestnetGuide mode={mode} />
-
-        <section className="mb-8 grid gap-4 md:grid-cols-2">
-          <div className="shelby-surface shelby-cut p-4">
-            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-[#9d9a92]">
-              <HardDrive className="h-3.5 w-3.5 text-[#9fe878]" />
-              {t.protocolPreviewTitle}
-            </div>
-            <p className="text-sm leading-6 text-[#f4f0e8]">{t.protocolPreviewBody}</p>
-          </div>
-          <div className="shelby-surface shelby-cut p-4">
-            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-[#9d9a92]">
-              <ShieldCheck className="h-3.5 w-3.5 text-[#de8aff]" />
-              {t.protocolTestnetTitle}
-            </div>
-            <p className="text-sm leading-6 text-[#f4f0e8]">{t.protocolTestnetBody}</p>
-          </div>
-        </section>
 
         {isTestnet && (
           <WalletConnector

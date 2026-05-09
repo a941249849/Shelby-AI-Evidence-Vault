@@ -28,6 +28,7 @@ import { getLocalBlobs, getLocalReadReceipts } from '@/lib/store/local-store';
 import { getPersistedBlobsAction, getPersistedReceiptsAction } from '@/app/actions/persist';
 import { formatDateTime } from '@/lib/utils';
 import { buildTestnetHandoffSummary } from '@/lib/testnet/handoff.mjs';
+import TestnetProofSummary from '@/components/testnet-proof-summary';
 
 const copy = {
   zh: {
@@ -362,6 +363,10 @@ export default function TestnetPageClient({ mode }: { mode: 'mock' | 'testnet' }
             </div>
           </aside>
         </section>
+
+        <div className="mt-8">
+          <TestnetProofSummary compact />
+        </div>
 
         <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {t.steps.map(([title, body, link], index) => {
