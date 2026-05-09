@@ -13,9 +13,9 @@ const copy = {
     subtitle: 'AI 证据回执层',
     product: '首页',
     testnet: '测试网',
-    registry: '索引',
-    create: '上传',
-    receipt: '回执',
+    registry: '证据库',
+    create: '创建证据',
+    receipt: '验证回执',
     language: '中文 / EN',
     wallet: {
       connect: '连接钱包',
@@ -35,8 +35,8 @@ const copy = {
     product: 'Home',
     testnet: 'Testnet',
     registry: 'Registry',
-    create: 'Upload',
-    receipt: 'Receipt',
+    create: 'Create evidence',
+    receipt: 'Verify receipt',
     language: 'EN / 中文',
     wallet: {
       connect: 'Connect wallet',

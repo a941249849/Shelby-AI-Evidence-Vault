@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/nav";
+import ProductFlowShell from "@/components/product-flow-shell";
 import SiteFooter from "@/components/site-footer";
 import UploadProviders from "@/app/upload/providers";
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-[#fffaf4] text-[#2b1b10]">
         <UploadProviders>
           <Nav />
+          <ProductFlowShell />
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </UploadProviders>

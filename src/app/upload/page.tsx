@@ -33,6 +33,8 @@ import { useWalletSessionVerification } from '@/components/wallet-session-state'
 
 type Category = 'dataset' | 'agent-run' | 'document' | 'manifest';
 type SourceType = 'web-scrape' | 'api-export' | 'agent-output' | 'manual-upload';
+type UploadStage = 'idle' | 'packing' | 'testnet' | 'recording' | 'persisting';
+type ActiveUploadStage = Exclude<UploadStage, 'idle'>;
 
 interface FormState {
   title: string;
@@ -152,6 +154,19 @@ const uploadCopy = {
     sessionConsole: '返回测试会话',
     viewIndex: '查看证据索引',
     uploadAnother: '继续上传证据包',
+    progressTitle: '上传进度',
+    progressSteps: {
+      packing: '封装证据包并读取文件',
+      testnet: '等待钱包确认，注册 Shelby Blob 并上传文件',
+      recording: '生成读取回执与 Blob 详情',
+      persisting: '写入本地 SQLite 记录',
+    },
+    progressNotes: {
+      packing: '正在整理元数据、哈希、标签和文件内容。',
+      testnet: '如果钱包弹出确认窗口，请完成签名；页面会继续等待 Shelby 测试网返回。',
+      recording: '链路已返回，正在把账号、blobName、检索链接写成产品内记录。',
+      persisting: '正在把证据包、Blob 和回执保存到本地数据库。',
+    },
     computingHash: '正在计算 SHA-256',
     hashError: '哈希计算失败',
     removeFile: '移除文件',
@@ -263,6 +278,19 @@ const uploadCopy = {
     sessionConsole: 'Back to test session',
     viewIndex: 'View evidence index',
     uploadAnother: 'Upload another pack',
+    progressTitle: 'Upload progress',
+    progressSteps: {
+      packing: 'Package evidence and read files',
+      testnet: 'Await wallet confirmation, register Shelby Blob, and upload file',
+      recording: 'Create read receipt and Blob detail records',
+      persisting: 'Persist local SQLite records',
+    },
+    progressNotes: {
+      packing: 'Preparing metadata, hashes, tags, and file bytes.',
+      testnet: 'If the wallet opens a confirmation prompt, approve it; this page will wait for Shelby testnet to return.',
+      recording: 'The testnet path returned; writing account, blobName, and retrieval links into product records.',
+      persisting: 'Saving the evidence pack, Blob, and receipt into the local database.',
+    },
     computingHash: 'Computing SHA-256',
     hashError: 'Hash error',
     removeFile: 'Remove file',
@@ -583,6 +611,68 @@ function PublicTestnetGuide({ mode }: { mode: 'mock' | 'testnet' | null }) {
   );
 }
 
+function UploadProgressPanel({
+  stage,
+  isTestnet,
+}: {
+  stage: UploadStage;
+  isTestnet: boolean;
+}) {
+  const { language } = useLanguage();
+  const t = uploadCopy[language];
+  if (stage === 'idle') return null;
+
+  const steps: ActiveUploadStage[] = isTestnet
+    ? ['packing', 'testnet', 'recording', 'persisting']
+    : ['packing', 'recording', 'persisting'];
+  const activeIndex = Math.max(0, steps.indexOf(stage));
+
+  return (
+    <div className="mt-5 shelby-cut border border-[#de8aff]/25 bg-[#160f1a] p-4">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <p className="font-mono text-xs font-semibold uppercase text-[#de8aff]">
+          {t.progressTitle}
+        </p>
+        <span className="inline-flex items-center gap-2 font-mono text-xs text-[#9d9a92]">
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-[#9fe878]" />
+          {activeIndex + 1}/{steps.length}
+        </span>
+      </div>
+      <div className="space-y-3">
+        {steps.map((item, index) => {
+          const done = index < activeIndex;
+          const active = item === stage;
+          return (
+            <div key={item} className="flex gap-3">
+              <span
+                className={`mt-0.5 grid h-5 w-5 flex-none place-items-center rounded-full border text-[10px] ${
+                  done
+                    ? 'border-[#9fe878] bg-[#9fe878] text-[#101813]'
+                    : active
+                      ? 'border-[#de8aff] bg-[#de8aff]/15 text-[#de8aff]'
+                      : 'border-white/15 text-[#6f716d]'
+                }`}
+              >
+                {done ? <CheckCircle2 className="h-3 w-3" /> : index + 1}
+              </span>
+              <div className="min-w-0">
+                <p className={`text-sm font-semibold ${active ? 'text-[#f4f0e8]' : 'text-[#9d9a92]'}`}>
+                  {t.progressSteps[item]}
+                </p>
+                {active && (
+                  <p className="mt-1 text-xs leading-5 text-[#9d9a92]">
+                    {t.progressNotes[item]}
+                  </p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function UploadPageContent() {
   const { language } = useLanguage();
   const t = uploadCopy[language];
@@ -596,6 +686,7 @@ function UploadPageContent() {
   const [files, setFiles] = useState<UploadFileEntry[]>([]);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadStage, setUploadStage] = useState<UploadStage>('idle');
   const [uploadResult, setUploadResult] = useState<UploadedResult | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [mode, setMode] = useState<'mock' | 'testnet' | null>(null);
@@ -715,6 +806,7 @@ function UploadPageContent() {
     }
 
     setUploading(true);
+    setUploadStage('packing');
 
     try {
       const tags = parseTags(form.tags);
@@ -740,6 +832,7 @@ function UploadPageContent() {
           const buffer = await entry.file.arrayBuffer();
           const blobData = new Uint8Array(buffer);
 
+          setUploadStage('testnet');
           const testnetResult = await shelbyUpload.uploadBlob({
             packId: pack.id,
             fileName: entry.file.name,
@@ -747,6 +840,7 @@ function UploadPageContent() {
             hash,
           });
 
+          setUploadStage('recording');
           const blob = buildBlobRecord({
             evidencePackId: pack.id,
             hash,
@@ -800,6 +894,7 @@ function UploadPageContent() {
             throw new Error(actionResult.error);
           }
 
+          setUploadStage('recording');
           const blob = buildBlobRecord({
             evidencePackId: pack.id,
             hash,
@@ -820,6 +915,7 @@ function UploadPageContent() {
       }
 
       addLocalPack(pack);
+      setUploadStage('recording');
 
       const receipt: ReadReceipt = {
         id: `local-rr-${crypto.randomUUID()}`,
@@ -837,6 +933,7 @@ function UploadPageContent() {
       // Persist to SQLite (server-side) so uploads survive localStorage resets
       // and are visible across browser sessions.  Errors are non-fatal.
       try {
+        setUploadStage('persisting');
         await persistUploadAction(pack, builtBlobs, receipt);
       } catch {
         // SQLite persistence failure is non-fatal — localStorage already holds
@@ -856,6 +953,7 @@ function UploadPageContent() {
       setUploadError(err instanceof Error ? err.message : t.errors.uploadFailed);
     } finally {
       setUploading(false);
+      setUploadStage('idle');
     }
   }
 
@@ -1276,6 +1374,7 @@ function UploadPageContent() {
                   {t.mockHint}
                 </p>
               )}
+              <UploadProgressPanel stage={uploadStage} isTestnet={isTestnet} />
             </section>
           </aside>
         </form>
